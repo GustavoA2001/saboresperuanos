@@ -1,0 +1,54 @@
+<!--Componente que muestra los datos personales del cliente para editar-->
+<div class="datos-personales-cuenta">
+    <h2 class="titulo-informacion">Información Personal</h2>
+    <form action="/cambiarDatos" method="post" class="datos-cliente-form">
+        <div class="campo-nombre">
+            <label for="nombre"><strong>Nombre:</strong></label>
+            <input type="text" id="nombre" name="nombre" th:value="${cliente.nombre}" required class="input-nombre">
+        </div>
+        <div class="campo-apellido">
+            <label for="apellido"><strong>Apellido:</strong></label>
+            <input type="text" id="apellido" name="apellido" th:value="${cliente.apellido}" required class="input-apellido">
+        </div>
+        <div class="campo-usuario">
+            <label for="usuario"><strong>Usuario:</strong></label>
+            <input type="text" id="usuario" name="usuario" th:value="${cliente.usuario}" required class="input-usuario">
+        </div>
+        <div class="campo-correo">
+            <label for="correo"><strong>Correo:</strong></label>
+            <input type="email" id="correo" name="correo" th:value="${cliente.correo}" required class="input-correo">
+        </div>
+
+
+        <div class="campo-foto">
+            <label for="foto"><strong>Foto:</strong></label>
+            <input type="file" id="foto" name="foto" class="input-foto">
+        </div>
+        <button type="submit" class="boton-guardar">Guardar Cambios</button>
+    </form>
+</div>
+
+<style>
+    .titulo-informacion {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+    .campo-nombre, .campo-apellido, .campo-usuario, .campo-correo, .campo-telefono, .campo-foto {
+        margin-bottom: 15px;
+    }
+    .input-nombre, .input-apellido, .input-usuario, .input-correo, .input-telefono, .input-foto {
+        width: 100%;
+        padding: 8px;
+        box-sizing: border-box;
+    }
+    .boton-guardar {
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px 15px;
+        border: none;
+        cursor: pointer;
+    }
+    .boton-guardar:hover {
+        background-color: #45a049;
+    }
+</style>

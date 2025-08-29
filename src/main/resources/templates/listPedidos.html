@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Pedidos</title>
+    <link rel="stylesheet" type="text/css" href="/css/styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Centra el contenido de la página */
+        }
+
+        /* Componente adminMenu en una sola línea */
+        .component {
+            width: 100%;
+            margin-bottom: 20px; /* Separación entre el menu y las cartas */
+        }
+        .pedido-container {
+            width: 100%;
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .pedido-card {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+
+        .pedido-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .pedido-card h3 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .pedido-card p {
+            color: #555;
+            font-size: 14px;
+            margin: 5px 0;
+        }
+
+        .pedido-card .pedido-status {
+            font-weight: bold;
+        }
+
+        .pedido-card .pedido-total {
+            font-size: 16px;
+            color: #2a9d8f;
+        }
+
+        .pedido-card .pedido-date {
+            font-size: 12px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+
+    <div th:include="components/adminMenu" class="component"></div>
+
+    <div class="pedido-container">
+        <div th:each="pedido : ${pedidos}" class="pedido-card">
+            <h3 th:text="'Pedido # ' + ${pedido.idPedido}"></h3>  <!-- idPedido -->
+            <p><strong>ID Cliente:</strong> <span th:text="${pedido.idCliente}"></span></p>  <!-- idCliente -->
+            <p><strong>Cliente:</strong> <span th:text="${pedido.nombre} + ' ' + ${pedido.apellido}"></span></p>
+            <p><strong>Dirección:</strong> <span th:text="${pedido.direccion}"></span></p>
+            <p><span class="pedido-status" th:text="${pedido.estadoPedido}"></span></p>  <!-- estadoPedido -->
+            <p><span class="pedido-total" th:text="'Monto Total: ' + ${pedido.totalPagoUltimo}"></span></p>  <!-- totalPagoUltimo -->
+            <p class="pedido-date"><strong>Fecha de Pago:</strong> <span th:text="${pedido.fechaPagoUltimo}"></span></p>  <!-- fechaPagoUltimo -->
+        </div>
+    </div>
+    
+    
+    <!--div class="pedido-container">
+
+        
+        <div class="pedido-card">
+            <h3>Pedido #12345</h3>
+            <p><strong>ID Cliente:</strong> 67890</p>
+            <p><span class="pedido-status">Estado:</span> En proceso</p>
+            <p><span class="pedido-total">Monto Total: $50.00</span></p>
+            <p class="pedido-date"><strong>Fecha de Pago:</strong> 2024-12-03</p>
+        </div>
+
+        <div class="pedido-card">
+            <h3>Pedido #12346</h3>
+            <p><strong>ID Cliente:</strong> 67891</p>
+            <p><span class="pedido-status">Estado:</span> Completado</p>
+            <p><span class="pedido-total">Monto Total: $35.50</span></p>
+            <p class="pedido-date"><strong>Fecha de Pago:</strong> 2024-12-02</p>
+        </div>
+
+        <div class="pedido-card">
+            <h3>Pedido #12347</h3>
+            <p><strong>ID Cliente:</strong> 67892</p>
+            <p><span class="pedido-status">Estado:</span> Cancelado</p>
+            <p><span class="pedido-total">Monto Total: $22.00</span></p>
+            <p class="pedido-date"><strong>Fecha de Pago:</strong> 2024-12-01</p>
+        </div>
+        
+
+    </div-->
+</body>
+</html>

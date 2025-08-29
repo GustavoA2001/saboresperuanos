@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${empleado.idEmpleado} == null ? 'Agregar Empleado' : 'Editar Empleado'"></title>
+    <link rel="stylesheet" type="text/css" href="/css/styles.css">
+</head>
+<body>
+    <div th:include="components/adminMenu"></div>
+    <h1 th:text="${empleado.idEmpleado} == null ? 'Agregar Empleado' : 'Editar Empleado'"></h1>
+    <form th:action="@{/empleados/{id}(id=${empleado.idEmpleado})}" th:object="${empleado}" method="post">
+        <input type="hidden" th:field="*{idEmpleado}"/>
+        <label>Nombre:</label>
+        <input type="text" th:field="*{nombre}" required/>
+        <label>Apellido Paterno:</label>
+        <input type="text" th:field="*{apellidoPaterno}" required/>
+        <label>Apellido Materno:</label>
+        <input type="text" th:field="*{apellidoMaterno}" required/>
+        <label>Usuario:</label>
+        <input type="text" th:field="*{usuario}" required/>
+        <label>Contraseña:</label>
+        <input type="password" th:field="*{contrasena}" required/>
+        <label>Rol:</label>
+        <select th:field="*{rol.idRol}" required>
+            <option th:each="rol : ${roles}" th:value="${rol.idRol}" th:text="${rol.nomRol}"></option> 
+        </select>
+        <button type="submit">Guardar</button>
+    </form>
+    <a href="/empleados">Volver a la lista</a>
+</body>
+</html>

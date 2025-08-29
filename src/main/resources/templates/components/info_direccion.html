@@ -1,0 +1,55 @@
+<!--Componente que muestra las direcciones que registro el cliente-->
+<div class="direccion-lista">
+    <h2 class="direccion-titulo">Lista de direcciones</h2> 
+    <p class="direccion-total" th:text="'Total de direcciones: ' + ${direcciones.size()}">Total de direcciones</p>
+</div>
+<div th:each="direccion : ${direcciones}" class="direccion-individual">
+    <div class="direccion-card">
+        <div class="direccion-card-body">           
+            <h5 class="direccion-card-title" th:text="${direccion.direccion}">Dirección</h5>
+            <!--p class="direccion-card-text" th:text="${direccion.direccion}">Dirección del cliente</p-->
+            <p class="direccion-card-text" th:text="${direccion.distrito}">Distrito</p>
+            <p class="direccion-card-text" th:text="${direccion.referencia}">Referencia</p>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* styles.css */
+.direccion-lista {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.direccion-titulo {
+    color: #333;
+}
+
+.direccion-total {
+    font-weight: bold;
+}
+
+.direccion-individual {
+    margin-bottom: 15px;
+}
+
+.direccion-card {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.direccion-card-body {
+    padding: 15px;
+}
+
+.direccion-card-title {
+    font-size: 1.2em;
+    color: #007bff;
+}
+
+.direccion-card-text {
+    margin: 5px 0;
+}
+</style>

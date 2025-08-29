@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito de Compras</title>
+    <link th:include="components/link"></link>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <header th:include="components/nav_panel"></header>
+    <br>
+
+    <div th:include="components/mensajes"></div>
+
+<br>
+    <div class="container mt-5">
+        <h2>Mi Carrito de Compras</h2>
+        
+        <div th:if="${#lists.isEmpty(carrito)}" class="alert alert-info">
+            Tu carrito está vacío
+        </div>
+
+        <div th:unless="${#lists.isEmpty(carrito)}" class="table-responsive">
+
+            <p th:text="'Pedido N° ' + ${idPedido}"></p>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Precio</th>
+                        <th>Cantidad</th>
+                        <th>Subtotal</th>
+                        <th>Acciones</th>                        
+                        <th>idProducto</th>
+                        <th>idCarrito</th>
+                        <th>idPedido</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="item : ${carrito}">
+                        <td th:text="${item.producto}"></td>
+                        <td th:text="${'S/. ' + item.precioUnitario}"></td>
+                        <td>
+                            <input type="number" class="form-control" style="width: 80px"
+                                   th:value="${item.cantidad}" min="1"
+                                   th:data-id="${item.idProducto}"
+                                   onchange="actualizarCantidad(this)">
+                        </td>
+                        <td th:text="${'S/. ' + item.precioUnitario * item.cantidad}"></td>
+                        <td>
+                            <button class="btn btn-danger btn-sm" 
+                                    th:onclick="'eliminarProducto(' + ${item.idCarrito} + ', ' + ${item.idPedido} + ')'">
+                                Eliminar
+                            </button>
+                        </td>                        
+                        <td th:text="${item.idProducto}"></td>
+                        <td th:text="${item.idCarrito}"></td>
+                        <td th:text="${item.idPedido}"></td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                        <td th:text="${'S/. ' + total}"></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <div class="d-flex justify-content-between mt-3">
+                <a href="/carta" class="btn btn-secondary">Seguir Comprando</a>
+
+                <a href="#" class="btn btn-primary" 
+                th:onclick="'abrirModalPago(' + ${idPedido} + ', ' + ${total} + ')'">Procesar Pago</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de del formulario de pago -->
+    <div id="modal" th:classappend="${mostrarModal} ? 'active' : ''" class="modal">
+        <div class="modal-content-pago">
+            <h2>Realizar pago</h2>
+            <form th:action="@{/guardarPago}" method="post" class="form-pago">
+                <main th:include="components/form_pago"></main>
+                <button type="submit" class="button-p2">Pagar</button>
+            </form>
+            <button onclick="cerrarModal()">Cerrar</button>
+        </div>
+    </div>
+
+    <div th:include="components/footer"></div>
+</body>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+<script>
+    function actualizarCantidad(input) {
+        const idProducto = input.getAttribute('data-id');
+        const cantidad = input.value;
+        
+        fetch(`/carrito/actualizar/${idProducto}/${cantidad}`, {
+            method: 'POST'
+        }).then(() => window.location.reload());
+    }
+
+    function eliminarProducto(idCarrito, idPedido) {
+        if(confirm('¿Estás seguro de eliminar este producto?')) {
+            fetch(`/carrito/eliminar/${idCarrito}/${idPedido}`, {
+                method: 'POST'
+            }).then(() => window.location.reload());
+        }
+    }
+</script>
+
+<script>
+    function abrirModalPago(idPedido, total) {
+        // Asignar los valores al modal
+        document.getElementById('modalIdPedido').value = idPedido;
+        document.getElementById('modalTotal').value = total;
+        
+        // Mostrar el modal
+        document.getElementById('modal').style.display = 'block';
+    }
+
+    function cerrarModal() {
+        // Ocultar el modal
+        document.getElementById('modal').style.display = 'none';
+    }
+</script>
+<script>
+    // Esperar 3 segundos y ocultar el mensaje
+    setTimeout(function() {
+        const mensajeContainer = document.querySelector('.mensaje-container');
+        if (mensajeContainer) {
+            mensajeContainer.style.display = 'none';
+        }
+    }, 3000);
+</script>
+</html>

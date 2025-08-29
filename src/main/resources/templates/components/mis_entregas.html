@@ -1,0 +1,115 @@
+<!-- Componente que muestra los pedidos disponibles para el delivery -->
+
+<div>
+    <h2 class="titulo-pedidos-unico">Mis entregas</h2>
+    <!--p class="total-pedidos-unico" th:text="'Total de pedidos: ' + ${pedidos.size()}">Total de pedidos</p-->
+    <div th:if="${pedidos != null}">
+        <p>El tamaño de los pedidos es: <span th:text="${pedidos.size()}"></span></p>
+    </div>
+    <div th:if="${pedidos == null || pedidos.isEmpty()}">
+        <p>No hay pedidos disponibles.</p>
+    </div>
+    
+</div>
+
+<div class="pedido-container">
+    <div th:each="pedido : ${pedidos}" class="pedido-card">
+        <h3 th:text="'Pedido # ' + ${pedido.idPedido}"></h3>  <!-- idPedido -->
+        <p><strong>ID Cliente:</strong> <span class="pedido-status" th:text="${pedido.idCliente}"></span></p>  <!-- idCliente -->
+        <p><strong>Cliente:</strong> <span class="pedido-status" th:text="${pedido.nombre} + ' ' + ${pedido.apellido}"></span></p>
+        <p><strong>Dirección:</strong> <span class="pedido-status" th:text="${pedido.direccion}"></span></p>
+        <!--p><span class="pedido-status" th:text="${pedido.estadoPedido}"></span></p>  <!-- estadoPedido -->
+        <!--p><span class="pedido-total" th:text="'Monto Total: ' + ${pedido.totalPagoUltimo}"></span></p>  <!-- totalPagoUltimo -->
+        <p class="pedido-date"><strong>Fecha de Pago:</strong> <span class="pedido-total" th:text="${pedido.fechaPagoUltimo}"></span></p>  <!-- fechaPagoUltimo -->
+        <button>Eliminar entrega</button>
+        <button>Recogido</button>
+        <button>Entegado</button>
+    </div>
+</div>
+
+<style>
+
+    .titulo-pedidos-unico {
+        font-size: 2rem;
+        color: #3d3d3d;
+        margin-bottom: 10px;
+        text-align: center;
+    }
+
+    .total-pedidos-unico {
+        font-size: 1.1rem;
+        color: #555;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .pedido-container {
+        width: 100%;
+        max-width: 1200px;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
+    }
+
+    .pedido-card {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .pedido-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .pedido-card h3 {
+        margin-top: 0;
+        color: #333;
+        font-size: 1.3rem;
+    }
+
+    .pedido-card p {
+        color: #555;
+        font-size: 14px;
+        margin: 8px 0;
+    }
+
+    .pedido-status {
+        font-size: 20px;
+        font-weight: bold;
+        color: #2a9d8f;
+    }
+
+    .pedido-total {
+        font-size: 20px;
+        font-weight: bold;
+        color: #e76f51;
+    }
+
+    .pedido-date {
+        font-size: 12px;
+        color: #777;
+    }
+
+    button {
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 10px;
+        transition: background-color 0.3s;
+        align-self: flex-start;
+    }
+
+    button:hover {
+        background-color: #0056b3;
+    }
+
+</style>

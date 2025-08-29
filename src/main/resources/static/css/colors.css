@@ -1,0 +1,101 @@
+:root {
+    --base-color: #FCF5F4;
+    --base-variant: #ededed;
+    --text-color: #271B1B;
+    --primary-color: #C9B2A8;
+    --second-color: #543B3A;
+    --color-dark: #060606;
+    --color-light: #FFFFFF;
+
+    /* Colores principales */
+    --color-primary: #DED1CA;
+    --color-secondary: #543B3A;
+    --color-third: #271B1B;
+    --color-fourth: #3D3D3D;
+    --color-fifth: #963A3D;
+
+    /* Colores de estado */
+    --color-verify: #19B235;
+    --color-danger: #A93234;
+    --color-alert: #f6c000;
+    --color-subalert: #fff8dd;
+
+    --eclipse: #DB9691;
+}
+
+.darkmode {
+    --base-color: #0a0a0b;
+    --base-variant: #1a1a1b;
+    --text-color: #fcfcfc;
+    --primary-color: #543B3A;
+    --second-color: #C9B2A8;
+    --color-dark: #fcfcfc;
+    --color-light: #060606;
+
+    /* Colores principales en modo oscuro */
+    --color-primary: #543B3A;
+    --color-secondary: #C9B2A8;
+    --color-third: #FCF5F4;
+    --color-fourth: #BDBDBD;
+    --color-fifth: #DB9691;
+
+    /* Colores de estado en modo oscuro */
+    --color-verify: #2ECC71;
+    --color-danger: #E74C3C;
+    --color-alert: #F39C12;
+    --color-subalert: #34495E;
+
+    --eclipse: #878787;
+}
+
+.color{color: var(--color-light);}
+
+.color_primary{color: var(--color-primary)!important;}
+.color_secondary{color: var(--color-secondary)!important;}
+.color_third{color: var(--color-third)!important;}
+.color_fourth{color: var(--color-fourth)!important;}
+.color_fifth{color: var(--color-fifth)!important;}
+
+/*----
+    Background
+----*/
+.bg_base{background: var(--base-color) !important;}
+.bg_variant{background: var(--base-variant) !important;}
+.bg_light{background: var(--color-light) !important;}
+.bg_eclipse{background: var(--eclipse) !important;}
+
+.bg_pri{background: var(--color_primary) !important;}
+.bg_sec{background: var(--color_secondary) !important;}
+.bg_thi{background: var(--color_third) !important;}
+.bg_fou{background: var(--color_fourth) !important;}
+.bg_fif{background: var(--color_fifth) !important;}
+
+/*----
+    Estilos BORDER
+----*/
+.border_pri{border-color: var(--color_primary) !important;}
+.border_sec{border-color: var(--color_secondary) !important;}
+.border_thi{border-color: var(--color_third) !important;}
+.border_fou{border-color: var(--color_fourth) !important;}
+.border_fif{border-color: var(--color_fifth) !important;}
+
+.border_b1{border: 1px solid !important;}
+.border_b2{border: 2px solid !important;}
+.border_b3{border: 3px solid !important;}
+
+.rad5{border-radius: 5px;}
+.rad20{border-radius: 30px;}
+.rad50{border-radius: 50%;}
+
+
+/*
+    border: 4px double black;   double: Bordes dobles. Se crean con dos líneas paralelas separadas por un espacio.
+    border: 4px groove black;   groove: Bordes con un efecto de relieve. Parecen estar incrustados en la página.
+    border: 4px ridge black;    ridge: Bordes con un efecto de relieve. Parecen sobresalir de la página.
+    border: 4px inset black;    inset: Bordes con un efecto de profundidad. Parecen estar incrustados en el elemento.
+    border: 4px outset black;   outset: Bordes con un efecto de profundidad. Parecen sobresalir del elemento.
+*/
+
+.border_verify{border: 1px solid var(--color_verify)!important;}
+.border_danger{border: 1px solid var(--color_danger)!important;}
+.border_alert{border: 1px solid var(--color_alert)!important;}

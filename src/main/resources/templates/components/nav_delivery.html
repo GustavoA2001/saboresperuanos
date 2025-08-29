@@ -1,0 +1,78 @@
+<!-- Barra de navegación principal del sitio -->
+<nav class="main-nav">
+        <ul class="ul-items">
+            <li class="nav-item">
+                <a class="nav-link-mis-entregas" th:classappend="${activePage == 'datos_personales'} ? 'active-link'" th:href="@{/mis_entregas}">
+                    <i class="ki-outline ki-user icon"></i> <!-- Icono de usuario -->
+                    <span>Mis Entregas</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link-seleccionar-pedido" th:classappend="${activePage == 'mis_pedidos'} ? 'active-link'" th:href="@{/seleccionar_pedido}">
+                    <i class="ki-outline ki-shopping-cart icon"></i> <!-- Icono de carrito -->
+                    <span>Seleccionar Pedido</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/logout" class="nav-link-seleccionar-pedido" title="Cerrar Sesión">Cerrar Sesión</a>
+            </li>
+        </ul>
+</nav>
+
+<style>
+    /* Contenedor de la barra de navegación */
+    .main-nav {
+        background-color: #e9ecef;
+        padding: 10px;
+
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .ul-items {
+        display: flex;
+    }
+    /* Estilo de los elementos de la lista de navegación */
+    .nav-item {
+        list-style-type: none;
+        margin-bottom: 18px;
+    }
+
+    /* Estilo para los enlaces de navegación */
+    .nav-link-mis-entregas,
+    .nav-link-seleccionar-pedido {
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        color: #495057;
+        font-size: 18px;
+        padding: 12px 15px;
+        border-radius: 8px;
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    /* Iconos de la barra de navegación */
+    .icon {
+        font-size: 22px;
+        margin-right: 12px;
+    }
+
+    /* Estilo cuando el enlace está activo */
+    .active-link {
+        background-color: #007bff;
+        color: #fff;
+        font-weight: bold;
+    }
+
+    /* Efecto hover para los enlaces */
+    .nav-link-mis-entregas:hover,
+    .nav-link-seleccionar-pedido:hover {
+        background-color: #0056b3;
+        color: #fff;
+    }
+
+    /* Efecto de color para los enlaces activos */
+    .active-link:hover {
+        background-color: #0056b3;
+        color: #fff;
+    }
+</style>

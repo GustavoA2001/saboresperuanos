@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro | Nextclass</title>
+    <link th:include="components/link"></link>
+    <link rel="stylesheet" type="text/css" href="./css/login.css">
+    <script>
+        function validarDNI(input) {
+            input.value = input.value.replace(/[^0-9]/g, '');
+            
+            if (input.value.length > 8) {
+                input.value = input.value.slice(0, 8);
+            }
+        }
+
+        function validarContrasenas() {
+            const password = document.getElementById('nueva_clave').value;
+            const confirmPassword = document.getElementById('repetir_clave').value;
+            const mensajeError = document.getElementById('mensaje-error');
+            const submitBtn = document.getElementById('submit-registro');
+
+            if (password !== confirmPassword) {
+                mensajeError.style.display = 'block';
+                mensajeError.textContent = 'Las contraseñas no coinciden';
+                submitBtn.disabled = true;
+                setTimeout(() => {
+                    mensajeError.style.display = 'none';
+                    submitBtn.disabled = false;
+                }, 2000);
+                return false;
+            }
+            return true;
+        }
+
+        function validarEnTiempoReal() {
+            const password = document.getElementById('nueva_clave');
+            const confirmPassword = document.getElementById('repetir_clave');
+            
+            password.addEventListener('input', validarContrasenas);
+            confirmPassword.addEventListener('input', validarContrasenas);
+        }
+
+        window.onload = validarEnTiempoReal;
+    </script>
+</head>
+<body>
+    <div th:replace="components/mensajes :: mostrarMensaje(${error})" class="custom-alert"></div>
+    <div class="body-login">
+        <div class="registro-container registro">
+            <form action="/registrarse" method="POST" class="registro-form" id="FormRegistro" autocomplete="off" onsubmit="return verificarExistenciaYRegistrar(event)">
+                <h1>¡Registra tu cuenta!</h1>
+                <hr>
+                <p>Ingresa tus datos para registrarte</p>
+                <div class="registro-grid">
+                    <div class="input-box registro-input-box">
+                        <label for="nombre">Nombre:</label>
+                        <input type="text" id="nombre" name="nombre" class="input registro-input" placeholder="Tu nombre" required />
+                    </div>
+                    <div class="input-box registro-input-box">
+                        <label for="apellidos">Apellidos:</label>
+                        <input type="text" id="apellidos" name="apellido" class="input registro-input" placeholder="Tus apellidos" required />
+                    </div>
+                    <div class="input-box registro-input-box">
+                        <label for="correo">Correo electrónico:</label>
+                        <input type="email" id="correo" name="correo" class="input registro-input" placeholder="Tu correo electrónico" required />
+                    </div>
+                    <div class="input-box registro-input-box">
+                        <label for="usuario">Nombre de usuario:</label>
+                        <input type="text" id="usuario" name="usuario" class="input registro-input" placeholder="Tu nombre de usuario" required />
+                    </div>
+                    <div class="input-box registro-input-box">
+                        <label for="dni">DNI:</label>
+                        <input type="text" id="dni" name="dni" class="input registro-input" placeholder="Tu DNI" maxlength="8" oninput="validarDNI(this)" required />
+                    </div>
+                    <div class="input-box registro-input-box">
+                        <label for="nueva_clave">Contraseña:</label>
+                        <input type="password" id="nueva_clave" name="contrasena" class="input registro-input" placeholder="Contraseña nueva" required />
+                    </div>
+                    <div class="input-box registro-input-box">
+                        <label for="repetir_clave">Repetir contraseña:</label>
+                        <input type="password" id="repetir_clave" name="repetircontrasena" class="input registro-input" placeholder="Repite la contraseña" required />
+                        <div id="mensaje-error" style="display: none; color: red; margin-top: 5px;"></div>
+                    </div>
+                </div>
+                <div class="remember-forgot registro-remember-forgot">
+                    <a th:href="@{/login}">¿Ya tienes cuenta?</a>
+                </div>
+                <input type="submit" value="Registrarse" class="button-p" name="registro" id="submit-registro">
+            </form>
+        </div>
+    </div>
+</body>
+<script>
+    // Esperar 3 segundos y ocultar el mensaje
+    setTimeout(function() {
+        const mensajeContainer = document.querySelector('.mensaje-container');
+        if (mensajeContainer) {
+            mensajeContainer.style.display = 'none';
+        }
+    }, 3000);
+</script>
+<script>
+    // Función para validar nombre y apellido
+    function validarNombreApellido(input) {
+        const regex = /^[A-Za-záéíóúÁÉÍÓÚñÑ\s]+$/;
+        if (!regex.test(input.value)) {
+            alert("El nombre o apellido solo puede contener letras y espacios.");
+            input.value = ""; // Limpiar el campo si no es válido
+            input.focus();
+        }
+    }
+
+    // Función para verificar la validez de todos los campos
+    function verificarDatos(event) {
+        const nombre = document.getElementById('nombre');
+        const apellidos = document.getElementById('apellidos');
+        const usuario = document.getElementById('usuario');
+
+        // Validar nombre y apellido
+        validarNombreApellido(nombre);
+        validarNombreApellido(apellidos);
+
+        
+        // Si algún campo no es válido, evitar el envío del formulario
+        if (!nombre.value || !apellidos.value) {
+            event.preventDefault();
+            return false;
+        }
+    }
+
+    window.onload = function() {
+        // Asignar validaciones a los campos de nombre, apellido y usuario
+        document.getElementById('nombre').addEventListener('input', function() {
+            validarNombreApellido(this);
+        });
+        document.getElementById('apellidos').addEventListener('input', function() {
+            validarNombreApellido(this);
+        });
+
+        // Agregar validación al enviar el formulario
+        document.getElementById('FormRegistro').addEventListener('submit', verificarDatos);
+    };
+</script>
+
+</script>
+</html>

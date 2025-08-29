@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/css/styles.css">
+</head>
+<body>
+    <div th:include="components/adminMenu"></div>
+    <form th:action="@{/detalle-empleados/{id}(id=${detalleEmpleado.idDetalleEmp})}" th:object="${detalleEmpleado}" method="post" enctype="multipart/form-data">
+        <input type="hidden" th:field="*{idDetalleEmp}"/>
+        <input type="hidden" th:field="*{empleado.idEmpleado}" th:value="${empleado != null ? empleado.idEmpleado : ''}"/>
+        
+        <label>Teléfono:</label>
+        <input type="text" th:field="*{telefono}" required/>
+
+        <label>Correo Electrónico:</label>
+        <input type="email" th:field="*{correo}" required/>
+
+        <label for="foto" class="form-label">Imagen</label>
+        <input type="file" id="foto" name="file" class="form-control">
+
+        <button type="submit">Guardar Cambios</button>
+    </form>
+    <a href="/detalle-empleados">Volver a la lista</a>
+</body>
+</html>

@@ -1,0 +1,212 @@
+<!-- Componente que muestra los pedidos disponibles para el delivery -->
+<div>
+    <h2 class="titulo-pedidos-unico">Lista de pedidos disponibles</h2>
+    <p class="total-pedidos-unico" th:text="'Total de pedidos: ' + ${pedidos.size()}">Total de pedidos</p>
+</div>
+
+<div class="pedido-container">
+    <div th:each="pedido : ${pedidos}" class="pedido-card" th:data-idpedido="${pedido.idPedido}">
+        <h3 th:text="'Pedido # ' + ${pedido.idPedido}"></h3>
+        
+        <p><strong>ID Cliente:</strong> <span class="pedido-status" th:text="${pedido.idCliente}"></span></p>
+        <p><strong>Cliente:</strong> <span class="pedido-status" th:text="${pedido.nombre} + ' ' + ${pedido.apellido}"></span></p>
+        <p><strong>Dirección:</strong> <span class="pedido-status" th:text="${pedido.direccion}"></span></p>
+        <p class="pedido-date"><strong>Fecha de Pago:</strong> <span class="pedido-total" th:text="${pedido.fechaPagoUltimo}"></span></p>
+        <button class="seleccionar-pedido-btn">Seleccionar pedido</button>
+    </div>
+</div>
+
+<!-- Modal de confirmación -->
+<div id="modalConfirmacion" class="modal">
+    <div class="modal-content">
+        <h3>¿Estás seguro de seleccionar este pedido?</h3>
+        <form id="formSeleccionarPedido" method="POST" action="/seleccionar_delivery">
+            <input type="hidden" id="idPedidoInput" name="idPedido" value="">
+            
+            <div class="modal-buttons">
+                <button type="submit" id="confirmar" class="btn-aceptar">Confirmar</button>
+                <button type="button" id="cancelar" class="btn-cancelar">Cancelar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<style>
+
+    .titulo-pedidos-unico {
+        font-size: 2rem;
+        color: #4CAF50;
+        margin-bottom: 10px;
+        text-align: center;
+    }
+
+    .total-pedidos-unico {
+        font-size: 1.1rem;
+        color: #555;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .pedido-container {
+        width: 100%;
+        max-width: 1200px;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
+    }
+
+    .pedido-card {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .pedido-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .pedido-card h3 {
+        margin-top: 0;
+        color: #333;
+        font-size: 1.3rem;
+    }
+
+    .pedido-card p {
+        color: #555;
+        font-size: 14px;
+        margin: 8px 0;
+    }
+
+    .pedido-status {
+        font-size: 20px;
+        font-weight: bold;
+        color: #2a9d8f;
+    }
+
+    .pedido-total {
+        font-size: 20px;
+        font-weight: bold;
+        color: #e76f51;
+    }
+
+    .pedido-date {
+        font-size: 12px;
+        color: #777;
+    }
+
+    button {
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 10px;
+        transition: background-color 0.3s;
+        align-self: flex-start;
+    }
+
+    button:hover {
+        background-color: #0056b3;
+    }
+
+    /* Estilos para el modal */
+.modal {
+    display: none; /* Ocultar por defecto */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Fondo oscuro */
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 300px;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+
+.btn-aceptar, .btn-cancelar {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.btn-aceptar {
+    background-color: #28a745;
+    color: white;
+}
+
+.btn-aceptar:hover {
+    background-color: #218838;
+}
+
+.btn-cancelar {
+    background-color: #dc3545;
+    color: white;
+}
+
+.btn-cancelar:hover {
+    background-color: #c82333;
+}
+
+</style>
+
+<!-- Script para manejar la lógica del modal y formulario -->
+<script>
+    var modal = document.getElementById("modalConfirmacion");
+    var confirmarBtn = document.getElementById("confirmar");
+    var cancelarBtn = document.getElementById("cancelar");
+    var botonesSeleccionar = document.querySelectorAll(".pedido-card button");
+    var form = document.getElementById("formSeleccionarPedido");
+    var inputIdPedido = document.getElementById("idPedidoInput");
+
+    function mostrarModal(idPedido) {
+        console.log(idPedido);
+        modal.style.display = "flex"; 
+        inputIdPedido.value = parseInt(idPedido, 10);  // Convertir a número entero
+    }
+
+
+    function cerrarModal() {
+        modal.style.display = "none"; 
+    }
+
+    botonesSeleccionar.forEach(function (boton) {
+        boton.addEventListener("click", function(event) {
+            var idPedido = event.target.closest(".pedido-card").getAttribute("data-idpedido");
+            mostrarModal(idPedido); 
+        });
+    });
+
+    cancelarBtn.addEventListener("click", function() {
+        cerrarModal(); 
+    });
+
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            cerrarModal();
+        }
+    }
+</script>

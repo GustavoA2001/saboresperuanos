@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${detalleEmpleado.idDetalleEmp} == null ? 'Agregar Detalle Empleado' : 'Editar Detalle Empleado'"></title>
+    <link rel="stylesheet" type="text/css" href="/css/styles.css">
+</head>
+<body>
+    <div th:include="components/adminMenu"></div>
+    <h1 th:text="${detalleEmpleado.idDetalleEmp} == null ? 'Agregar Detalle Empleado' : 'Editar Detalle Empleado'"></h1>
+    <form th:action="@{/detalle-empleados}" th:object="${detalleEmpleado}" method="post" enctype="multipart/form-data">
+        <input type="hidden" th:field="*{idDetalleEmp}"/>
+        <input type="hidden" th:field="*{empleado.idEmpleado}" th:value="${empleado != null ? empleado.idEmpleado : ''}"/>
+        
+        <label>Teléfono:</label>
+        <input type="text" th:field="*{telefono}" required/>
+
+        <label>Correo Electrónico:</label>
+        <input type="email" th:field="*{correo}" required/>
+
+            <label for="foto" class="form-label">Imagen</label>
+            <input type="file" id="foto" name="file" class="form-control">
+
+        <!--<label>Empleado:</label>
+        <select th:field="*{empleado.idEmpleado}">
+            <option th:each="empleado : ${empleados}" th:value="${empleado.idEmpleado}" th:text="${empleado.nombre}"></option>
+        </select>-->
+
+        <button type="submit">Registrar Empleado</button>
+    </form>
+    <a href="/detalle-empleados">Volver a la lista</a>
+</body>
+</html>

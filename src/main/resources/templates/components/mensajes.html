@@ -1,0 +1,10 @@
+
+    <!--
+    Mensajes para mostrar el error, observaciones o acciones
+    -->
+    <div th:fragment="mostrarMensaje(mensaje)" class="mensaje-container" th:if="${mensaje != null}">
+        <div class="alert alert-info custom-alert" role="alert">
+            <span th:text="${mensaje}"></span>
+        </div>
+    </div>
+    

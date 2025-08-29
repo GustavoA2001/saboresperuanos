@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${rol.idRol} == null ? 'Agregar Rol' : 'Editar Rol'"></title>
+    <link rel="stylesheet" type="text/css" href="/css/styles.css">
+</head>
+<body>
+    <div th:include="components/adminMenu"></div>
+    <h1 th:text="${rol.idRol} == null ? 'Agregar Rol' : 'Editar Rol'"></h1>
+    <form th:action="@{/roles}" th:object="${rol}" method="post">
+        <input type="hidden" th:field="*{idRol}"/>
+        <label>Nombre del Rol:</label>
+        <input type="text" th:field="*{nomRol}" required/>
+        <label>Descripción:</label>
+        <input type="text" th:field="*{descripcion}" required/>
+        <button type="submit">Guardar</button>
+    </form>
+    <a href="/roles">Volver a la lista</a>
+</body>
+</html>

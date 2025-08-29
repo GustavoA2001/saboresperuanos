@@ -1,0 +1,374 @@
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Space+Grotesk:wght@300..700&display=swap');
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing: border-box;
+    font-family: 'Lora', serif;
+}
+body{
+    font-family: 'Lora', serif;
+    overflow-x: hidden;
+}
+
+/** Navegation Menu **/
+#header{
+    position: relative;
+    width: 100%;
+}
+.menu{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    background: #ffffff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1;
+}
+.btn-menu{display: none;}
+.menu .logobox{margin-left: 30px;}
+.menu .logobox h1 > a{
+    text-decoration: none;
+    color:#A43131;
+    font-size: 30px;
+    font-weight: 400;
+}
+.menu .logobox h1 > a > i{color:#A43131; margin-right: 10px;}
+.menu .list-container{margin-right: 20px; margin-left: 50px;}
+.menu .list-container .lists{display: flex;}
+.menu .list-container .lists li{list-style: none;}
+.menu .list-container .lists li a{
+    text-decoration: none;
+    color:#020202;
+    font-size: 19px;
+    margin:0px 7px;
+    padding: 5px;
+    border-radius: 3px;
+    transition: 300ms;
+}
+.menu .list-container .lists li a:hover{color:#A43131;}
+.menu .list-container .lists li a.active{color:#fa1b1b;}
+
+/** Img header **/
+.img-header{
+    background: url(../img/titulo.jpeg);
+    background-attachment: fixed;
+    background-position: center;
+    background-size: cover;
+    background-color: rgba(0,0,0,0.6);
+    background-blend-mode: soft-light;
+
+    position: relative;
+    width: 100%;
+    height:100vh;
+}
+.img-header .welcome{
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+.img-header .welcome h4{
+    color: #ffff;
+    font-size: 50px;
+    text-align: center;
+    font-family: "Dancing Script", cursive;
+    font-optical-sizing: auto;
+    font-weight: 700;
+    font-style: normal;
+}
+.img-header .welcome > h2{margin-top: 50px;}
+.img-header .welcome > h2 a{
+    text-decoration: none;
+    color:#fff;
+    font-size: 80px;
+    font-weight: 400;
+}
+.img-header .welcome > h2 a > i{color:#ffffff; margin-right: 10px;}
+
+
+/** About Us **/
+.about-us{width: 100%;}
+.about-us .info{
+    width: 100%;
+    margin-top: 100px;
+}
+.about-us .info h3{
+    text-align: center;
+    font-size: 40px;
+    font-weight: 400;
+}
+.about-us .info p {
+   width: 80%;
+   margin:50px auto;
+   text-align: center;
+   color:#000;
+   font-size: 19px;
+   line-height: 40px;
+}
+.about-us .info hr{
+    width: 90%;
+    border:none;
+    height: 2px;
+    background: #4d4d4d;
+    margin:auto;
+}
+.about-us .free-content{
+    width: 100%;
+    margin-top: 100px;
+    background: #A43131;
+    padding:30px;
+}
+.about-us .free-content h4{
+    text-align: center;
+    font-size: 40px;
+    font-weight: 400;
+    color:#fff;
+}
+.about-us .free-content .icons{
+    width: 90%;
+    margin:30px auto;
+    display: flex;
+    justify-content: center;
+}
+.about-us .free-content .icons > div{width: 100%; margin:0px 30px;}
+.about-us .free-content .icons > div > .span-icon{
+    width:100%;
+    font-size: 40px;
+    color:#fff;
+    display: flex;
+    justify-content: center;
+}
+.about-us .free-content .icons > div h6{
+    font-size: 25px;
+    color:#fff;
+    text-align: center;
+    font-weight:normal;
+    margin:20px 0px 5px 0px;
+}
+.about-us .free-content .icons > div p{
+    font-size: 18px;
+    text-align: center;
+    color:#fff;
+}
+
+/** Gallery **/
+.gallery-section{
+    width: 100%;
+    background-color: #F5F5F5;
+}
+.animal-icon{
+    width: 100%;
+    height: 250px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+}
+.animal-icon i{
+    font-size: 120px;
+    color: #000;
+}
+.gallery-content{
+    width: 90%;
+    margin:30px auto;
+    background-color: #F5F5F5;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(2, 230px);
+    grid-gap: 10px;
+}
+.gallery-content .img-card{
+    width: 100%;
+    width: 100%;
+}
+.gallery-content .img-card img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 5px;
+    transition: 300ms;
+    cursor: pointer;
+}
+.modal{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background:rgba(0,0,0,0.7);
+    z-index: 999999;
+    cursor: pointer;
+    display:none;
+}
+.modal #imgModal{
+    width: 75%;
+    margin:50px auto;
+    height: 75%;
+    display: block;
+    object-fit: cover;
+    cursor: auto;
+}
+.modal #caption{
+    text-align: center;
+    color:#fff;
+    font-size: 25px;
+    font-weight: normal;
+    cursor: auto;
+    text-transform: uppercase;
+}
+.modal #closeModal{
+    position: absolute;
+    right: 30px;
+    top: 10px;
+    color:#fff;
+    font-size: 30px;
+    transition: 200ms;
+}
+
+/*Estilo de tarjetas*/
+
+.tarjetas-container {
+    display: flex;
+    justify-content: space-around; /* Espacio entre las tarjetas */
+    margin: 20px; /* Margen alrededor del contenedor */
+}
+
+.tarjeta {
+    position: relative; /* Necesario para posicionar el pseudo-elemento */
+    width: 30%; /* Ancho de cada tarjeta */
+    height: 200px; /* Altura de cada tarjeta */
+    display: flex;
+    align-items: center; /* Centra verticalmente el contenido */
+    justify-content: center; /* Centra horizontalmente el contenido */
+    color: white; /* Color del texto */
+    text-align: center; /* Centra el texto */
+    border-radius: 10px; /* Bordes redondeados */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra para las tarjetas */
+    overflow: hidden; /* Asegura que el pseudo-elemento no se salga de la tarjeta */
+}
+
+.tarjeta::before {
+    content: ""; /* Necesario para mostrar el pseudo-elemento */
+    position: absolute; /* Posiciona el pseudo-elemento sobre la tarjeta */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5); /* Color negro con opacidad para oscurecer */
+    z-index: 1; /* Asegura que la superposición esté por encima de la imagen de fondo */
+}
+
+.contenido {
+    position: relative; /* Necesario para que el contenido esté por encima de la superposición */
+    z-index: 2; /* Asegura que el texto esté por encima de la superposición */
+}
+
+.tarjeta-1 {
+    background-image: url('/upload/productos/temuna.jpg'); /* Cambia la ruta a tu imagen de fondo para la tarjeta 1 */
+    background-color: #1a1818b0;
+    background-size: cover; /* Asegura que la imagen cubra toda la tarjeta */
+    background-position: center; /* Centra la imagen */
+}
+
+.tarjeta-2 {
+    background-image: url('/upload/productos/sopaseca.jpg'); /* Cambia la ruta a tu imagen de fondo para la tarjeta 2 */
+    background-size: cover; /* Asegura que la imagen cubra toda la tarjeta */
+    background-position: center; /* Centra la imagen */
+}
+
+.tarjeta-3 {
+    background-image: url('/upload/productos/arrozconleche.jpg'); /* Cambia la ruta a tu imagen de fondo para la tarjeta 3 */
+    background-size: cover; /* Asegura que la imagen cubra toda la tarjeta */
+    background-position: center; /* Centra la imagen */
+}
+
+/* CAMBIOS DEL MENU DE NAVEGACION */
+.menu {
+    display: flex;
+    justify-content: space-between; /* Espacio entre los elementos del menú */
+    align-items: center; /* Centra verticalmente los elementos */
+}
+
+.list-container {
+    display: flex;
+    flex-grow: 1; /* Permite que la lista ocupe el espacio disponible */
+    justify-content: flex-start; /* Alinea los elementos a la izquierda */
+}
+
+.lists {
+    display: flex;
+    list-style: none; /* Sin viñetas */
+    padding: 0; /* Sin padding */
+    margin: 0; /* Sin margen */
+}
+
+.lists li {
+    margin: 0 10px; /* Espacio entre los elementos de la lista */
+}
+
+.user-actions {
+    display: flex;
+    align-items: center; /* Centra verticalmente los elementos */
+    margin-left: auto; /* Empuja este contenedor al extremo derecho */
+}
+
+/* BOTONES DE MENU NAV */
+.user-actions .button {
+    display: inline-flex; /* Asegura que el botón se comporte como un botón */
+    justify-content: center;
+    align-items: center;
+    padding: 10px 20px; /* Espaciado interno */
+    margin: 10px;
+    background-color: #A43131; /* Color de fondo del botón */
+    color: white; /* Color del texto */
+    border: none; /* Sin borde */
+    border-radius: 5px; /* Bordes redondeados */
+    text-decoration: none; /* Sin subrayado */
+    transition: background-color 0.3s, transform 0.3s; /* Transición suave para el hover */
+    font-size: 16px; /* Tamaño de fuente */
+}
+
+.user-actions .button:hover {
+    background-color: rgb(179, 0, 0); /* Color de fondo al pasar el mouse */
+    transform: scale(1.05); /* Efecto de aumento al pasar el mouse */
+}
+
+.user-actions .button i {
+    margin-right: 5px; /* Espacio entre el ícono y el texto */
+}
+
+.user-actions .buttoncerrar {
+    margin-right: 5px; /* Espacio entre el ícono y el texto */
+    color: #000;
+}
+
+/* Espacio entre los botones */
+.user-actions .button + .button {
+    margin-left: 10px; /* Espacio entre los botones */
+}
+
+.toggle-logout{
+    background-color: black;
+}
+/* PARA EL SLIDER */
+.logout-container {
+    position: absolute; /* Permite que el contenedor se superponga */
+    top: 100%; /* Coloca el contenedor justo debajo del botón de la flecha */
+    left: 0; /* Alinea el contenedor a la izquierda */
+    margin-top: 5px; /* Espacio entre el botón y el contenedor de cierre de sesión */
+    background-color: #f8f9fa; /* Color de fondo */
+    border: 1px solid #ccc; /* Borde */
+    border-radius: 5px; /* Bordes redondeados */
+    padding: 10px; /* Espaciado interno */
+    display: none; /* Oculto por defecto */
+    z-index: 1000; /* Asegura que esté por encima de otros elementos */
+}
+
+.user-info {
+    position: relative; /* Asegura que el contenedor de cierre de sesión se posicione correctamente */
+}

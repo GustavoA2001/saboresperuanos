@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenido</title>
+    <!-- Incluye los archivos CSS necesarios del components/link.html en  -->
+    <link th:include="components/link"></link>
+</head>
+<body>
+    <header th:include="components/nav_panel"></header>
+<br>
+<br>
+<br>
+<center>
+    <h1>¡Bienvenido, <span th:text="${cliente.nombre}"></span>!</h1>
+    <p>Realiza tus compras de manera responsable</p>
+
+</center>
+
+    
+        <!-- Modal de registro de dirección -->
+    <div id="modal-direccion" th:classappend="${mostrarModal} ? 'active' : ''" class="modal modal-direccion">
+        <div class="modal-content modal-content-direccion">
+            <h2>Completa tu Dirección</h2>
+            <form th:action="@{/guardarDireccion}" method="post" class="form-direccion">
+                <main th:include="components/form_datos"></main>
+                <button type="submit" class="button-p2">Guardar</button>
+            </form>
+            <a th:href="@{/logout}" title="Cerrar Sesión" class="link-cerrar-sesion">Cerrar Sesión</a>
+        </div>
+    </div>
+    
+    <div th:include="components/footer"></div>
+</body>
+
+<script>
+    function closeModal() {
+        document.getElementById('modal').classList.remove('active');
+    }
+</script>
+</html>

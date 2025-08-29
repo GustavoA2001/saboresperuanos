@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${producto.nomProducto}">Detalles del Producto</title>
+    <link th:include="components/link"></link>
+    <style>
+        .body-modal-producto {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
+        }
+        .modal-producto-contenedor {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 800px;
+            overflow: hidden;
+            max-height: 90vh;
+        }
+        .modal-producto-detalle {
+            display: flex;
+        }
+
+        .modal-producto-imagen-container,
+        .modal-producto-datos {
+            /*flex: 1; /* Ocupa el espacio restante */
+            padding: 10px;
+        }
+        .modal-producto-titulo {
+            font-size: 28px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        .modal-producto-imagen {
+            max-width: 400px;
+            max-height: 400px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .modal-producto-precio {
+            font-size: 22px;
+            color: #e74c3c;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .modal-producto-descripcion {
+            font-size: 16px;
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        .cantidad-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        .cantidad-container button {
+            width: 50px !important;
+            font-size: 20px;
+            padding: 10px 15px;
+            background: #f1f1f128;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .cantidad-container button:hover {
+            background-color: #e1e1e1;
+        }
+        .cantidad-container span {
+            font-size: 20px;
+            font-weight: bold;
+            margin: 0 15px;
+        }
+        .btn {
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        .btn-secondary {
+            background-color: #0479df;
+            color: #d30000;
+            border: none;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        .btn-success {
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+        }
+        .btn-success:hover {
+            background-color: #218838;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        .modal-producto-botones {
+            display: flex;
+            justify-content: space-between;
+        }
+        .modal-producto-botones button {
+            width: 49%;
+        }
+    </style>
+    
+</head>
+<body class="body-modal-producto">
+    <!--header th:include="components/nav_panel"></header-->
+    <!-- Cambiar un modal -->
+    <section class="modal-producto-contenedor">
+        <form id="form-agregar" action="/carrito/agregar" method="POST">
+            
+            <div class="modal-producto-detalle">
+                <div class="modal-producto-imagen-container">
+                    <img th:src="@{/upload/productos/{filename}(filename=${producto.FotoProducto})}" 
+                         th:alt="'Imagen de ' + ${producto.FotoProducto}" class="modal-producto-imagen">
+                </div>
+                <div class="modal-producto-datos">
+                    
+                    <input type="hidden" name="idproducto" th:value="${producto.idProducto}">
+
+                    <span th:text="${producto.idProducto}" name="productoId"></span>
+                    <h4 th:text="${producto.nomProducto}" class="modal-producto-titulo"></h4>
+
+                    <input type="hidden" name="precioUnitario" id="precio-input" th:value="${producto.precioUnitario}">
+
+                    <p th:text="'Precio: ' + ${#numbers.formatDecimal(producto.precioUnitario, 2, 2)}" class="modal-producto-precio"></p>
+
+                    <p th:text="${producto.descripcion}" class="modal-producto-descripcion"></p>
+
+                    <div class="cantidad-container mt-3">
+                        <button type="button" id="btn-decrementar" class="btn btn-secondary">-</button>
+                        <span id="cantidad" class="mx-2">1</span>
+                        <button type="button" id="btn-incrementar" class="btn btn-secondary">+</button>
+                    </div>
+                    <input type="hidden" name="cantidad" id="cantidad-input" value="1">
+
+                    <div class="modal-producto-botones">
+                        <button type="submit" class="btn btn-success mt-3">Agregar al carrito</button>
+                        <button id="btn-comprar" class="btn btn-primary mt-3" onclick="comprarProducto()">Comprar</button>
+                    </div>
+                </div>
+            </div>
+
+        </form>        
+    </section>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const btnDecrementar = document.getElementById('btn-decrementar');
+            const btnIncrementar = document.getElementById('btn-incrementar');
+            const cantidadSpan = document.getElementById('cantidad');
+            const cantidadInput = document.getElementById('cantidad-input');
+
+            let cantidad = 1;
+
+            btnDecrementar.addEventListener('click', function() {
+                if (cantidad > 1) {
+                    cantidad--;
+                    cantidadSpan.textContent = cantidad;
+                    cantidadInput.value = cantidad; // Actualiza el valor del input oculto
+                }
+            });
+
+            btnIncrementar.addEventListener('click', function() {
+                cantidad++;
+                cantidadSpan.textContent = cantidad;
+                cantidadInput.value = cantidad; // Actualiza el valor del input oculto
+            });
+        });
+    </script>
+</body>
+
+<script>
+    function comprarProducto() {
+        alert('Botón Comprar presionado.'); // Mensaje al presionar el botón Comprar
+    }
+</script>
+
+</html>

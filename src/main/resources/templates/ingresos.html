@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportes de Ingresos del Restaurante</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        /* Contenedor principal para las columnas */
+        .container {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* Cada sección de la columna */
+        .section {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 30%;
+            min-width: 280px;
+        }
+
+        /* Estilo para las tablas */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        th {
+            background-color: #007BFF;
+            color: white;
+        }
+
+        td {
+            background-color: #f9f9f9;
+        }
+
+        /* Estilo para el total de ingresos */
+        .total-ingresos p {
+            font-size: 18px;
+            font-weight: bold;
+            color: #007BFF;
+            text-align: center;
+        }
+
+        /* Sección de encabezado */
+        .section h2 {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .section table {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div th:include="components/adminMenu"></div>
+
+    <h1>Reportes de Ingresos del Restaurante</h1>
+
+    <!-- Contenedor principal para las tres columnas -->
+    <div class="container">
+        
+        <!-- Sección de Ingresos Totales -->
+        <div class="section total-ingresos">
+            <h2>Ingresos Totales</h2>
+            <p th:text="'$' + ${ingresosTotales}"></p>
+        </div>
+
+        <!-- Sección de Ingresos por Producto -->
+        <div class="section ingresos-producto">
+            <h2>Ingresos por Producto</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Ingresos Totales</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="producto : ${ingresosProducto}">
+                        <td th:text="${producto['NomProducto']}"></td>
+                        <td th:text="${producto['IngresosTotales']}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Sección de Ingresos por Cliente -->
+        <div class="section ingresos-cliente">
+            <h2>Ingresos por Cliente</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Cliente</th>
+                        <th>Total Gastado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="cliente : ${ingresosCliente}">
+                        <td th:text="${cliente['Nombre']}"></td>
+                        <td th:text="${cliente['TotalGastado']}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div> <!-- fin del contenedor principal -->
+</body>
+
+</html>

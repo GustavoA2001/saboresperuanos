@@ -1,0 +1,100 @@
+<!-- Barra de navegación principal del sitio -->
+<nav class="nav-container">
+    <div>
+        <div><img src="./upload/clientes/generico.jpg" alt="" class="user-avatar"></div>
+        
+        <ul>            
+            <li class="nav-item">
+                <a class="nav-link"
+                    th:classappend="${activePage == 'datos_personales'} ? 'active-link'" th:href="@{/datos_personales}">
+                    <i class="ki-outline ki-user nav-icon"></i> 
+                    <span>Mis Datos Personales</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link"
+                    th:classappend="${activePage == 'mis_pedidos'} ? 'active-link'" th:href="@{/mis_pedidos}">
+                    <i class="ki-outline ki-shopping-cart nav-icon"></i>
+                    <span>Mis Pedidos</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link"
+                    th:classappend="${activePage == 'mis_direcciones'} ? 'active-link'" th:href="@{/mis_direcciones}">
+                    <i class="ki-outline ki-map-marker nav-icon"></i> 
+                    <span>Mis Direcciones</span>
+                </a>
+            </li>
+            <!--li class="nav-item">
+                <a class="nav-link"
+                    th:classappend="${activePage == 'mis_configuraciones'} ? 'active-link'" th:href="@{/mis_configuraciones}">
+                    <i class="ki-outline ki-cog nav-icon"></i>
+                    <span>Mis Configuraciones</span>
+                </a>
+            </li-->
+        </ul>        
+    </div>
+</nav>
+<style>
+    /* Contenedor de la barra de navegación */
+    .nav-container {
+        background-color: #f4f4f4;
+        padding: 20px;
+        width: 350px;
+        border-radius: 10px;
+    }
+
+    /* Estilo para el avatar de usuario */
+    .user-avatar {
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        margin-bottom: 15px;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* Estilo para los elementos de la lista de navegación */
+    .nav-item {
+        list-style-type: none;
+        margin-bottom: 15px;
+    }
+
+    /* Estilo para los enlaces de navegación */
+    .nav-link {
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        color: #333;
+        font-size: 16px;
+        padding: 10px;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+    }
+
+    /* Iconos de la barra de navegación */
+    .nav-icon {
+        font-size: 20px;
+        margin-right: 10px;
+    }
+
+    /* Estilo cuando el enlace está activo */
+    .active-link {
+        background-color: #007bff;
+        color: white;
+    }
+
+    /* Efecto hover para los enlaces */
+    .nav-link:hover {
+        background-color: #0056b3;
+        color: white;
+    }
+
+    /* Efecto de color para los enlaces activos */
+    .active-link:hover {
+        background-color: #0056b3;
+        color: white;
+    }
+
+</style>

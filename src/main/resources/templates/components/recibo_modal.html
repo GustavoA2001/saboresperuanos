@@ -1,0 +1,38 @@
+<h2 class="titulo-recibo">Recibo Good Day</h2>
+
+            <!-- Datos del cliente -->
+            <div class="recibo-card">
+                <div class="recibo-card-body">
+                    <h4 class="recibo-card-title">Datos del Cliente</h4>
+                    <p><strong>Nombre:</strong> <span id="clienteNombre"></span></p>
+                    <p><strong>Dirección:</strong> <span id="clienteDireccion"></span></p>
+                </div>
+            </div>
+
+            <!-- Datos del pedido -->
+            <div class="recibo-card">
+                <div class="recibo-card-body">
+                    <h4 class="recibo-card-title">Detalles del Pedido</h4>
+                    <p><strong>ID Pedido:</strong> <span id="pedidoId"></span></p>
+                    <p><strong>Total a Pagar:</strong>S/. <span id="totalPago"></span></p>
+                </div>
+            </div>
+
+            <!-- Lista de productos -->
+            <div class="recibo-card">
+                <div class="recibo-card-body">
+                    <h4 class="recibo-card-title">Productos Comprados</h4>
+                    <table class="recibo-table">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Precio Unitario</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productosComprados">
+                            <!-- Aquí irán los productos -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>

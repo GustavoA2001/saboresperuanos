@@ -1,0 +1,454 @@
+<!-- Componente que muestra los pedidos que realizó el cliente y un contador de la cantidad de pedidos -->
+<div>
+    <h2 class="titulo-pedidos-unico">Lista de pedidos</h2>
+    <p class="total-pedidos-unico" th:text="'Total de pedidos: ' + ${pedidos.size()}">Total de pedidos</p>
+</div>
+
+<div class="contenedor-pedidos-unico">
+    <div th:each="pedido : ${pedidos}">
+        <div class="pedido-item-unico">
+            <h5 class="pedido-titulo-unico">Pedido</h5>
+            <div class="pedido-detalles-unico">
+                <p class="pedido-id-unico" th:text="${pedido.idPedido}">ID del Pedido</p>
+                <p class="pedido-estado-unico" th:text="${pedido.estadoPedido}">Estado del Pedido</p>
+                <p class="pedido-fecha-unico" th:text="${pedido.fechaPedido}">Fecha del Pedido</p>
+                <p class="pedido-total-unico" th:text="${pedido.totalPago}">Total del Pago</p>
+
+                <button class="boton-ver-recibo-unico">
+                    <a href="/recibo_modal/{idPedido}" th:href="@{/recibo_modal/{idPedido}(idPedido=${pedido.idPedido})}">
+                        Ver Recibo
+                    </a>
+                </button>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal del recibo -->
+<div id="facturaModal" class="modal-unico" style="display:none;">
+    <div class="modal-contenido-unico">
+        <button type="button" class="boton-cerrar-unico" onclick="cerrarModal()">Cerrar</button>
+
+        <!-- Aquí irá el contenido del recibo -->
+        <article class="recibo-article">
+            <div class="container mt-5">
+                <div class="titulo-recibo">
+                    <img src="../img/logo_recibo.png" alt="Logo" />
+                    <h2 class="text-center">Recibo de Pedido</h2>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="datos-linea">
+                            <p><strong>ID Pedido:</strong> <span id="idPedido"></span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="datos-linea">
+                            <div class="col">
+                                <h4 class="card-title">Información del Cliente</h4>
+                                <p><strong>Nombre:</strong> <span id="nombreCliente"></span></p>
+                                <p><strong>Dirección:</strong> <span id="direccionCliente"></span></p>
+                            </div>
+                            <div class="col">
+                                <h4 class="card-title">Información del Pedido</h4>
+                                <p><strong>Total:</strong> S/. <span id="totalPago"></span></p>
+                                <p><strong>Fecha:</strong> <span id="fechaPago"></span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h4 class="card-title">Productos Comprados</h4>
+                        <table class="table productos-table" id="productosTable">
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Cantidad</th>
+                                    <th>Precio</th>
+                                </tr>
+                            </thead>
+                            <tbody id="productosComprados">
+                                <!-- Los productos serán agregados aquí dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <footer>
+                    <p>Puedes comunicarte con nosotros al <a href="tel:999222111">999-222-111</a> o enviarnos un correo
+                        electrónico a <a href="mailto:contacto@goodday.com">contacto@goodday.com</a>.</p>
+                </footer>
+            </div>
+        </article>
+
+        <button type="button" class="boton-descargar-unico" onclick="descargarRecibo()">Descargar Recibo</button>
+    </div>
+</div>
+
+
+<!-- Estilos -->
+<style>
+    /* Estilo para el título de la lista de pedidos */
+    .titulo-pedidos-unico {
+        font-size: 24px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    /* Estilo para el total de pedidos */
+    .total-pedidos-unico {
+        font-size: 18px;
+        color: #555;
+    }
+
+    /* Estilo para la sección de los pedidos */
+    .contenedor-pedidos-unico {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    /* Estilo para cada pedido */
+    .pedido-item-unico {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 15px;
+        background-color: #f9f9f9;
+        width: 300px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .pedido-item-unico:hover {
+        transform: translateY(-5px);
+        box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Estilo para el título de cada pedido */
+    .pedido-titulo-unico {
+        font-size: 20px;
+        color: #007bff;
+        margin-bottom: 10px;
+    }
+
+    /* Estilo para el texto de cada pedido */
+    .pedido-detalles-unico p {
+        font-size: 16px;
+        color: #666;
+        margin: 5px 0;
+    }
+
+    /* Estilo para el botón de ver factura */
+    .boton-ver-recibo-unico {
+        margin-top: 10px;
+        background-color: #007bff;
+        color: white;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .boton-ver-recibo-unico:hover {
+        background-color: #0056b3;
+    }
+
+    /* Estilos para el modal */
+    .modal-unico {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-contenido-unico {
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        width: 80%;
+        max-width: 500px;
+        text-align: center;
+    }
+
+    .boton-cerrar-unico {
+        background-color: #ccc;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        position: absolute;
+        top: 10px;
+        right: 10px;
+    }
+
+    .boton-cerrar-unico:hover {
+        background-color: #aaa;
+    }
+
+    .boton-descargar-unico {
+        margin-top: 20px;
+        background-color: #28a745;
+        color: white;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .boton-descargar-unico:hover {
+        background-color: #218838;
+    }
+
+    /* Estilos para el recibo */
+    .titulo-recibo {
+        font-size: 24px;
+        font-weight: bold;
+        color: #333;
+        text-align: center;
+    }
+
+    .recibo-card {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        background-color: #f9f9f9;
+        padding: 15px;
+    }
+
+    .recibo-card-title {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 10px;
+        color: #007bff;
+    }
+
+    .recibo-card-body p {
+        font-size: 16px;
+        color: #666;
+        margin: 5px 0;
+    }
+
+    .recibo-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    .recibo-table th,
+    .recibo-table td {
+        padding: 10px;
+        border: 1px solid #ddd;
+        text-align: left;
+    }
+
+    .recibo-table th {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .container {
+        background-image: url(../img/fonto_recibo.png);
+        background-size: cover;
+        background-position: center center;
+        background-repeat: no-repeat;
+        width: 150mm;
+        height: 200mm;
+        margin: auto;
+        position: relative;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        border-radius: 10px;
+        color: black;
+    }
+
+    .container::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.5);
+        z-index: 1;
+    }
+
+    .container>* {
+        position: relative;
+        z-index: 13;
+    }
+
+    .col {
+        padding-right: 10px;
+        padding-left: 10px;
+    }
+
+    .card {
+        opacity: 1;
+        background: transparent;
+    }
+
+    .card-body {
+        padding: 10px;
+    }
+
+    .card-title {
+        margin-bottom: 0;
+        display: flex;
+        justify-content: center;
+    }
+
+    .datos-linea {
+        display: flex;
+        justify-content: space-between;
+        gap: 40px;
+    }
+
+    .datos-linea .col {
+        flex: 1;
+    }
+
+    .datos-linea p {
+        margin: 0;
+        padding: 0;
+    }
+
+    .productos-table tr {
+        background: rgba(0, 0, 0, 0);
+    }
+
+    .productos-table,
+    .productos-table th,
+    .productos-table td {
+        border: none;
+    }
+
+    .productos-table th,
+    .productos-table td {
+        padding: 5px 10px;
+        text-align: center;
+    }
+
+    .productos-table {
+        width: 100%;
+    }
+
+    .titulo-recibo {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+    }
+
+    .titulo-recibo img {
+        width: 50px;
+        height: 50px;
+    }
+
+    footer {
+        display: flex;
+        margin-top: 20px;
+        padding-top: 10px;
+        border-top: 1px solid #888;
+        text-align: center;
+        justify-content: end;
+        font-size: 12px;
+        color: #888;
+        /* Gris claro */
+    }
+
+    footer p {
+        margin: 0px 0;
+    }
+
+    footer a {
+        color: #888;
+        /* Gris claro */
+        text-decoration: none;
+    }
+
+    footer a:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<!-- Script para mostrar y cerrar el modal -->
+<script>
+    // Función para mostrar el modal con el recibo
+    function verFactura(button) {
+        var idPedido = button.getAttribute('data-id');
+
+        // Simular la obtención de datos de pedido (esto debe venir del servidor o de la base de datos)
+        var pedido = {
+            idPedido: idPedido,
+            nombreCliente: 'Juan Pérez',
+            direccionCliente: 'Av. Siempre Viva 123',
+            totalPago: '100.00',
+            fechaPago: '2024-12-05',
+            productos: [
+                { nomProducto: 'Producto A', cantidad: 2, precioUnitario: '50.00' },
+                { nomProducto: 'Producto B', cantidad: 1, precioUnitario: '20.00' }
+            ]
+        };
+
+        // Asignar los datos al HTML del recibo
+        document.getElementById('idPedido').textContent = pedido.idPedido;
+        document.getElementById('nombreCliente').textContent = pedido.nombreCliente;
+        document.getElementById('direccionCliente').textContent = pedido.direccionCliente;
+        document.getElementById('totalPago').textContent = pedido.totalPago;
+        document.getElementById('fechaPago').textContent = pedido.fechaPago;
+
+        // Llenar la tabla de productos
+        var productosTable = document.getElementById('productosComprados');
+        productosTable.innerHTML = ''; // Limpiar la tabla antes de agregar
+
+        pedido.productos.forEach(function (producto) {
+            var row = document.createElement('tr');
+            row.innerHTML = `
+            <td>${producto.nomProducto}</td>
+            <td>${producto.cantidad}</td>
+            <td>${producto.precioUnitario}</td>
+        `;
+            productosTable.appendChild(row);
+        });
+
+        // Mostrar el modal
+        document.getElementById('facturaModal').style.display = 'flex';
+    }
+
+    // Función para cerrar el modal
+    function cerrarModal() {
+        document.getElementById('facturaModal').style.display = 'none';
+    }
+
+    // Función para descargar el recibo
+    function descargarRecibo() {
+        const { jsPDF } = window.jspdf;
+        const container = document.querySelector(".recibo-article");
+
+        html2canvas(container, { scale: 2 }).then(canvas => {
+            const imgData = canvas.toDataURL("image/png");
+            const pdf = new jsPDF("p", "mm", [150, 200]); // Dimensiones del pdf
+            const pageWidth = 150;
+            const imgWidth = pageWidth;
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+            pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+            pdf.save("recibo-pedido.pdf");
+        });
+    }
+
+</script>

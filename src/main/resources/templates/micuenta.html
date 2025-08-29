@@ -1,0 +1,44 @@
+
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi cuenta</title>
+    <link th:include="components/link"></link>
+</head>
+<body>
+    <header th:include="components/nav_panel"></header>
+
+    <div th:include="components/mensajes"></div>
+
+    <main class="main-container-cuenta">
+        <header th:include="components/nav_cuenta" class="header-cuenta-info"></header>
+        <section class="section-cuenta-info">
+            <!-- Datos Personales -->
+            <div th:if="${activePage == 'datos_personales'}" th:include="components/info_cuenta"></div>
+
+            <!-- Mis Direcciones -->
+            <div th:if="${activePage == 'mis_direcciones'}" th:include="components/info_direccion"></div>
+
+            <!-- Mis Pedidos -->
+            <div th:if="${activePage == 'mis_pedidos'}" th:include="components/info_pedido"></div>
+
+            <!-- Seguir pedido más actual -->
+
+        </section>
+    </main>
+    
+</body>
+
+<script>
+    // Esperar 3 segundos y ocultar el mensaje
+    setTimeout(function() {
+        const mensajeContainer = document.querySelector('.mensaje-container');
+        if (mensajeContainer) {
+            mensajeContainer.style.display = 'none';
+        }
+    }, 3000);
+</script>
+
+</html>
