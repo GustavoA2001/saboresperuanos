@@ -1,112 +1,301 @@
+@import url(colors.css);
+@import url(fonts.css);
 body {
-    font-family: 'Arial', sans-serif;
-    background-color: #f4f4f4;
+    font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
+    background-color: #f2f5f8;
 }
 
-.body-login {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background: rgba(80, 9, 9, 0.805)
-}
-
-.registro-container {
-    background-color: #fff;
-    padding: 40px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    max-width: 500px;
-    width: 100%;
-}
-
-.registro-form h1 {
-    font-size: 24px;
-    margin-bottom: 20px;
+h2 {
     color: #333;
-    text-align: center;
+    text-align: center;            
+    font-size: 3.5rem;
 }
 
-.registro-form hr {
-    border: 0;
-    height: 1px;
-    background: #ddd;
-    margin-bottom: 20px;
-}
-
-.registro-form p {
-    font-size: 14px;
-    color: #666;
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-.input-box {
-    margin-bottom: 20px;
-}
-
-.input-box label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 5px;
-    color: #333;
-}
-
-.input-box input {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 16px;
-}
-
-.button-p {
-    width: 100%;
-    padding: 10px;
-    background-color: #890606;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    
-}
-
-.button-p:hover {
-    background-color: #c21e0f;
-    
-}
-
-.remember-forgot a {
-    color: #007bff;
-    text-decoration: none;
-    display: block;
+p {
     text-align: center;
     margin-top: 20px;
+    font-size: 1rem;
 }
 
-.remember-forgot a:hover {
+a {
+    color: #007bff;
+    text-decoration: none;
+}
+a:hover {
     text-decoration: underline;
 }
 
-#mensaje-error {
-    color: red;
-    font-size: 14px;
-    margin-top: 5px;
-    display: none;
+
+.layout-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
 }
 
-.registro-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
+.section-role-selection {
+    text-align: center;
+}
+
+/* 
+   BOTONES DE SELECCIÓN DE ROL
+ */
+.roles-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    margin-top: 30px;
+}
+
+.role-card {
+    padding: 20px;
+    font-size: 4.5rem;
+    color: var(--color-fourth);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 500px;
+    height: 500px;
+    background-size: cover;
+    background-position: center;
+    text-align: center;
+    font-weight: bold;
+    position: relative;
+}
+
+.role-card img {
+    max-width: 50px;
+    height: auto;
+    margin-right: 10px;
+}
+
+.role-card:hover {
+    opacity: 0.9;
+}
+
+.role-cliente {
+    background-image: url(../img/cliente_login.png);
+}
+
+.role-empleado {
+    background-image: url(../img/empleado_login.png);
+}
+
+/* 
+   BOTÓN SIGUIENTE
+ */
+.btn-next {
+    margin-top: 40px;
+    padding: 15px 30px;
+    background-color: var(--color-secondary);
+    color: var(--color-light);
+    border: 2px solid var(--color-third);
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-size: 1.3rem;
+    transition: all 0.3s;
+    opacity: 0.5;
+    box-shadow: 4px 4px 0 var(--color-third);
+}
+
+.btn-next:hover {
+    background-color: var(--color-third); /* Un verde más oscuro para hover */
+    color: #f9f1fb;
+    box-shadow: 0 0 0 var(--color-third);
+}
+
+
+/* 
+   MODAL LOGIN
+ */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(39, 27, 27, 0.7); /* más cálido que el negro puro */
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
+.modal-box {
+    background-color: var(--base-color);
+    color: var(--text-color);
+    padding: 30px 25px;
+    border-radius: 20px; /* rad20 */
+    text-align: center;
+    width: 90%;
+    max-width: 420px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+    transform: translateY(-80px);
+    opacity: 0;
+    transition: transform 0.4s ease, opacity 0.4s ease;
+}
+
+.modal-overlay.show .modal-box {
+    transform: translateY(0);
+    opacity: 1;
+}
+/*
+    REGISTRARSE
+*/
+.register-text {
+    font-size: 1rem;
+    color: var(--color-fourth); /* Un gris elegante */
+    text-align: center;
+    margin-top: 15px;
+}
+
+.register-text a {
+    color: var(--color-secondary); /* Usa tu color secundario */
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.3s ease-in-out;
+}
+
+.register-text a:hover {
+    color: var(--color-fifth); /* Un tono más llamativo al pasar el mouse */
+    text-decoration: underline;
+}
+
+/* 
+   FORMULARIO LOGIN
+*/
+.login-form-wrapper {
+    padding: 20px;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.login-form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.login-input {
+    width: 94%;
+    padding: 10px;
+    font-size: 1rem;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.btn-login-submit {
+    width: 100%;
+    padding: 10px;
+    background-color: #28a745;
+    color: white;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+}
+/* Títulos */
+.modal-box h3 {
+    margin-bottom: 20px;
+    font-size: 1.4rem;
+    color: var(--color-secondary);
+}
+
+/* Inputs */
+.login-input {
+    width: 94%;
+    padding: 12px;
+    font-size: 1rem;
+    border-radius: 10px;
+    border: 1px solid var(--color-fourth);
+    background-color: var(--base-variant);
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.login-input:focus {
+    border-color: var(--color-primary);
+    outline: none;
+    box-shadow: 0 0 5px var(--color-primary);
+}
+
+/* Botón principal */
+.btn-login-submit {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    background-color: var(--color-secondary);
+    color: var(--color-light);
+    font-size: 1rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.btn-login-submit:hover {
+    background-color: var(--color-fifth);
+    transform: scale(1.02);
+}
+
+/* Botón cancelar */
+.btn-modal-cancel {
+    margin-top: 15px;
+    padding: 10px;
+    width: 100%;
+    background-color: var(--color-third);
+    color: var(--color-light);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-modal-cancel:hover {
+    background-color: var(--color-fourth);
+}
+/* 
+   RESPONSIVE
+*/
+@media (max-width: 1400px) {
+    .role-card {
+        width: 90%;
+        height: 450px;
+    }
+}
+
+@media (max-width: 1070px) {
+    .role-card {
+        width: 70%;
+        height: 250px;
+    }
 }
 
 @media (max-width: 768px) {
-    .registro-grid {
-        grid-template-columns: 1fr;
+    .role-card {
+        width: 90%;
+        height: 200px;
+    }
+    .btn-next {
+        width: 100%;
+        padding: 10px 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .role-card {
+        width: 40%;
+        height: 250px;
+        font-size: 2rem;
+    }
+    .btn-next {
+        padding: 10px;
+        font-size: 1rem;
     }
 }

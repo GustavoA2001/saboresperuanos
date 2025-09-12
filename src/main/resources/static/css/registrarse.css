@@ -1,0 +1,156 @@
+@import url(colors.css);
+@import url(fonts.css);
+/* ======== RESET BÁSICO ======== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body {
+    background-color: #f4f4f4;
+}
+
+/* ======== CONTENEDOR PRINCIPAL ======== */
+.reg-main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f9f9f9, #eef2f7);
+    padding: 20px;
+}
+
+/* ======== CARD DE REGISTRO ======== */
+.reg-container {
+    background: var(--primary-color);
+    border: 2px solid #111827;
+    border-radius: 1rem;
+    padding: 30px;
+    max-width: 600px;
+    width: 100%;
+    box-shadow: 8px 8px 0 rgba(17, 24, 39, 1);
+}
+
+/* ======== FORMULARIO ======== */
+.reg-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.reg-title {
+    font-size:3rem;
+    font-weight: bold;
+    text-align: center;
+    color: #111827;
+    margin-bottom: 5px;
+}
+
+.reg-subtitle {
+    text-align: center;
+    color: var(--second-color);
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.reg-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.reg-input-box {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.reg-input-box label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #111827;
+}
+
+.reg-input {
+    padding: 12px;
+    border: 2px solid #111827;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.reg-input:focus {
+    border-color: #a75d28;
+    box-shadow: 0 0 0 3px rgba(240, 33, 43, 0.3);
+}
+
+/* ======== MENSAJE DE ERROR ======== */
+.reg-error-msg {
+    font-size: 0.85rem;
+    color: #dc2626;
+    margin-top: 5px;
+    display: none;
+}
+
+/* ======== FOOTER Y LINKS ======== */
+.reg-footer {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.reg-link {
+    color: var(--second-color);
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.reg-link:hover {
+    color: var(--color-dark);
+}
+
+/* ======== BOTÓN SUBMIT ======== */
+.btn-reg-submit {
+    text-decoration: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 12px 26px;
+    background-color: var(--color-secondary); /* mismo verde que login */
+    border: 2px solid #111827;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s;
+    box-shadow: 4px 4px 0 rgba(17, 24, 39, 1);
+    font-size: 1rem;
+    font-weight: bold;
+    color: white;
+}
+
+.btn-reg-submit:hover {
+    background-color: #111827;
+    color: #f9f9f9;
+    box-shadow: 0 0 0 rgba(17, 24, 39, 0.5);
+}
+
+/* ======== RESPONSIVE ======== */
+@media (max-width: 768px) {
+    .reg-grid {
+        grid-template-columns: 1fr;
+    }
+    .reg-container {
+        padding: 20px;
+    }
+}
+@media (max-width: 480px) {
+    .reg-container {
+        padding: 15px;
+        box-shadow: 4px 4px 0 rgba(17, 24, 39, 1);
+    }
+    .btn-reg-submit {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+    }
+}

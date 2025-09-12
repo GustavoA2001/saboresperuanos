@@ -4,248 +4,51 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Selección de Rol | Nextclass</title>
-    <!--
-        ARREGLAR LOS ESTILOS HAY CONFUCIONES POR LAS CLASES
-    -->
-    <style>
-        /* Estilos generales */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-        }
-        h2 {
-            color: #333;
-            text-align: center;            
-            font-size: 1.5rem;
-        }
-        p {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 1rem;
-        }
-        a {
-            color: #007bff;
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-
-        /* Contenedor principal */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        /* Estilos de los botones de selección */
-        .role-buttons {
-            display: flex;
-            flex-wrap: wrap; /* Permite que los botones se ajusten */
-            justify-content: center;
-            align-items: center;
-            gap: 30px;            
-        }
-        .role-button {
-            padding: 20px;
-            font-size: 2.5rem;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease-in-out;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            max-width: 500px;
-            height: 500px;
-            background-size: cover;
-            background-position: center;
-            text-align: center;
-            font-weight: bold;
-            position: relative;
-        }
-        .role-button img {
-            max-width: 50px;
-            height: auto;
-            margin-right: 10px;
-        }
-        .role-button:hover {
-            opacity: 0.9;
-        }
-        .btn-cliente {
-            background-image: url(./img/cliente.jpg);
-        }
-        .btn-empleado {
-            background-image: url(./img/empleado.jpg);
-        }
-
-         /* Botón "Siguiente" */
-         #next-btn {
-            margin-top: 40px;
-            padding: 15px 30px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background-color 0.3s;
-            opacity: 0.5;
-            pointer-events: none;
-        }
-        #next-btn:hover {
-            background-color: #218838;
-        }
-
-        /* Estilos del modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-content {
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            width: 80%;
-            max-width: 400px;
-            transform: translateY(-100%);
-            opacity: 0;
-            transition: transform 0.4s ease, opacity 0.4s ease;
-        }
-        .modal.show .modal-content {
-            transform: translateY(0);
-            opacity: 1;
-        }
-        .btn-modal {
-            margin-top: 20px;
-            padding: 10px 20px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .btn-cancel {
-            background-color: #ccc;
-            color: black;
-        }
-
-        /* Responsive */
-        @media (max-width: 1200px) {
-            .role-button {
-                width: 90%;
-                height: 450px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .role-button {
-                width: 90%;
-                height: 400px;
-            }
-            #next-btn {
-                width: 100%;
-                padding: 10px 20px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .role-button {
-                width: 80%;
-                height: 350px;
-                font-size: 2rem;
-            }
-            #next-btn {
-                padding: 10px;
-                font-size: 1rem;
-            }
-        }
-
-        .registro-container.login {
-            padding: 20px;
-            max-width: 400px;
-            margin: 0 auto;
-        }
-
-        .registro-input-box {
-            margin-bottom: 20px;
-        }
-
-        .registro-input {
-            width: 94%;
-            padding: 10px;
-            font-size: 1rem;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
-
-        .button-p {
-            width: 100%;
-            padding: 10px;
-            background-color: #28a745;
-            color: white;
-            font-size: 1rem;
-            border: none;
-            border-radius: 5px;
-        }
-    </style>
+    <link rel="stylesheet" href="/css/login.css">
 </head>
 <body class="light_mode">
     <main class="main">
-        <div class="container">
-            <section class="contender">
-                <h2>¿Como desea continuar?</h2>
+        <div class="layout-wrapper">
+            <section class="section-role-selection">
+                <h2 class="dancing-script">¿Cómo desea continuar?</h2>
 
-                <div class="role-buttons">
-                    <button class="role-button btn-cliente" id="cliente-btn" onclick="selectRole('cliente')">
+                <!-- Botones de selección de rol -->
+                <div class="roles-container">
+                    <button class="role-card role-cliente league-spartan" id="cliente-btn" onclick="selectRole('cliente')">
                         Cliente
                     </button>
-                    <button class="role-button btn-empleado" id="empleado-btn" onclick="selectRole('empleado')">
+                    <button class="role-card role-empleado league-spartan" id="empleado-btn" onclick="selectRole('empleado')">
                         Empleado
                     </button>
                 </div>
 
-                <button type="button" id="next-btn" onclick="redirectToLogin()">Siguiente</button>
+                <!-- Botón siguiente -->
+                <button type="button" id="next-btn" class="btn-next league-spartan" onclick="redirectToLogin()">Siguiente</button>
 
-                <p>¿No tiene cuenta? <a th:href="@{/registro}">Regístrese aquí</a></p>
+                <!-- Registro -->
+                <p class="register-text">
+                    ¿No tiene cuenta? <a th:href="@{/registro}">Regístrese aquí</a>
+                </p>
 
-                <!-- Modal para trabajar el login del cliente o del empleao -->
-                <div id="loginModal" class="modal">
-                    <div class="modal-content">
+
+                <!-- Modal -->
+                <div id="loginModal" class="modal-overlay">
+                    <div class="modal-box league-spartan">
                         <h3>Inicio de Sesión</h3>
                         
-                        <form id="loginForm" method="POST" autocomplete="off" >
-                            <!--div class="registro-input-box">
-                                <label for="email">Correo electrónico:</label>
-                                <input type="email" id="email" name="email" class="registro-input" placeholder="Correo electrónico" required />
-                                <h5>Ejemplo: usuario@dominio.com</h5>
-                            </div-->
-                            <div class="registro-input-box">
+                        <form id="loginForm" method="POST" autocomplete="off">
+                            <div class="login-form-group">
                                 <label for="usuario">Usuario:</label>
-                                <input type="text" id="usuario" name="usuario" class="registro-input" placeholder="Usuario" required />
+                                <input type="text" id="usuario" name="usuario" class="login-input" placeholder="Usuario" required />
                                 <h5>Ejemplo: usuario123</h5>
                             </div>
-                            <div class="registro-input-box">
+                            <div class="login-form-group">
                                 <label for="contrasena">Contraseña:</label>
-                                <input type="password" id="contrasena" name="contrasena" class="registro-input" placeholder="Contraseña" required />
+                                <input type="password" id="contrasena" name="contrasena" class="login-input" placeholder="Contraseña" required />
                             </div>                            
-                            <!--div class="remember-forgot">
-                                <a href="#">Restablecer contraseña</a>
-                            </div-->
 
-                            <input type="submit" value="Iniciar Sesión" class="button-p" name="iniciar_sesion">
-                            <button type="button" onclick="closeModal()" class="btn-modal btn-cancel">Cancelar</button>
+                            <input type="submit" value="Ingresar" class="btn-login-submit" name="iniciar_sesion">
+                            <button type="button" onclick="closeModal()" class="btn-modal-action btn-modal-cancel cabin">Cancelar</button>
                         </form>
                     </div>
                 </div>
@@ -260,35 +63,30 @@
         function selectRole(role) {
             selectedRole = role;
 
-            // Manipulamos los elementos con id asignando una constante
             const clienteBtn = document.getElementById('cliente-btn');
             const empleadoBtn = document.getElementById('empleado-btn');
 
-            // Desactivar la selección previa
             clienteBtn.style.transform = 'scale(1)';
             empleadoBtn.style.transform = 'scale(1)';
             clienteBtn.style.backgroundColor = '#007bff';
             empleadoBtn.style.backgroundColor = '#007bff';
-            clienteBtn.style.border = 'none'
-            empleadoBtn.style.border = 'none'
+            clienteBtn.style.border = 'none';
+            empleadoBtn.style.border = 'none';
 
-            // Activar la selección actual
             if (role === 'cliente') {
                 clienteBtn.style.transform = 'scale(1.05)';
-                clienteBtn.style.backgroundColor = '#0056b3'; // Cambia de color
-                clienteBtn.style.border = '2px solid #222'
+                clienteBtn.style.backgroundColor = '#0056b3';
+                clienteBtn.style.border = '2px solid #222';
             } else {
                 empleadoBtn.style.transform = 'scale(1.05)';
-                empleadoBtn.style.backgroundColor = '#0056b3'; // Cambia de color
-                empleadoBtn.style.border = '2px solid #222'
+                empleadoBtn.style.backgroundColor = '#0056b3';
+                empleadoBtn.style.border = '2px solid #222';
             }
 
-            // Habilitar el botón "Siguiente"
             document.getElementById('next-btn').style.opacity = 1;
             document.getElementById('next-btn').style.pointerEvents = 'auto';
         }
 
-        // Mostrar modal con animación
         function redirectToLogin() {
             if (selectedRole) {
                 const modal = document.getElementById('loginModal');
@@ -297,25 +95,17 @@
                     modal.classList.add('show');
                 }, 10);
 
-                // Aqui se trabaja el cambio de ACTION
-                // <form id="loginForm" method="POST" autocomplete="off">
-                // Cambia la ruta a la que se dirige el formulario asi separamos el login cliente y empelado
-                // Esto se inicia cuando se elige Cliente o Empleado
-                // Aqui solo se cambia con el if
                 const form = document.getElementById('loginForm');
                 if (selectedRole === 'cliente') {
-                    form.action = '/login'; // Ruta para cliente
-
-                    // Cambialo a la ruta del login del empleado que tengan
+                    form.action = '/login';
                 } else if (selectedRole === 'empleado') {  
-                    form.action = '/loginEmpleado'; // Ruta para empleado
+                    form.action = '/loginEmpleado';
                 }
             } else {
                 alert('Por favor, seleccione un rol antes de continuar.');
             }
         }
 
-        // Cerrar modal con animación
         function closeModal() {
             const modal = document.getElementById('loginModal');
             modal.classList.remove('show');
