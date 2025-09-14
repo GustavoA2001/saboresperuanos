@@ -1,5 +1,6 @@
 package com.app.restaurante.dao;
 
+import com.app.restaurante.model.Categoria;
 //import com.app.restaurante.model.Cliente;
 import com.app.restaurante.model.Productos;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -12,7 +13,8 @@ import java.sql.SQLException;
 import java.util.List;
 
 /**
- * Clase DAO para gestionar las operaciones de base de datos relacionadas con los productos
+ * Clase DAO para gestionar las operaciones de base de datos relacionadas con
+ * los productos
  */
 @Repository
 public class ProductosDAO {
@@ -26,22 +28,25 @@ public class ProductosDAO {
     public ProductosDAO(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
+
     /*
-    -------------------------------------- 
-    */
-    // Metodo que devuelve el nombre de la tabla en la base de datos donde se almacenan los clientes
+     * --------------------------------------
+     */
+    // Metodo que devuelve el nombre de la tabla en la base de datos donde se
+    // almacenan los clientes
     protected String getTableName() {
         return "producto";
     }
 
-    // Metodo que devuelve el RowMapper para mapear los resultados a objetos Productos
+    // Metodo que devuelve el RowMapper para mapear los resultados a objetos
+    // Productos
     protected RowMapper<Productos> getRowMapper() {
         return new RowMapper<Productos>() {
             @Override
             public Productos mapRow(ResultSet rs, int rowNum) throws SQLException {
                 Productos productos = new Productos();
                 productos.setIdProducto(rs.getLong("idProducto"));
-                productos.setNomProducto(rs.getString("NomProducto")); 
+                productos.setNomProducto(rs.getString("NomProducto"));
                 productos.setPrecioUnitario(rs.getDouble("PrecioUnitario"));
                 productos.setFotoProducto(rs.getString("FotoProducto"));
                 productos.setDescripcion(rs.getString("Descripcion"));
@@ -58,36 +63,35 @@ public class ProductosDAO {
     public void save(Productos producto) {
         if (producto.getIdProducto() == null) {
             // Si el producto no tiene ID, es nuevo, hacemos INSERT
-            String sql = "INSERT INTO " + getTableName() + 
-                        " (NomProducto, PrecioUnitario, Descripcion, Cantidad, FechaProducto, FotoProducto, IDCategoria, IDTipo) " +
-                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO " + getTableName() +
+                    " (NomProducto, PrecioUnitario, Descripcion, Cantidad, FechaProducto, FotoProducto, IDCategoria, IDTipo) "
+                    +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
             jdbcTemplate.update(sql,
-                producto.getNomProducto(),
-                producto.getPrecioUnitario(),
-                producto.getDescripcion(),
-                producto.getCantidad(),
-                producto.getFechaProducto(),
-                producto.getFotoProducto(),
-                producto.getIdCategoria(),
-                producto.getIdTipo()
-            );
+                    producto.getNomProducto(),
+                    producto.getPrecioUnitario(),
+                    producto.getDescripcion(),
+                    producto.getCantidad(),
+                    producto.getFechaProducto(),
+                    producto.getFotoProducto(),
+                    producto.getIdCategoria(),
+                    producto.getIdTipo());
         } else {
             // Si el producto tiene ID, es existente, hacemos UPDATE
-            String sql = "UPDATE " + getTableName() + 
-                        " SET NomProducto = ?, PrecioUnitario = ?, Descripcion = ?, " +
-                        "Cantidad = ?, FechaProducto = ?, FotoProducto = ?, " + 
-                        "IDCategoria = ?, IDTipo = ? WHERE idProducto = ?";
+            String sql = "UPDATE " + getTableName() +
+                    " SET NomProducto = ?, PrecioUnitario = ?, Descripcion = ?, " +
+                    "Cantidad = ?, FechaProducto = ?, FotoProducto = ?, " +
+                    "IDCategoria = ?, IDTipo = ? WHERE idProducto = ?";
             jdbcTemplate.update(sql,
-                producto.getNomProducto(),
-                producto.getPrecioUnitario(), 
-                producto.getDescripcion(),
-                producto.getCantidad(),
-                producto.getFechaProducto(),
-                producto.getFotoProducto(),
-                producto.getIdCategoria(),
-                producto.getIdTipo(),
-                producto.getIdProducto()
-            );
+                    producto.getNomProducto(),
+                    producto.getPrecioUnitario(),
+                    producto.getDescripcion(),
+                    producto.getCantidad(),
+                    producto.getFechaProducto(),
+                    producto.getFotoProducto(),
+                    producto.getIdCategoria(),
+                    producto.getIdTipo(),
+                    producto.getIdProducto());
         }
     }
 
@@ -115,30 +119,33 @@ public class ProductosDAO {
     public void deleteByCategoria(Long idCategoria) {
         String sql = "DELETE FROM " + getTableName() + " WHERE IDCategoria = ?";
         jdbcTemplate.update(sql, idCategoria);
-    }    
-    
+    }
+
     // Metodo para obtener todos los productos
     public List<Productos> findAll() {
         String sql = "SELECT * FROM " + getTableName();
         return jdbcTemplate.query(sql, getRowMapper());
     }
 
-    /*
-    -------------------------------------- 
-    */
-    
-    /*
-     * Metodo para obtener todas las categorías de productos
-     */
-    public List<String> findAllCategorias() {
-        // Consulta SQL para obtener todas las categorías distintas
-        String sql = "SELECT IDCategoria, NomCategoria FROM categoriaproducto";
-        return jdbcTemplate.queryForList(sql, String.class);
+    // Metodo para obtener productos con paginación
+    public List<Productos> findAllPaginated(int offset, int limit) {
+        String sql = "SELECT * FROM " + getTableName() + " LIMIT ? OFFSET ?";
+        return jdbcTemplate.query(sql, new Object[] { limit, offset }, getRowMapper());
     }
 
-    
+    // Metodo para contar todos los productos
+    public int countAll() {
+        String sql = "SELECT COUNT(*) FROM " + getTableName();
+        return jdbcTemplate.queryForObject(sql, Integer.class);
+    }
+
+    /*
+     * --------------------------------------
+     */
+
     /*
      * Metodo para obtener todos los tipos de productos
+     * 
      * @return Lista de tipos de productos
      */
     public List<String> findAllTipos() {
@@ -147,9 +154,9 @@ public class ProductosDAO {
         return jdbcTemplate.queryForList(sql, String.class);
     }
 
-    /* 
-    --------------------------------------
-    */
+    /*
+     * --------------------------------------
+     */
 
     /**
      * Metodo para obtener productos por categoría
@@ -158,13 +165,15 @@ public class ProductosDAO {
     public List<Productos> obtenerPorCategoria(String categoria) {
         // Consulta SQL para obtener productos por categoria
         String sql = "SELECT idProducto, NomProducto, PrecioUnitario, FotoProducto, Descripcion, Cantidad FROM producto WHERE idCategoria = (SELECT idCategoria FROM categoriaproducto WHERE NomCategoria = ?);";
-        List<Productos> productos = jdbcTemplate.query(sql, new Object[]{categoria}, new BeanPropertyRowMapper<>(Productos.class));
-    
+        List<Productos> productos = jdbcTemplate.query(sql, new Object[] { categoria },
+                new BeanPropertyRowMapper<>(Productos.class));
+
         // Verifica el contenido de los productos antes de retornarlos
         for (Productos producto : productos) {
-            System.out.println("Producto: " + producto.getNomProducto() + ", FotoProducto: " + producto.getFotoProducto() + 
-            ", Precio" + producto.getPrecioUnitario() + ", Cantidad" + producto.getCantidad() + "./");
-        }    
+            System.out.println(
+                    "Producto: " + producto.getNomProducto() + ", FotoProducto: " + producto.getFotoProducto() +
+                            ", Precio" + producto.getPrecioUnitario() + ", Cantidad" + producto.getCantidad() + "./");
+        }
 
         return productos;
     }
@@ -176,10 +185,28 @@ public class ProductosDAO {
     public Productos obtenerProductoPorId(int idProducto) {
         // Consulta SQL para obtener un producto específico por su ID
         String sql = "SELECT idProducto, NomProducto, PrecioUnitario, FotoProducto, Descripcion FROM producto WHERE idProducto = ?";
-        return jdbcTemplate.queryForObject(sql, new Object[]{idProducto}, new BeanPropertyRowMapper<>(Productos.class));
+        return jdbcTemplate.queryForObject(sql, new Object[] { idProducto },
+                new BeanPropertyRowMapper<>(Productos.class));
     }
 
-    
-    
-    
+    public List<Categoria> findAllCategorias() {
+        String sql = "SELECT IDCategoria, NomCategoria FROM categoriaproducto";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> {
+            Categoria categoria = new Categoria();
+            categoria.setIdCategoria(rs.getLong("IDCategoria"));
+            categoria.setNomCategoria(rs.getString("NomCategoria"));
+            return categoria;
+        });
+    }
+
+    public List<Productos> obtenerPorCategoriaId(Long categoriaId, int offset, int limit) {
+        String sql = "SELECT * FROM " + getTableName() + " WHERE IDCategoria = ? LIMIT ? OFFSET ?";
+        return jdbcTemplate.query(sql, new Object[] { categoriaId, limit, offset }, getRowMapper());
+    }
+
+    public int countByCategoria(Long categoriaId) {
+        String sql = "SELECT COUNT(*) FROM " + getTableName() + " WHERE IDCategoria = ?";
+        return jdbcTemplate.queryForObject(sql, new Object[] { categoriaId }, Integer.class);
+    }
+
 }

@@ -1,6 +1,7 @@
 package com.app.restaurante.controller;
 
 import com.app.restaurante.dao.ProductosDAO;
+import com.app.restaurante.model.Categoria;
 import com.app.restaurante.model.Cliente;
 import com.app.restaurante.model.Productos;
 
@@ -28,84 +29,92 @@ public class ProductoController {
     private ProductosDAO productosDAO;
 
     @Autowired
-    private HttpSession session;   
+    private HttpSession session;
 
     /**
      * Metodo que maneja la solicitud GET para mostrar la carta de productos
      */
     @GetMapping("/carta")
-    public String mostrarCarta(Model model) {
-        // Obtiene los productos separados por categorías
-        List<Productos> bebidas = productosDAO.obtenerPorCategoria("Bebidas");
-        List<Productos> postres = productosDAO.obtenerPorCategoria("Postres");
-        List<Productos> platillos = productosDAO.obtenerPorCategoria("Platillos");
-    
-        // Asigna imagen por defecto a bebidas si no tienen una
-        for (Productos producto : bebidas) {
+    public String mostrarCarta(
+            @RequestParam(defaultValue = "1") int pagina,
+            @RequestParam(required = false) Integer tamaño,
+            @RequestParam(required = false) Long categoriaId,
+            Model model) {
+
+        // Calcular el offset
+        if (tamaño == null || tamaño <= 0) {
+            tamaño = 12; // fallback por defecto
+        }
+
+        int offset = (pagina - 1) * tamaño;
+
+        List<Productos> productos;
+        int totalProductos;
+
+        if (categoriaId != null) {
+            productos = productosDAO.obtenerPorCategoriaId(categoriaId, offset, tamaño);
+            totalProductos = productosDAO.countByCategoria(categoriaId);
+        } else {
+            productos = productosDAO.findAllPaginated(offset, tamaño);
+            totalProductos = productosDAO.countAll();
+        }
+
+        int totalPaginas = (int) Math.ceil((double) totalProductos / tamaño);
+
+        for (Productos producto : productos) {
             if (producto.getFotoProducto() == null || producto.getFotoProducto().isEmpty()) {
                 producto.setFotoProducto("default");
             }
         }
-        
-        // Asigna imagen por defecto a postres si no tienen una
-        for (Productos producto : postres) {
-            if (producto.getFotoProducto() == null || producto.getFotoProducto().isEmpty()) {
-                producto.setFotoProducto("default");
-            }
-        }
-        
-        // Asigna imagen por defecto a platillos si no tienen una
-        for (Productos producto : platillos) {
-            if (producto.getFotoProducto() == null || producto.getFotoProducto().isEmpty()) {
-                producto.setFotoProducto("default");
-            }            
-        }
-        
-        // Agrega las listas de productos y la pagina activa al modelo
-        model.addAttribute("bebidas", bebidas);
-        model.addAttribute("postres", postres);
-        model.addAttribute("platillos", platillos);
+
+        // Agrega datos al modelo
+        model.addAttribute("productos", productos);
+        model.addAttribute("paginaActual", pagina);
+        model.addAttribute("totalPaginas", totalPaginas);
         model.addAttribute("activePage", "carta");
-    
-        //Incorpora los atributos del Cliente
+
+        // Enviar categorías y la activa
+        List<Categoria> categorias = productosDAO.findAllCategorias();
+        System.out.println("Categorías encontradas: " + categorias.size());
+        System.out.println("Categorías encontradas: " + categorias.size());
+        System.out.println("Categorías encontradas: " + categorias.size());
+
+        model.addAttribute("categorias", categorias);
+        model.addAttribute("categoriaId", categoriaId);
+
+        // Cliente logueado
         Cliente cliente = (Cliente) session.getAttribute("cliente");
-        model.addAttribute("cliente", cliente); 
+        model.addAttribute("cliente", cliente);
 
         return "carta";
     }
 
     /**
-     * Metodo que maneja la solicitud GET para obtener los detalles de un producto especifico
+     * Metodo que maneja la solicitud GET para obtener los detalles de un producto
+     * especifico
      */
     @GetMapping("/producto/{idProducto}")
     public String obtenerDetalleProducto(@PathVariable("idProducto") int idProducto, Model model) {
-
-        //Incorpora los atributos del Cliente
         Cliente cliente = (Cliente) session.getAttribute("cliente");
-        model.addAttribute("cliente", cliente); 
-        
+        model.addAttribute("cliente", cliente);
+
         Productos producto = productosDAO.obtenerProductoPorId(idProducto);
         model.addAttribute("producto", producto);
         return "modalproducto";
     }
 
-
-    /*
-     * 
-     */
     /**
      * Metodo que maneja la solicitud POST para registrar un nuevo producto
      */
     @PostMapping("/registrar_producto")
     public String registrarProducto(@RequestParam("nomProducto") String nomProducto,
-                                  @RequestParam("precioUnitario") double precioUnitario,
-                                  @RequestParam("descripcion") String descripcion,
-                                  @RequestParam("cantidad") int cantidad,
-                                  @RequestParam("idCategoria") Long idCategoria,
-                                  @RequestParam("idTipo") Long idTipo,
-                                  @RequestParam("fotoProducto") String fotoProducto,
-                                  RedirectAttributes redirectAttributes) {
-                                
+            @RequestParam("precioUnitario") double precioUnitario,
+            @RequestParam("descripcion") String descripcion,
+            @RequestParam("cantidad") int cantidad,
+            @RequestParam("idCategoria") Long idCategoria,
+            @RequestParam("idTipo") Long idTipo,
+            @RequestParam("fotoProducto") String fotoProducto,
+            RedirectAttributes redirectAttributes) {
         Productos nuevoProducto = new Productos();
         nuevoProducto.setNomProducto(nomProducto);
         nuevoProducto.setPrecioUnitario(precioUnitario);
@@ -117,7 +126,6 @@ public class ProductoController {
 
         productosDAO.save(nuevoProducto);
 
-        // Agregar mensaje de éxito y limpiar el formulario
         redirectAttributes.addFlashAttribute("mensaje", "Producto registrado exitosamente");
         redirectAttributes.addFlashAttribute("limpiarFormulario", true);
 
@@ -125,7 +133,7 @@ public class ProductoController {
     }
 
     /**
-     * Metodo que muestra todos los productos disponibles
+     * Metodo alternativo para mostrar todos los productos (opcional)
      */
     @GetMapping("/productocarta")
     public String mostrarTodosProductos(Model model) {
@@ -134,9 +142,4 @@ public class ProductoController {
         return "productocarta";
     }
 
-
-    /*** APARTADO PARA LA GESTIONAR LOS PRODUCTOS EN LA VISTA DEL EMPLEADO ****/
-
-
-    
 }
