@@ -6,51 +6,65 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carta de Menú</title>
     <link rel="stylesheet" href="/css/carta.css">
+    
 </head>
 
 <body>
     <!-- Header -->
-    <header th:include="components/nav_panel"></header>
+    <header th:include="components/menu"></header>
 
     <!-- Sección principal de carta -->
     <section class="carta-section">
-        <!-- Sidebar categorías -->
-        <aside class="carta-category">
-            <h6>Categorías</h6>
-            <a th:href="@{/carta}" th:classappend="${categoriaId == null} ? 'active'">
-                <button>Todos</button>
-            </a>
-            <a th:each="cat : ${categorias}" 
-               th:href="@{/carta(categoriaId=${cat.idCategoria})}"
-               th:classappend="${categoriaId == cat.idCategoria} ? 'active'">
-                <button th:text="${cat.nomCategoria}">Categoría</button>
-            </a>
+        <!-- Categorías -->
+
+        <!-- Botón para abrir categorías en pequeños y medianos -->
+        <button class="btn-categorias" id="openCategorias">Categorías</button>
+
+        <aside class="carta-categorias desktop-only">
+            <h4>Categorías</h4>
+            <ul>
+                <!-- Botón "Todos" -->
+                <li>
+                    <a th:href="@{/carta}" th:classappend="${categoriaSeleccionada == null} ? 'active'">
+                        Todos
+                    </a>
+                </li>
+
+                <!-- Botones dinámicos de categorías -->
+                <li th:each="cat : ${categorias}">
+                    <a th:href="@{/carta(categoria=${cat.idCategoria})}" th:text="${cat.nomCategoria}"
+                        th:classappend="${categoriaSeleccionada != null and cat.idCategoria == categoriaSeleccionada} ? 'active'">
+                        Categoría
+                    </a>
+                </li>
+            </ul>
         </aside>
 
         <!-- Contenido principal -->
         <div class="carta-container">
-            <!-- Título y buscador -->
             <div class="carta-header">
                 <h3 class="carta-title dancing-script">Sabores Peruanos - Menú</h3>
-                <div class="carta-search">
-                    <input type="text" placeholder="Buscar producto...">
-                </div>
+
+                <form class="carta-search" method="get" action="#">
+                    <input type="text" name="query" placeholder="Buscar producto..." class="carta-search-input">                    
+                </form>
             </div>
 
-            <!-- Productos -->
-            <div class="carta-products">
+            <div class="carta-products" id="lista-productos" th:fragment="productos">
+                <div th:if="${productos.isEmpty()}">
+                    <p>No hay resultados para la búsqueda.</p>
+                </div>
                 <div class="carta-item" th:each="producto : ${productos}">
                     <a th:href="@{/producto/{id}(id=${producto.idProducto})}" class="carta-item-link">
-                        <!-- Imagen -->
+
                         <div class="carta-item-image-wrapper">
                             <img class="carta-item-image"
                                 th:src="@{/upload/productos/{filename}(filename=${producto.fotoProducto})}"
                                 alt="Imagen producto">
                         </div>
-
-                        <!-- Información -->
+ 
                         <div class="carta-item-info">
-                            <h4 class="carta-item-title" th:text="${producto.nomProducto}">Nombre Producto</h4>                            
+                            <h4 class="carta-item-title" th:text="${producto.nomProducto}">Nombre Producto</h4>
                             <span class="carta-item-price" th:text="'S/ ' + ${producto.precioUnitario}">S/ 20.00</span>
                         </div>
                     </a>
@@ -58,53 +72,89 @@
             </div>
 
             <!-- Paginación -->
-            <nav aria-label="Paginación productos" class="carta-pagination">
+            <div class="pagination">
                 <ul>
-                    <li th:classappend="${paginaActual == 1} ? 'disabled'">
-                        <a th:href="@{/carta(pagina=${paginaActual - 1})}">Anterior</a>
+                    <li th:if="${currentPage > 1}">
+                        <a
+                            th:href="@{/carta(page=${currentPage - 1}, query=${param.query}, categoria=${categoriaSeleccionada})}">«
+                            Anterior</a>
                     </li>
 
-                    <li th:each="i : ${#numbers.sequence(1, totalPaginas)}"
-                        th:classappend="${i == paginaActual} ? 'active'">
-                        <a th:href="@{/carta(pagina=${i})}" th:text="${i}">1</a>
+                    <li th:each="i : ${#numbers.sequence(1, totalPages)}"
+                        th:classappend="${i == currentPage} ? 'active'">
+                        <a th:href="@{/carta(page=${i}, query=${param.query}, categoria=${categoriaSeleccionada})}"
+                            th:text="${i}">1</a>
                     </li>
 
-                    <li th:classappend="${paginaActual == totalPaginas} ? 'disabled'">
-                        <a th:href="@{/carta(pagina=${paginaActual + 1})}">Siguiente</a>
+                    <li th:if="${currentPage < totalPages}">
+                        <a
+                            th:href="@{/carta(page=${currentPage + 1}, query=${param.query}, categoria=${categoriaSeleccionada})}">Siguiente
+                            »</a>
                     </li>
                 </ul>
-            </nav>
+            </div>
+
         </div>
     </section>
 
-    <!-- Footer >
-    <footer class="carta-footer" th:include="components/footer"></footer-->
 
-    <script>
-        // Ocultar mensajes temporales después de 3 segundos
-        setTimeout(function () {
-            const mensajeContainer = document.querySelector('.carta-mensaje-container');
-            if (mensajeContainer) {
-                mensajeContainer.style.display = 'none';
-            }
-        }, 3000);
-    </script>
+    <!-- Modal de categorías  -->
+    <div class="modal-categorias" id="modalCategorias">
+        <div class="modal-content">
+            <span class="close-modal" id="closeCategorias">&times;</span>
+            <h4>Elige una categoría</h4>
+            <ul>
+                <li>
+                    <a th:href="@{/carta}" th:classappend="${categoriaSeleccionada == null} ? 'active'">Todos</a>
+                </li>
+                <li th:each="cat : ${categorias}">
+                    <a th:href="@{/carta(categoria=${cat.idCategoria})}" th:text="${cat.nomCategoria}"
+                        th:classappend="${categoriaSeleccionada != null and cat.idCategoria == categoriaSeleccionada} ? 'active'">
+                        Categoría
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
 </body>
 
 </html>
 <script>
-    // Detecta cuántos productos caben en pantalla y ajusta el tamaño
-    document.addEventListener("DOMContentLoaded", function () {
-        const alturaPantalla = window.innerHeight;
-        const filas = Math.floor((alturaPantalla - 200) / 300); // 300px aprox por carta+espacios
-        const columnas = Math.floor(window.innerWidth / 250);   // 250px ancho carta aprox
-        const tamanio = filas * columnas;
+    const searchInput = document.querySelector(".carta-search-input");
 
-        // Redirige con el tamaño dinámico
-        const url = new URL(window.location.href);
-        if (!url.searchParams.get("tamanio")) {
-            url.searchParams.set("tamanio", tamanio);
-            window.location.href = url.toString();
+    searchInput.addEventListener("input", () => {
+        const query = searchInput.value;
+
+        fetch(`/carta?query=${encodeURIComponent(query)}`, {
+            headers: { "X-Requested-With": "XMLHttpRequest" }
+        })
+            .then(response => response.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const newDocument = parser.parseFromString(html, "text/html");
+                const newContent = newDocument.querySelector("#lista-productos");
+                document.querySelector("#lista-productos").innerHTML = newContent.innerHTML;
+            })
+            .catch(error => console.error("Error en la búsqueda:", error));
+    });
+</script>
+<script>
+    const openBtn = document.getElementById("openCategorias");
+    const modal = document.getElementById("modalCategorias");
+    const closeBtn = document.getElementById("closeCategorias");
+
+    openBtn.addEventListener("click", () => {
+        modal.style.display = "block";
+    });
+
+    closeBtn.addEventListener("click", () => {
+        modal.style.display = "none";
+    });
+
+    // Cerrar al hacer click fuera del modal
+    window.addEventListener("click", (e) => {
+        if (e.target === modal) {
+            modal.style.display = "none";
         }
     });
 </script>

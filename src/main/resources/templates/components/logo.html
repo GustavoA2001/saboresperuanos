@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Escudo Logo</title>
+  <style>
+    .escudo {
+      position: fixed;
+      left: 50px;
+      width: 200px;
+      height: 300px;
+      background: #d40000;
+      clip-path: polygon(0 0, 100% 0, 100% 80%, 50% 100%, 0 80%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      z-index: 10000;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .escudo img {
+      width: 80%;
+      height: auto;
+      filter: brightness(0) invert(1);
+      transition: all 0.3s ease-in-out;
+    }
+
+    /* Reducción cuando se hace scroll */
+    .escudo.shrink {
+      width: 170px;
+      height: 255px;
+    }
+
+    /* --- Responsivo --- */
+    @media (max-width: 1200px) {
+      .escudo {
+        width: 180px;
+        height: 270px;
+      }
+
+      .escudo.shrink {
+        width: 160px;
+        height: 240px;
+      }
+    }
+
+    @media (max-width: 992px) {
+      .escudo {
+        width: 150px;
+        height: 225px;
+      }
+
+      .escudo.shrink {
+        width: 140px;
+        height: 210px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .escudo {
+        width: 120px;
+        height: 180px;
+      }
+
+      .escudo.shrink {
+        width: 110px;
+        height: 165px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .escudo {
+        width: 100px;
+        height: 150px;
+        left: 20px;
+      }
+
+      .escudo.shrink {
+        width: 90px;
+        height: 135px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="escudo" id="escudo">
+    <img src="/img/saboresperuanos_logo.png" alt="logo_saboresperuanos">
+  </div>
+
+  <script>
+    const escudo = document.getElementById("escudo");
+
+    window.addEventListener("scroll", () => {
+      if (window.scrollY > 50) {
+        escudo.classList.add("shrink");
+      } else {
+        escudo.classList.remove("shrink");
+      }
+    });
+  </script>
+</body>
+
+</html>

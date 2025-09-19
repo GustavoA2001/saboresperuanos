@@ -1,23 +1,102 @@
-
-<main class="main">
-    <div class="categorias">
-        <div class="bebidas">
-            <img src="./img/bebidas.jpg" alt="">
-            <div class="categoria-info">
+<main class="categoria-principal">
+    <div class="categoria-secciones">
+        <div class="categoria-card bebidas-card">
+            <img src="./img/bebidas.jpg" alt="Bebidas">
+            <div class="categoria-info-bebidas">
                 <h3>Bebidas</h3>
             </div>
         </div>
-        <div class="postres">
-            <img src="./img/postres.jpg" alt="">
-            <div class="categoria-info">
+
+        <div class="categoria-card postres-card">
+            <img src="./img/postres.jpg" alt="Postres">
+            <div class="categoria-info-postres">
                 <h3>Postres</h3>
             </div>
         </div>
-        <div class="platillos">
-            <img src="./img/platillos.jpg" alt="">
-            <div class="categoria-info">
+
+        <div class="categoria-card platillos-card">
+            <img src="./img/platillos.jpg" alt="Platillos">
+            <div class="categoria-info-platillos">
                 <h3>Platillos</h3>
             </div>
         </div>
     </div>
 </main>
+
+
+<style>
+.categoria-principal {
+    padding: 3rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f9f9f9; /* Color de fondo suave */
+}
+
+.categoria-secciones {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2.5rem;
+    max-width: 1200px;
+    width: 100%;
+}
+
+.categoria-card {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* Sombra más suave */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.categoria-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+    border-radius: 15px;
+}
+
+.categoria-card:hover {
+    transform: translateY(-12px);
+    box-shadow: 0 15px 25px rgba(0, 0, 0, 0.3);
+}
+
+.categoria-card:hover img {
+    transform: scale(1.1);
+}
+
+.categoria-info-bebidas, .categoria-info-postres, .categoria-info-platillos {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 1.5rem;
+    text-align: center;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.75), transparent);
+    border-top: 4px solid #e94b3c; /* Rojo suave */
+}
+
+.categoria-info-bebidas h3, .categoria-info-postres h3, .categoria-info-platillos h3 {
+    color: #ffffff;
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+.bebidas-card:hover .categoria-info-bebidas {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.postres-card:hover .categoria-info-postres {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.platillos-card:hover .categoria-info-platillos {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+</style>

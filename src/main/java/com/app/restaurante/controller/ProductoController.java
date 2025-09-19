@@ -5,6 +5,7 @@ import com.app.restaurante.model.Categoria;
 import com.app.restaurante.model.Cliente;
 import com.app.restaurante.model.Productos;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,62 +32,73 @@ public class ProductoController {
     @Autowired
     private HttpSession session;
 
+
     /**
      * Metodo que maneja la solicitud GET para mostrar la carta de productos
      */
-    @GetMapping("/carta")
-    public String mostrarCarta(
-            @RequestParam(defaultValue = "1") int pagina,
-            @RequestParam(required = false) Integer tamaño,
-            @RequestParam(required = false) Long categoriaId,
-            Model model) {
+@GetMapping("/carta")
+public String mostrarCarta(HttpSession session,
+                           Model model,
+                           @RequestParam(value = "query", required = false) String query,
+                           @RequestParam(value = "categoria", required = false) Long idCategoria,
+                           @RequestParam(value = "page", defaultValue = "1") int page,
+                           HttpServletRequest request) {
 
-        // Calcular el offset
-        if (tamaño == null || tamaño <= 0) {
-            tamaño = 12; // fallback por defecto
-        }
+    Cliente cliente = (Cliente) session.getAttribute("cliente");
+    model.addAttribute("cliente", cliente);
+    model.addAttribute("activePage", "carta");
 
-        int offset = (pagina - 1) * tamaño;
+    // Tamaño de página (ej. 12 productos por página)
+    int pageSize = 12;
+    int offset = (page - 1) * pageSize;
 
-        List<Productos> productos;
-        int totalProductos;
+    // Cargar categorías
+    List<Categoria> categorias = productosDAO.findAllCategorias();
+    model.addAttribute("categorias", categorias);
 
-        if (categoriaId != null) {
-            productos = productosDAO.obtenerPorCategoriaId(categoriaId, offset, tamaño);
-            totalProductos = productosDAO.countByCategoria(categoriaId);
-        } else {
-            productos = productosDAO.findAllPaginated(offset, tamaño);
-            totalProductos = productosDAO.countAll();
-        }
+    // Guardar la categoría seleccionada
+    model.addAttribute("categoriaSeleccionada", idCategoria);
 
-        int totalPaginas = (int) Math.ceil((double) totalProductos / tamaño);
+    // Variables de resultados
+    List<Productos> productos;
+    int totalProductos;
 
+    if (query != null && !query.isEmpty()) {
+        totalProductos = productosDAO.countByBusquedaPorNombre(query);
+        productos = productosDAO.buscarProductosPorNombre(query, offset, pageSize);
+    } else if (idCategoria != null) {
+        totalProductos = productosDAO.countByCategoria(idCategoria);
+        productos = productosDAO.obtenerPorCategoriaId(idCategoria, offset, pageSize);
+    } else {
+        totalProductos = productosDAO.countAll();
+        productos = productosDAO.findAllPaginated(offset, pageSize);
+    }
+
+    model.addAttribute("productos", productos);
+
+    // Calcular número total de páginas
+    int totalPages = (int) Math.ceil((double) totalProductos / pageSize);
+    model.addAttribute("totalPages", totalPages);
+    model.addAttribute("currentPage", page);
+
+    // Si es petición AJAX solo devolvemos los productos
+    if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
+        return "carta :: productos";
+    }
+
+    return "carta";
+}
+
+
+    /**
+     * Asigna imagen por defecto si el producto no tiene foto.
+     */
+    private void normalizarImagenes(List<Productos> productos) {
         for (Productos producto : productos) {
             if (producto.getFotoProducto() == null || producto.getFotoProducto().isEmpty()) {
                 producto.setFotoProducto("default");
             }
         }
-
-        // Agrega datos al modelo
-        model.addAttribute("productos", productos);
-        model.addAttribute("paginaActual", pagina);
-        model.addAttribute("totalPaginas", totalPaginas);
-        model.addAttribute("activePage", "carta");
-
-        // Enviar categorías y la activa
-        List<Categoria> categorias = productosDAO.findAllCategorias();
-        System.out.println("Categorías encontradas: " + categorias.size());
-        System.out.println("Categorías encontradas: " + categorias.size());
-        System.out.println("Categorías encontradas: " + categorias.size());
-
-        model.addAttribute("categorias", categorias);
-        model.addAttribute("categoriaId", categoriaId);
-
-        // Cliente logueado
-        Cliente cliente = (Cliente) session.getAttribute("cliente");
-        model.addAttribute("cliente", cliente);
-
-        return "carta";
     }
 
     /**

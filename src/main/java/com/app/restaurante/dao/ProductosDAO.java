@@ -95,6 +95,7 @@ public class ProductosDAO {
         }
     }
 
+    // BUSQUEDA DE PRODUCTOS
     // Metodo para buscar un producto por su ID
     @SuppressWarnings("deprecation")
     public Productos findById(Long idProducto) {
@@ -102,6 +103,10 @@ public class ProductosDAO {
         List<Productos> productos = jdbcTemplate.query(sql, new Object[] { idProducto }, getRowMapper());
         return productos.isEmpty() ? null : productos.get(0);
     }
+
+
+
+    // ELIMACION
 
     // Metodo para eliminar un producto por su ID
     public void deleteById(Long idProducto) {
@@ -121,17 +126,7 @@ public class ProductosDAO {
         jdbcTemplate.update(sql, idCategoria);
     }
 
-    // Metodo para obtener todos los productos
-    public List<Productos> findAll() {
-        String sql = "SELECT * FROM " + getTableName();
-        return jdbcTemplate.query(sql, getRowMapper());
-    }
 
-    // Metodo para obtener productos con paginación
-    public List<Productos> findAllPaginated(int offset, int limit) {
-        String sql = "SELECT * FROM " + getTableName() + " LIMIT ? OFFSET ?";
-        return jdbcTemplate.query(sql, new Object[] { limit, offset }, getRowMapper());
-    }
 
     // Metodo para contar todos los productos
     public int countAll() {
@@ -145,8 +140,6 @@ public class ProductosDAO {
 
     /*
      * Metodo para obtener todos los tipos de productos
-     * 
-     * @return Lista de tipos de productos
      */
     public List<String> findAllTipos() {
         // Consulta SQL para obtener todos los tipos distintos
@@ -154,9 +147,6 @@ public class ProductosDAO {
         return jdbcTemplate.queryForList(sql, String.class);
     }
 
-    /*
-     * --------------------------------------
-     */
 
     /**
      * Metodo para obtener productos por categoría
@@ -199,14 +189,54 @@ public class ProductosDAO {
         });
     }
 
+    // Metodo para obtener todos los productos
+    public List<Productos> findAll() {
+        String sql = "SELECT * FROM " + getTableName();
+        return jdbcTemplate.query(sql, getRowMapper());
+    }
+
+    // Metodo para obtener productos con paginación
+    public List<Productos> findAllPaginated(int offset, int limit) {
+        String sql = "SELECT * FROM " + getTableName() + " LIMIT ? OFFSET ?";
+        return jdbcTemplate.query(sql, new Object[] { limit, offset }, getRowMapper());
+    }
+
+    // Metodo para obtener los productos por categoria
     public List<Productos> obtenerPorCategoriaId(Long categoriaId, int offset, int limit) {
         String sql = "SELECT * FROM " + getTableName() + " WHERE IDCategoria = ? LIMIT ? OFFSET ?";
         return jdbcTemplate.query(sql, new Object[] { categoriaId, limit, offset }, getRowMapper());
     }
 
+    // Metodo que cuenta las categorias en la tabla "PRODUCTOS"
     public int countByCategoria(Long categoriaId) {
         String sql = "SELECT COUNT(*) FROM " + getTableName() + " WHERE IDCategoria = ?";
         return jdbcTemplate.queryForObject(sql, new Object[] { categoriaId }, Integer.class);
     }
 
+    // BUSQUEDA POR NOMBRE (con paginación)
+public List<Productos> buscarProductosPorNombre(String nombre, int offset, int limit) {
+    String sql = "SELECT * FROM " + getTableName() + " WHERE NomProducto LIKE ? LIMIT ? OFFSET ?";
+    String param = "%" + nombre + "%";
+    return jdbcTemplate.query(sql, new Object[]{param, limit, offset}, getRowMapper());
 }
+
+// Contar productos por búsqueda de nombre
+public int countByBusquedaPorNombre(String nombre) {
+    String sql = "SELECT COUNT(*) FROM " + getTableName() + " WHERE NomProducto LIKE ?";
+    String param = "%" + nombre + "%";
+    return jdbcTemplate.queryForObject(sql, new Object[]{param}, Integer.class);
+}
+
+public List<Productos> buscarProductosPorNombre(String nombre) {
+    String sql = "SELECT * FROM " + getTableName() + " WHERE NomProducto LIKE ?";
+    String param = "%" + nombre + "%";
+    return jdbcTemplate.query(sql, new Object[]{param}, getRowMapper());
+}
+public List<Productos> buscarProductosPorCategoria(Long idCategoria) {
+    String sql = "SELECT * FROM " + getTableName() + " WHERE idCategoria = ?";
+    return jdbcTemplate.query(sql, new Object[]{idCategoria}, getRowMapper());
+}
+
+
+}
+

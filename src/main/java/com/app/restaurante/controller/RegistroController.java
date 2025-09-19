@@ -139,7 +139,7 @@ public class RegistroController {
         List<Direccion> distritos = clienteDAO.findAllDistritos();
         model.addAttribute("distritos", distritos);
 
-        return "bienvenido";
+        return "index";
     }
 
 

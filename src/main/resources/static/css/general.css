@@ -12,45 +12,7 @@ body{
 }
 
 /** Navegation Menu **/
-#header{
-    position: relative;
-    width: 100%;
-}
-.menu{
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 60px;
-    background: #ffffff;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    z-index: 1;
-}
-.btn-menu{display: none;}
-.menu .logobox{margin-left: 30px;}
-.menu .logobox h1 > a{
-    text-decoration: none;
-    color:#A43131;
-    font-size: 30px;
-    font-weight: 400;
-}
-.menu .logobox h1 > a > i{color:#A43131; margin-right: 10px;}
-.menu .list-container{margin-right: 20px; margin-left: 50px;}
-.menu .list-container .lists{display: flex;}
-.menu .list-container .lists li{list-style: none;}
-.menu .list-container .lists li a{
-    text-decoration: none;
-    color:#020202;
-    font-size: 19px;
-    margin:0px 7px;
-    padding: 5px;
-    border-radius: 3px;
-    transition: 300ms;
-}
-.menu .list-container .lists li a:hover{color:#A43131;}
-.menu .list-container .lists li a.active{color:#fa1b1b;}
+
 
 /** Img header **/
 .img-header{

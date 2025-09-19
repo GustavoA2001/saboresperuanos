@@ -1,129 +1,166 @@
+@import url(colors.css);
+@import url(fonts.css);
+
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    margin: 0;
-    padding: 20px;
+  padding: 0;
+  margin: 0;
 }
 
-.container {
-    max-width: 800px;
-    margin: auto;
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+/* === MENU DEL DIA === */
+.menu-day {
+  padding: 1rem;
+  text-align: center;
+  position: relative;
 }
 
-h1 {
-    color: #333;
-    text-align: center;
+.menu-day h2 {
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
+  color: var(--color-secondary, #b22222);
+  margin-bottom: 1rem;
+  letter-spacing: 1px;
 }
 
-nav {
-    margin: 20px 0;
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+  max-width: 1100px;
+  margin: 0 auto;
 }
 
-.menu {
-    list-style-type: none;
-    padding: 0;
+/* Cada card usa fondo como imagen */
+.menu-card {
+  position: relative;
+  height: 220px;
+  border-radius: 1rem;
+  background-size: cover;
+  background-position: center;
+  color: #fff;
+  display: flex;
+  align-items: flex-end;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-.menu li {
-    margin: 10px 0;
+.menu-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 0;
 }
 
-.menu a {
-    display: block;
-    padding: 10px;
-    background-color: #007bff;
-    color: white;
-    text-decoration: none;
-    border-radius: 5px;
-    transition: background-color 0.3s;
+.menu-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
 }
 
-.menu a:hover {
-    background-color: #0056b3;
+.menu-content {
+  position: relative;
+  z-index: 1;
+  padding: 1rem;
+  text-align: left;
 }
 
-footer {
-    text-align: center;
-    margin-top: 20px;
+.menu-card h3 {
+  margin: 0 0 0.5rem;
+  font-size: clamp(1rem, 2vw, 1.3rem);
+  font-weight: 700;
 }
 
-footer a {
-    color: #007bff;
-    text-decoration: none;
+.menu-card p {
+  font-size: clamp(0.85rem, 1.5vw, 0.95rem);
+  line-height: 1.4;
 }
 
-footer a:hover {
-    text-decoration: underline;
+/* Fondos individuales */
+.bebida_menu {
+  background-image: url('/upload/productos/temuna.jpg');
 }
 
-a {
-    text-decoration: none;
-    color: #007bff;
+.platillo_menu {
+  background-image: url('/upload/productos/sopaseca.jpg');
 }
 
-a:hover {
-    text-decoration: underline;
+.postre_menu {
+  background-image: url('/upload/productos/arrozconleche.jpg');
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
+
+/* === MENU CAROUSEL === */
+.menu-carousel {
+  padding: 1rem;
+  text-align: center;
+  background: #fff;
 }
 
-th, td {
-    padding: 10px;
-    text-align: left;
-    border: 1px solid #ddd;
+.menu-carousel__title {
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
+  margin-bottom: 1rem;
+  color: var(--color-secondary, #b22222);
 }
 
-th {
-    background-color: #007bff;
-    color: white;
+.menu-carousel__wrapper {
+  position: relative;
+  max-width: 100%;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 1rem;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
 }
 
-tr:nth-child(even) {
-    background-color: #f2f2f2;
+.menu-carousel__container {
+  display: flex;
+  transition: transform 0.8s ease-in-out;
 }
 
-tr:hover {
-    background-color: #ddd;
+.menu-carousel__item {
+  min-width: 100%;
+  user-select: none;
 }
 
-button {
-    background-color: #28a745;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    cursor: pointer;
+.menu-carousel__item img {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  display: block;
+  border-radius: 1rem;
 }
 
-button:hover {
-    background-color: #218838;
+
+/* === RESPONSIVE BREAKPOINTS === */
+
+/* Tablets */
+@media (max-width: 768px) {
+  .menu-card {
+    height: 180px;
+  }
+
+  .menu-carousel__item img {
+    height: 200px;
+  }
 }
 
-form {
-    background-color: white;
-    padding: 20px;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
+/* Celulares */
+@media (max-width: 480px) {
+  .menu-grid {
+    grid-template-columns: 1fr;
+  }
 
-label {
-    display: block;
-    margin: 10px 0 5px;
-}
+  .menu-card {
+    height: 160px;
+  }
 
-input[type="text"],
-input[type="password"],
-select {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-} 
+  .menu-content {
+    padding: 0.5rem;
+  }
+
+  .menu-card h3 {
+    font-size: 1rem;
+  }
+
+  .menu-carousel__item img {
+    height: 150px;
+  }
+}
