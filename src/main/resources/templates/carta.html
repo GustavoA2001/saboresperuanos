@@ -6,20 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carta de Menú</title>
     <link rel="stylesheet" href="/css/carta.css">
-    
+
 </head>
 
-<body>
-    <!-- Header -->
+<body class="body-carta">
+    <!--Componente menu-->
     <header th:include="components/menu"></header>
 
-    <!-- Sección principal de carta -->
-    <section class="carta-section">
-        <!-- Categorías -->
 
-        <!-- Botón para abrir categorías en pequeños y medianos -->
-        <button class="btn-categorias" id="openCategorias">Categorías</button>
 
+    <div class="carta_container">
+        <!--Sección de las categorias del menu -->
         <aside class="carta-categorias desktop-only">
             <h4>Categorías</h4>
             <ul>
@@ -29,7 +26,6 @@
                         Todos
                     </a>
                 </li>
-
                 <!-- Botones dinámicos de categorías -->
                 <li th:each="cat : ${categorias}">
                     <a th:href="@{/carta(categoria=${cat.idCategoria})}" th:text="${cat.nomCategoria}"
@@ -40,29 +36,66 @@
             </ul>
         </aside>
 
-        <!-- Contenido principal -->
-        <div class="carta-container">
+        <!-- Sección principal de carta -->
+        <section class="carta-section">
+
             <div class="carta-header">
                 <h3 class="carta-title dancing-script">Sabores Peruanos - Menú</h3>
 
-                <form class="carta-search" method="get" action="#">
-                    <input type="text" name="query" placeholder="Buscar producto..." class="carta-search-input">                    
-                </form>
+                <!-- Contenedor flex para buscador + botón -->
+                <div class="carta-actions">
+                    <form class="carta-search" method="get" action="#">
+                        <input type="text" name="query" placeholder="Buscar producto..." class="carta-search-input">
+                    </form>
+
+                    <!-- Botón Categorías -->
+                    <div class="modal_categorias">
+                        <button class="btn-categorias" id="openCategorias">Categorías</button>
+                        <!-- Modal de categorías -->
+                        <div class="modal-categorias" id="modalCategorias">
+                            <div class="modal-content">
+                                <span class="close-modal" id="closeCategorias">&times;</span>
+                                <h4>Elige una categoría</h4>
+                                <ul>
+                                    <li>
+                                        <a th:href="@{/carta}"
+                                            th:classappend="${categoriaSeleccionada == null} ? 'active'">Todos</a>
+                                    </li>
+                                    <li th:each="cat : ${categorias}">
+                                        <a th:href="@{/carta(categoria=${cat.idCategoria})}"
+                                            th:text="${cat.nomCategoria}"
+                                            th:classappend="${categoriaSeleccionada != null and cat.idCategoria == categoriaSeleccionada} ? 'active'">
+                                            Categoría
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
+
+
             <div class="carta-products" id="lista-productos" th:fragment="productos">
-                <div th:if="${productos.isEmpty()}">
-                    <p>No hay resultados para la búsqueda.</p>
+                <div th:if="${productos.isEmpty()}" class="no-results">
+                    <div class="no-results-card">
+                        <span class="no-results-icon">🔍</span>
+                        <h4>No hay resultados</h4>
+                        <p>Intenta con otra búsqueda o revisa las categorías.</p>
+                    </div>
+
                 </div>
                 <div class="carta-item" th:each="producto : ${productos}">
                     <a th:href="@{/producto/{id}(id=${producto.idProducto})}" class="carta-item-link">
 
+                        <!-- Imagen -->
                         <div class="carta-item-image-wrapper">
                             <img class="carta-item-image"
                                 th:src="@{/upload/productos/{filename}(filename=${producto.fotoProducto})}"
                                 alt="Imagen producto">
                         </div>
- 
+
                         <div class="carta-item-info">
                             <h4 class="carta-item-title" th:text="${producto.nomProducto}">Nombre Producto</h4>
                             <span class="carta-item-price" th:text="'S/ ' + ${producto.precioUnitario}">S/ 20.00</span>
@@ -94,28 +127,13 @@
                 </ul>
             </div>
 
-        </div>
-    </section>
 
-
-    <!-- Modal de categorías  -->
-    <div class="modal-categorias" id="modalCategorias">
-        <div class="modal-content">
-            <span class="close-modal" id="closeCategorias">&times;</span>
-            <h4>Elige una categoría</h4>
-            <ul>
-                <li>
-                    <a th:href="@{/carta}" th:classappend="${categoriaSeleccionada == null} ? 'active'">Todos</a>
-                </li>
-                <li th:each="cat : ${categorias}">
-                    <a th:href="@{/carta(categoria=${cat.idCategoria})}" th:text="${cat.nomCategoria}"
-                        th:classappend="${categoriaSeleccionada != null and cat.idCategoria == categoriaSeleccionada} ? 'active'">
-                        Categoría
-                    </a>
-                </li>
-            </ul>
-        </div>
+        </section>
     </div>
+
+
+
+
 </body>
 
 </html>
@@ -138,13 +156,14 @@
             .catch(error => console.error("Error en la búsqueda:", error));
     });
 </script>
+
 <script>
     const openBtn = document.getElementById("openCategorias");
     const modal = document.getElementById("modalCategorias");
     const closeBtn = document.getElementById("closeCategorias");
 
     openBtn.addEventListener("click", () => {
-        modal.style.display = "block";
+        modal.style.display = "flex"; // antes estaba en "block"
     });
 
     closeBtn.addEventListener("click", () => {
@@ -157,4 +176,5 @@
             modal.style.display = "none";
         }
     });
+
 </script>

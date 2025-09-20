@@ -1,19 +1,158 @@
-
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi cuenta</title>
-    <link th:include="components/link"></link>
+    <link th:include="components/link">
+    </link>
+    <style>
+        /* ===== Reset ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Segoe UI", sans-serif;
+            background: #f4f6f9;
+            color: #333;
+        }
+
+        /* ===== Layout ===== */
+        .main-container-cuenta {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ===== Sidebar ===== */
+        .sidebar-cuenta {
+            width: 260px;
+            background: #222831;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            padding: 30px 20px;
+            border-top-right-radius: 20px;
+            border-bottom-right-radius: 20px;
+        }
+
+        .sidebar-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .sidebar-avatar {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 10px;
+            border: 3px solid #00adb5;
+        }
+
+        .sidebar-username {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        /* ===== Navegación ===== */
+        .sidebar-nav ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .sidebar-nav ul li a {
+            display: block;
+            padding: 12px 16px;
+            border-radius: 12px;
+            text-decoration: none;
+            color: #eee;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+
+        .sidebar-nav ul li a:hover,
+        .sidebar-nav ul li a.active {
+            background: #00adb5;
+            color: #fff;
+        }
+
+        /* ===== Contenido ===== */
+        .section-cuenta-info {
+            flex: 1;
+            background: #fff;
+            padding: 40px;
+            border-radius: 20px;
+            margin: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .section-cuenta-info h2 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #222;
+        }
+
+        /* Animación */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 768px) {
+            .main-container-cuenta {
+                flex-direction: column;
+            }
+
+            .sidebar-cuenta {
+                flex-direction: row;
+                justify-content: space-around;
+                align-items: center;
+                width: 100%;
+                border-radius: 0;
+                padding: 15px;
+            }
+
+            .sidebar-header {
+                display: none;
+                /* Ocultar avatar en móvil */
+            }
+
+            .sidebar-nav ul {
+                flex-direction: row;
+                gap: 10px;
+            }
+
+            .sidebar-nav ul li a {
+                padding: 10px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
 </head>
+
 <body>
-    <header th:include="components/nav_panel"></header>
+    <header th:include="components/menu"></header>
 
     <div th:include="components/mensajes"></div>
 
     <main class="main-container-cuenta">
-        <header th:include="components/nav_cuenta" class="header-cuenta-info"></header>
+        <div th:include="components/nav_cuenta" class="header-cuenta-info"></div>
+
         <section class="section-cuenta-info">
             <!-- Datos Personales -->
             <div th:if="${activePage == 'datos_personales'}" th:include="components/info_cuenta"></div>
@@ -28,12 +167,12 @@
 
         </section>
     </main>
-    
+
 </body>
 
 <script>
     // Esperar 3 segundos y ocultar el mensaje
-    setTimeout(function() {
+    setTimeout(function () {
         const mensajeContainer = document.querySelector('.mensaje-container');
         if (mensajeContainer) {
             mensajeContainer.style.display = 'none';

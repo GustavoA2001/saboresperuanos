@@ -1,33 +1,135 @@
 @import url(colors.css);
 @import url(fonts.css);
 
-/* SECCIÓN PRINCIPAL */
-.carta-section {
-    display: flex;    
-    min-height: 100vh ;
+/* ====== RESETEO ====== */
+body {
+    margin: 0;
+    padding: 0;
 }
 
-/* CONTENEDOR DE PRODUCTOS */
-.carta-container {
-    flex: 1;
-    padding: 2rem;
-    overflow-x: hidden;
-    border: 1px solid red;
+.body-carta {
+    height: calc(100vh - 1rem);
+    border: 1px solid blue;
+    /* temporal para debug */
 }
 
-/* CATEGORÍAS */
+/* ========================
+   MODAL CATEGORÍAS
+======================== */
+.carta-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    /* espacio entre buscador y botón */
+}
+
+.btn-categorias {
+    display: none;
+    padding: 10px 20px;
+    background: #c0392b;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    width: 100%;
+    position: relative;
+}
+
+
+.modal_categorias {
+    display: block;
+    position: relative;
+    z-index: 10;
+}
+
+/* Modal oculto por defecto */
+.modal-categorias {
+    display: none;
+    /* 🔥 importante */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-categorias .modal-content {
+    background: #fff;
+    padding: 1rem 0;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    animation: fadeIn 0.3s ease;
+    position: relative;
+}
+
+.modal-categorias h4 {
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+}
+
+.modal-categorias ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.modal-categorias ul li {
+    margin: 0.5rem 0;
+}
+
+.modal-categorias ul li a {
+    display: block;
+    width: 250px;
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    background: #f4f4f4;
+    color: #333;
+    text-decoration: none;
+    transition: all 0.2s;
+    margin: 0 auto;
+}
+
+.modal-categorias ul li a.active,
+.modal-categorias ul li a:hover {
+    background: #c0392b;
+    color: #fff;
+    font-weight: bold;
+}
+
+.close-modal {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #888;
+}
+
+/* ========================
+   LAYOUT CARTA
+======================== */
+.carta_container {
+    display: flex;
+    margin-top: 60px;
+    padding: 0;
+    gap: 1rem;
+    width: 100%;
+}
+
 .carta-categorias {
-    width: 240px;
-    background: var(--color-light);
-    border-right: 1px solid var(--color-primary);
-    padding: 1.5rem 1rem;
-    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.06);
-    position: sticky;
-    top: 3rem;
-    height: calc(100vh - 3rem);
-    overflow-y: auto;
-    border-radius: 0 12px 12px 0;
-    border: 1px solid yellow;
+    width: 260px;
+    padding: 0rem 3rem;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    height: 90vh;
 }
 
 .carta-categorias h4 {
@@ -36,7 +138,8 @@
     margin-bottom: 1rem;
     color: var(--color-secondary);
     text-align: center;
-    letter-spacing: 0.5px;
+    border-bottom: 2px solid var(--base-variant);
+    padding-bottom: 0.5rem;
 }
 
 .carta-categorias ul {
@@ -46,12 +149,15 @@
     display: flex;
     flex-direction: column;
     gap: 0.6rem;
+    align-items: center;
 }
 
 .carta-categorias a {
-    display: block;
-    padding: 0.7rem 1rem;
-    border-radius: 10px;
+    display: inline-block;
+    min-width: 140px;
+    max-width: 200px;
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
     text-decoration: none;
     font-size: 0.95rem;
     font-weight: 500;
@@ -59,7 +165,8 @@
     background: var(--base-variant);
     border: 1px solid transparent;
     transition: all 0.25s ease-in-out;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    text-align: center;
 }
 
 .carta-categorias a:hover {
@@ -75,16 +182,26 @@
     color: var(--color-light);
     font-weight: bold;
     border-color: var(--color-fifth);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
-/* HEADER */
+/* ========================
+   SECCIÓN PRINCIPAL
+======================== */
+.carta-section {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin: 0 10px;
+    border: 1 solid;
+}
+
 .carta-header {
+    margin-top: 10px;
     display: flex;
     justify-content: space-between;
     margin-bottom: 0.7rem;
-    gap: 1rem;
-    border: 1px solid green;
+    gap: 10px;
 }
 
 .carta-title {
@@ -94,7 +211,6 @@
     margin: 0;
 }
 
-/* BUSCADOR */
 .carta-search {
     display: flex;
     align-items: center;
@@ -108,33 +224,71 @@
     font-size: 16px;
     width: 250px;
 }
+/* ========================
+SIN RESULTADOS
+========================== */
+.no-results {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 40vh;
+    text-align: center;
+}
+
+.no-results-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 2rem 3rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    border: 1px solid #eee;
+    max-width: 400px;
+}
+
+.no-results-icon {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 1rem;
+    color: #c0392b; /* rojo del estilo general */
+}
+
+.no-results-card h4 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+
+.no-results-card p {
+    font-size: 1rem;
+    color: #666;
+}
 
 
-/* PRODUCTOS */
+/* ========================
+   PRODUCTOS
+======================== */
 .carta-products {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 1.5rem;
     align-items: stretch;
-    border: 1px solid blue;
-    overflow-y: auto;   /* permite scroll vertical */
-    max-height: 70vh;   /* ajusta según lo que quieras mostrar */
+    width: 100%;
     height: 70vh;
-    padding-right: 0.3rem; /* evita que el scroll tape contenido */
-
+    border: 1 solid red !important;
+    overflow: hidden;
+    overflow-y: auto;
 }
 
 .carta-item {
-    background: #fff;
+    background: #ab7e7e;
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     display: flex;
     flex-direction: column;
-    height: 260px;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    border: 1px solid red;
-
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    cursor: pointer;
+    height: 300px;
+    border: 1 solid blue !important;
 }
 
 .carta-item:hover {
@@ -145,14 +299,19 @@
 .carta-item-link {
     text-decoration: none;
     color: inherit;
-    display: block;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    border: 1 solid green !important;
 }
 
 .carta-item-image-wrapper {
     width: 100%;
-    height: 180px;
+    height: 200px;
     overflow: hidden;
+    position: relative;
     flex-shrink: 0;
+    border: 1 solid yellow !important;
 }
 
 .carta-item-image {
@@ -160,35 +319,38 @@
     height: 100%;
     object-fit: cover;
     transition: transform 0.3s ease;
+    border: 1 solid red;
 }
 
 .carta-item:hover .carta-item-image {
-    transform: scale(1.05);
+    transform: scale(1.08);
 }
 
 .carta-item-info {
     flex: 1;
-    padding: 1rem;
-    text-align: center;
+    padding: 0 1rem;
+    text-align: start;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    color: #ffffff;
 }
 
 .carta-item-title {
     font-size: 1.1rem;
     font-weight: 600;
-    margin-bottom: 0.5rem;
-    color: #333;
+    margin: 10px 0;
 }
 
 .carta-item-price {
-    font-size: 1rem;
+    font-size: 30px;
     font-weight: bold;
-    color: #28a745;
+    margin: 10px 0;
 }
 
-/* PAGINACIÓN */
+/* ========================
+   PAGINACIÓN
+======================== */
 .pagination {
     margin: 20px 0;
     text-align: center;
@@ -199,10 +361,6 @@
     padding: 0;
     display: inline-flex;
     gap: 8px;
-}
-
-.pagination li {
-    display: inline;
 }
 
 .pagination a {
@@ -226,114 +384,64 @@
     border-color: var(--color-fifth);
     font-weight: bold;
 }
-/*nuevo*/
-/* Botón visible solo en móviles */
-.btn-categorias {
-    display: none;
-    padding: 0.6rem 1rem;
-    margin: 1rem 0;
-    background: #c0392b;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    cursor: pointer;
-    width: 100%;
-}
 
-/* Modal categorías */
-.modal-categorias {
-    display: none; /* oculto por defecto */
-    position: fixed;
-    z-index: 2000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow-y: auto;
-    background: rgba(0, 0, 0, 0.6);
-}
-
-.modal-categorias .modal-content {
-    background: #fff;
-    margin: 10% auto;
-    padding: 1.5rem;
-    border-radius: 12px;
-    width: 90%;
-    max-width: 400px;
-    text-align: center;
-    animation: fadeIn 0.3s ease;
-}
-
-.modal-categorias h4 {
-    margin-bottom: 1rem;
-    font-size: 1.2rem;
-}
-
-.modal-categorias ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.modal-categorias ul li {
-    margin: 0.5rem 0;
-}
-
-.modal-categorias ul li a {
-    display: block;
-    padding: 0.6rem 1rem;
-    border-radius: 8px;
-    background: #f4f4f4;
-    color: #333;
-    text-decoration: none;
-    transition: all 0.2s;
-}
-
-.modal-categorias ul li a.active,
-.modal-categorias ul li a:hover {
-    background: #c0392b;
-    color: #fff;
-    font-weight: bold;
-}
-
-.close-modal {
-    float: right;
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: #888;
-}
-
-/* Mostrar/ocultar según tamaño de pantalla */
-@media (max-width: 768px) {
-    .desktop-only {
-        display: none; /* ocultar sidebar en pantallas pequeñas */
-    }
-
-    .btn-categorias {
-        display: block; /* mostrar botón en móviles */
-    }
-}
-
-/* RESPONSIVE */
+/* ========================
+   RESPONSIVE
+======================== */
 @media (max-width: 1024px) {
     .carta-header {
         flex-direction: column;
         align-items: center;
         text-align: center;
     }
+
+    .carta-item {
+        height: 200px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .carta-item-image-wrapper {
+        height: 100%;
+    }
+
+    .carta-item-info {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        /* fondo translúcido para que resalte el texto */
+        color: #fff;
+        padding: 5px 0;
+        text-align: center;
+    }
+
+    .carta-item-title {
+        font-size: 19px;
+        font-weight: bold;
+        margin: 0;
+    }
+
+    .carta-item-price {
+        font-size: 20px;
+        font-weight: 600;
+    }
+
 }
 
 @media (max-width: 768px) {
     .desktop-only {
         display: none;
     }
-    .carta-section {
-        flex-direction: column;
+
+    .btn-categorias {
+        display: block;
     }
 
-    .carta-container {
-        padding: 1rem;
+    .carta-section {
+        flex-direction: column;
+        height: 90vh;
     }
 
     .carta-title {
@@ -343,13 +451,16 @@
     .carta-products {
         grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
         gap: 1rem;
-                overflow-y: auto;   /* permite scroll vertical */
-        max-height: 70vh;   /* ajusta según lo que quieras mostrar */
-        padding-right: 0.3rem; /* evita que el scroll tape contenido */
+        height: 63vh;
+
+    }
+
+    .carta-item {
+        height: 170px;
     }
 
     .carta-item-image-wrapper {
-        height: 150px;
+        height: 160px;
     }
 
     .carta-categorias {
@@ -363,14 +474,9 @@
     }
 
     .carta-categorias ul {
-        display: flex;
-        gap: 0.5rem;
         flex-wrap: wrap;
         justify-content: center;
-    }
-
-    .carta-categorias li {
-        margin-bottom: 0;
+        gap: 0.5rem;
     }
 
     .carta-categorias a {
@@ -383,12 +489,15 @@
     .carta-title {
         font-size: 1.4rem;
     }
-
+    .carta-search-input{
+        width: 200px;
+    }
     .carta-products {
         grid-template-columns: 1fr 1fr;
-        overflow-y: auto;   /* permite scroll vertical */
-        max-height: 70vh;   /* ajusta según lo que quieras mostrar */
-        padding-right: 0.3rem; /* evita que el scroll tape contenido */
+    }
+
+    .carta-item {
+        height: 125px;
     }
 
     .carta-item-image-wrapper {
@@ -396,10 +505,10 @@
     }
 
     .carta-item-title {
-        font-size: 1rem;
+        font-size: 15px;
     }
 
     .carta-item-price {
-        font-size: 0.9rem;
+        font-size: 17px;
     }
 }

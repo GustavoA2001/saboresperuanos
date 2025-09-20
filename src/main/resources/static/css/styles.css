@@ -2,130 +2,129 @@
 @import url(fonts.css);
 
 body {
-  padding: 0;
-  margin: 0;
+    padding: 0;
+    margin: 0;
 }
 
 /* === MENU DEL DIA === */
 .menu-day {
-  padding: 1rem;
-  text-align: center;
-  position: relative;
+    padding: 1rem;
+    text-align: center;
+    position: relative;
 }
 
 .menu-day h2 {
-  font-size: clamp(1.5rem, 2.5vw, 2rem);
-  color: var(--color-secondary, #b22222);
-  margin-bottom: 1rem;
-  letter-spacing: 1px;
+    font-size: clamp(1.5rem, 2.5vw, 2rem);
+    color: var(--color-secondary, #b22222);
+    margin-bottom: 1rem;
+    letter-spacing: 1px;
 }
 
 .menu-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 1rem;
-  max-width: 1100px;
-  margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+    max-width: 1100px;
+    margin: 0 auto;
 }
 
 /* Cada card usa fondo como imagen */
 .menu-card {
-  position: relative;
-  height: 220px;
-  border-radius: 1rem;
-  background-size: cover;
-  background-position: center;
-  color: #fff;
-  display: flex;
-  align-items: flex-end;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-  overflow: hidden;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+    position: relative;
+    height: 220px;
+    border-radius: 1rem;
+    background-size: cover;
+    background-position: center;
+    color: #fff;
+    display: flex;
+    align-items: flex-end;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .menu-card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  z-index: 0;
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 0;
 }
 
 .menu-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
 }
 
 .menu-content {
-  position: relative;
-  z-index: 1;
-  padding: 1rem;
-  text-align: left;
+    position: relative;
+    z-index: 1;
+    padding: 1rem;
+    text-align: left;
 }
 
 .menu-card h3 {
-  margin: 0 0 0.5rem;
-  font-size: clamp(1rem, 2vw, 1.3rem);
-  font-weight: 700;
+    margin: 0 0 0.5rem;
+    font-size: clamp(1rem, 2vw, 1.3rem);
+    font-weight: 700;
 }
 
 .menu-card p {
-  font-size: clamp(0.85rem, 1.5vw, 0.95rem);
-  line-height: 1.4;
+    font-size: clamp(0.85rem, 1.5vw, 0.95rem);
+    line-height: 1.4;
 }
 
 /* Fondos individuales */
 .bebida_menu {
-  background-image: url('/upload/productos/temuna.jpg');
+    background-image: url('/upload/productos/temuna.jpg');
 }
 
 .platillo_menu {
-  background-image: url('/upload/productos/sopaseca.jpg');
+    background-image: url('/upload/productos/sopaseca.jpg');
 }
 
 .postre_menu {
-  background-image: url('/upload/productos/arrozconleche.jpg');
+    background-image: url('/upload/productos/arrozconleche.jpg');
 }
 
 
 /* === MENU CAROUSEL === */
 .menu-carousel {
-  padding: 1rem;
-  text-align: center;
-  background: #fff;
+    padding: 1rem;
+    text-align: center;
+    background: #fff;
 }
 
 .menu-carousel__title {
-  font-size: clamp(1.5rem, 2.5vw, 2rem);
-  margin-bottom: 1rem;
-  color: var(--color-secondary, #b22222);
+    font-size: clamp(1.5rem, 2.5vw, 2rem);
+    margin-bottom: 1rem;
+    color: var(--color-secondary, #b22222);
 }
 
 .menu-carousel__wrapper {
-  position: relative;
-  max-width: 100%;
-  margin: 0 auto;
-  overflow: hidden;
-  border-radius: 1rem;
-  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+    position: relative;
+    max-width: 100%;
+    margin: 0 auto;
+    overflow: hidden;
+    border-radius: 1rem;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
 }
 
 .menu-carousel__container {
-  display: flex;
-  transition: transform 0.8s ease-in-out;
+    display: flex;
+    transition: transform 0.8s ease-in-out;
 }
 
 .menu-carousel__item {
-  min-width: 100%;
-  user-select: none;
+    min-width: 100%;
+    user-select: none;
 }
 
 .menu-carousel__item img {
-  width: 100%;
-  height: 300px;
-  object-fit: cover;
-  display: block;
-  border-radius: 1rem;
+    width: 100%;
+    height: 450px;
+    object-fit: cover;
+    display: block;
 }
 
 
@@ -133,34 +132,34 @@ body {
 
 /* Tablets */
 @media (max-width: 768px) {
-  .menu-card {
-    height: 180px;
-  }
+    .menu-card {
+        height: 180px;
+    }
 
-  .menu-carousel__item img {
-    height: 200px;
-  }
+    .menu-carousel__item img {
+        height: 200px;
+    }
 }
 
 /* Celulares */
 @media (max-width: 480px) {
-  .menu-grid {
-    grid-template-columns: 1fr;
-  }
+    .menu-grid {
+        grid-template-columns: 1fr;
+    }
 
-  .menu-card {
-    height: 160px;
-  }
+    .menu-card {
+        height: 160px;
+    }
 
-  .menu-content {
-    padding: 0.5rem;
-  }
+    .menu-content {
+        padding: 0.5rem;
+    }
 
-  .menu-card h3 {
-    font-size: 1rem;
-  }
+    .menu-card h3 {
+        font-size: 1rem;
+    }
 
-  .menu-carousel__item img {
-    height: 150px;
-  }
+    .menu-carousel__item img {
+        height: 150px;
+    }
 }
