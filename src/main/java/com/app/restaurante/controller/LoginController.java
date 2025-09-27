@@ -27,7 +27,6 @@ public class LoginController {
     @Autowired
     private HttpSession session;    
     
-    // Cambiar el email por el user
     @PostMapping("/login")
     public ModelAndView login(
             @RequestParam("usuario") String usuario, 
@@ -52,14 +51,6 @@ public class LoginController {
         }
     }
     
-    /* Nuevo método para manejar el cierre de sesión
-    @GetMapping("/logout")
-    public String logout(HttpSession session) {
-        session.invalidate(); // Invalida la sesión actual y destruye todos los datos
-        return "redirect:/login"; // Redirige a la página de inicio de sesión
-    }*/
-    
-    // Cierra sesion, destruye los datos
     @GetMapping("/logout")
     public String logout(HttpServletRequest request, HttpServletResponse response) {
         // Invalidar la sesión
@@ -73,6 +64,4 @@ public class LoginController {
         
         return "redirect:/";
     }
-
 }
-

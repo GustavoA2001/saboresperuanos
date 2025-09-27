@@ -32,63 +32,61 @@ public class ProductoController {
     @Autowired
     private HttpSession session;
 
-
     /**
      * Metodo que maneja la solicitud GET para mostrar la carta de productos
      */
-@GetMapping("/carta")
-public String mostrarCarta(HttpSession session,
-                           Model model,
-                           @RequestParam(value = "query", required = false) String query,
-                           @RequestParam(value = "categoria", required = false) Long idCategoria,
-                           @RequestParam(value = "page", defaultValue = "1") int page,
-                           HttpServletRequest request) {
+    @GetMapping("/carta")
+    public String mostrarCarta(HttpSession session,
+            Model model,
+            @RequestParam(value = "query", required = false) String query,
+            @RequestParam(value = "categoria", required = false) Long idCategoria,
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            HttpServletRequest request) {
 
-    Cliente cliente = (Cliente) session.getAttribute("cliente");
-    model.addAttribute("cliente", cliente);
-    model.addAttribute("activePage", "carta");
+        Cliente cliente = (Cliente) session.getAttribute("cliente");
+        model.addAttribute("cliente", cliente);
+        model.addAttribute("activePage", "carta");
 
-    // Tamaño de página (ej. 12 productos por página)
-    int pageSize = 12;
-    int offset = (page - 1) * pageSize;
+        // Tamaño de página (ej. 12 productos por página)
+        int pageSize = 12;
+        int offset = (page - 1) * pageSize;
 
-    // Cargar categorías
-    List<Categoria> categorias = productosDAO.findAllCategorias();
-    model.addAttribute("categorias", categorias);
+        // Cargar categorías
+        List<Categoria> categorias = productosDAO.findAllCategorias();
+        model.addAttribute("categorias", categorias);
 
-    // Guardar la categoría seleccionada
-    model.addAttribute("categoriaSeleccionada", idCategoria);
+        // Guardar la categoría seleccionada
+        model.addAttribute("categoriaSeleccionada", idCategoria);
 
-    // Variables de resultados
-    List<Productos> productos;
-    int totalProductos;
+        // Variables de resultados
+        List<Productos> productos;
+        int totalProductos;
 
-    if (query != null && !query.isEmpty()) {
-        totalProductos = productosDAO.countByBusquedaPorNombre(query);
-        productos = productosDAO.buscarProductosPorNombre(query, offset, pageSize);
-    } else if (idCategoria != null) {
-        totalProductos = productosDAO.countByCategoria(idCategoria);
-        productos = productosDAO.obtenerPorCategoriaId(idCategoria, offset, pageSize);
-    } else {
-        totalProductos = productosDAO.countAll();
-        productos = productosDAO.findAllPaginated(offset, pageSize);
+        if (query != null && !query.isEmpty()) {
+            totalProductos = productosDAO.countByBusquedaPorNombre(query);
+            productos = productosDAO.buscarProductosPorNombre(query, offset, pageSize);
+        } else if (idCategoria != null) {
+            totalProductos = productosDAO.countByCategoria(idCategoria);
+            productos = productosDAO.obtenerPorCategoriaId(idCategoria, offset, pageSize);
+        } else {
+            totalProductos = productosDAO.countAll();
+            productos = productosDAO.findAllPaginated(offset, pageSize);
+        }
+
+        model.addAttribute("productos", productos);
+
+        // Calcular número total de páginas
+        int totalPages = (int) Math.ceil((double) totalProductos / pageSize);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("currentPage", page);
+
+        // Si es petición AJAX solo devolvemos los productos
+        if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
+            return "carta :: productos";
+        }
+
+        return "carta";
     }
-
-    model.addAttribute("productos", productos);
-
-    // Calcular número total de páginas
-    int totalPages = (int) Math.ceil((double) totalProductos / pageSize);
-    model.addAttribute("totalPages", totalPages);
-    model.addAttribute("currentPage", page);
-
-    // Si es petición AJAX solo devolvemos los productos
-    if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
-        return "carta :: productos";
-    }
-
-    return "carta";
-}
-
 
     /**
      * Asigna imagen por defecto si el producto no tiene foto.
