@@ -32,7 +32,7 @@ public class LoginController {
             @RequestParam("usuario") String usuario, 
             @RequestParam("contrasena") String password,
             RedirectAttributes redirectAttributes)
-             throws NoSuchAlgorithmException, IOException, CloneNotSupportedException {
+            throws NoSuchAlgorithmException, IOException, CloneNotSupportedException {
         
         Cliente cliente = loginService.validateUser(usuario, password);  // Validación de credenciales
         
@@ -41,7 +41,6 @@ public class LoginController {
             session.setAttribute("idCliente", cliente.getIdCliente());
             session.setAttribute("usuario", cliente.getUsuario()); 
             session.setAttribute("nombre", cliente.getNombre());
-           
             return new ModelAndView("redirect:/registro_completar");
 
         } else {
