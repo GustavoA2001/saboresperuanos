@@ -7,6 +7,7 @@ import com.app.restaurante.utils.Validation;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -70,14 +71,9 @@ public class RegistroController {
             return "redirect:/login";
         }
 
-        // Encripta la contraseña
-        String hashedPassword;
-        try {
-            hashedPassword = Validation.md5(contrasena);
-        } catch (NoSuchAlgorithmException e) {
-            redirectAttributes.addFlashAttribute("error", "Error al encriptar la contraseña");
-            return "redirect:/login";
-        }
+         // 🔹 Encriptar contraseña con BCrypt
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        String hashedPassword = encoder.encode(contrasena);
 
         // Crear y guardar el cliente
         // Podemos descartar el nombre y apellido en el formulario

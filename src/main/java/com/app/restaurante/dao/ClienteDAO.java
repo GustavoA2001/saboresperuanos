@@ -89,6 +89,15 @@ public class ClienteDAO {
         return clientes.isEmpty() ? null : clientes.get(0); // Si no se encuentra el cliente, retornamos null
     }
 
+    // Método para obtener un cliente por su nombre de usuario
+@SuppressWarnings("deprecation")
+public Cliente findByUsuario(String usuario) {
+    String sql = "SELECT * FROM " + getTableName() + " WHERE usuario = ?";
+    List<Cliente> clientes = jdbcTemplate.query(sql, new Object[] { usuario }, getRowMapper());
+    return clientes.isEmpty() ? null : clientes.get(0);
+}
+
+
     // Metodo para obtener un cliente por correo electrónico
     @SuppressWarnings("deprecation")
     public Cliente findByCorreo(String correo) {
@@ -145,6 +154,12 @@ public class ClienteDAO {
         });
     }
 
-    
+
+    public void actualizarContrasenaPorCorreo(String correo, String nuevaContrasena) {
+        String sql = "UPDATE cliente SET contrasena = ? WHERE correo = ?";
+        jdbcTemplate.update(sql, nuevaContrasena, correo);
+    }
+
+
     
 }

@@ -119,6 +119,14 @@ CREATE TABLE cliente (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
+CREATE TABLE password_reset_token (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  email VARCHAR(100) NOT NULL,
+  token VARCHAR(255) NOT NULL UNIQUE,
+  expiration_date DATETIME NOT NULL
+);
+
+
 INSERT INTO cliente (IDCliente, Nombre, Apellido, Usuario, Correo, Contrasena, dni) VALUES
 (1, 'Luis', 'Alvarado', 'luis', 'luis@gmail.com', '4c96f8324e3ba54a99e78249b95daa30', '12345678'),
 (2, 'gustavo', 'alegre', 'gustavo', NULL, '67daae98ed0c612857a716202f463356ffcf1a018ce140ab4a4bebc8eb274e6d', '23456789'),

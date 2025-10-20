@@ -37,16 +37,16 @@ public class DeliveryDAO {
      // Metodo para obtener los pedidos disponibles para delivery
     public List<Pedido> obtenerPedidosDisponibles() {
         String sql = "SELECT c.idcliente, c.nombre, c.apellido, " +
-                     "d.iddireccion, d.direccion, " +
-                     "p.idpedido, pg.idpago, pg.totalpago, pg.FechaPago, p.Estado as EstadoPedido, " +
-                     "e.IDEmpleado, pg.fechaPago AS fechaPagoUltimo " +
-                     "FROM cliente c " +
-                     "INNER JOIN direccion d ON c.idcliente = d.idcliente " +
-                     "INNER JOIN pedido p ON c.idcliente = p.idcliente " +
-                     "INNER JOIN pago pg ON p.idpedido = pg.idpedido " +
-                     "LEFT JOIN delivery e ON p.idpedido = e.IDPedido " +
-                     "WHERE p.Estado = 'Pagado' AND e.IDEmpleado IS NULL AND e.IDDelivery IS NOT NULL " +
-                     "GROUP BY p.IDPedido";
+                    "d.iddireccion, d.direccion, " +
+                    "p.idpedido, pg.idpago, pg.totalpago, pg.FechaPago, p.Estado as EstadoPedido, " +
+                    "e.IDEmpleado, pg.fechaPago AS fechaPagoUltimo " +
+                    "FROM cliente c " +
+                    "INNER JOIN direccion d ON c.idcliente = d.idcliente " +
+                    "INNER JOIN pedido p ON c.idcliente = p.idcliente " +
+                    "INNER JOIN pago pg ON p.idpedido = pg.idpedido " +
+                    "LEFT JOIN delivery e ON p.idpedido = e.IDPedido " +
+                    "WHERE p.Estado = 'Pagado' AND e.IDEmpleado IS NULL AND e.IDDelivery IS NOT NULL " +
+                    "GROUP BY p.IDPedido";
 
         return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Pedido.class));
     }

@@ -13,7 +13,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.app.restaurante.model.Empleado;
 import com.app.restaurante.service.EmpleadoService;
-import com.app.restaurante.utils.Validation;
 
 @Controller
 public class EmpleadoLoginController {

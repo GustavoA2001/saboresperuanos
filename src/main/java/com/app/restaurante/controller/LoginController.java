@@ -34,28 +34,25 @@ public class LoginController {
             RedirectAttributes redirectAttributes)
             throws NoSuchAlgorithmException, IOException, CloneNotSupportedException {
         
-        Cliente cliente = loginService.validateUser(usuario, password);  // Validación de credenciales
+        Cliente cliente = loginService.validateUser(usuario, password);
         
         if (cliente != null) {
-            // Almacena el cliente en la sesión
             session.setAttribute("idCliente", cliente.getIdCliente());
-            session.setAttribute("usuario", cliente.getUsuario()); 
+            session.setAttribute("usuario", cliente.getUsuario());
             session.setAttribute("nombre", cliente.getNombre());
-            return new ModelAndView("redirect:/registro_completar");
-
+            System.out.println("✅ Usuario logueado: " + cliente.getUsuario());
+            return new ModelAndView("redirect:/inicio");
         } else {
-            // Mensaje si las credenciales son incorrectas
-            redirectAttributes.addFlashAttribute("error", "Correo electrónico o contraseña inválidos");
+            redirectAttributes.addFlashAttribute("error", "Usuario o contraseña inválidos");
             return new ModelAndView("redirect:/login");
         }
     }
     
     @GetMapping("/logout")
     public String logout(HttpServletRequest request, HttpServletResponse response) {
-        // Invalidar la sesión
         HttpSession session = request.getSession(false);
         if (session != null) {
-            session.invalidate(); // Invalida la sesión y destruye
+            session.invalidate();
         }
         response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
         response.setHeader("Pragma", "no-cache"); 
@@ -63,4 +60,10 @@ public class LoginController {
         
         return "redirect:/";
     }
+
+    @GetMapping("/inicio")
+public String mostrarInicio() {
+    return "index";
+}
+
 }
