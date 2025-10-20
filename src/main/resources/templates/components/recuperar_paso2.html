@@ -1,0 +1,138 @@
+<form th:action="@{/recuperar/verificarCodigo}" method="post" class="form-recuperar" onsubmit="unirCodigo()">
+    <h2 class="league-spartan">Verificar código</h2>
+    <p class="league-spartan">Ingresa el código que te enviamos a tu correo electrónico.</p>
+
+    <label for="codigo1 cabin">Código de verificación</label>
+
+    <div class="codigo-inputs league-spartan">
+        <input type="text" maxlength="1" id="codigo1" class="codigo" required>
+        <input type="text" maxlength="1" id="codigo2" class="codigo" required>
+        <input type="text" maxlength="1" id="codigo3" class="codigo" required>
+        <input type="text" maxlength="1" id="codigo4" class="codigo" required>
+        <input type="text" maxlength="1" id="codigo5" class="codigo" required>
+        <input type="text" maxlength="1" id="codigo6" class="codigo" required>
+    </div>
+
+    <!-- Campo oculto donde se junta el código -->
+    <input type="hidden" id="codigo" name="codigo">
+
+    <button type="submit" class="btn-rec cabin">Verificar</button>
+</form>
+
+<style>
+.form-recuperar {
+    max-width: 360px;
+    margin: 50px auto;
+    padding: 30px 25px;
+    background: #fff;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+}
+
+.form-recuperar h2 {
+    text-align: center;
+    color: #111827;
+    margin-bottom: 0;
+    font-size: 1.35rem;
+}
+
+.form-recuperar p {
+    font-size: 0.9rem;
+    color: #555;
+    text-align: center;
+    margin-bottom: 5px;
+}
+
+.form-recuperar label {
+    font-weight: 600;
+    color: #1f2937;
+    text-align: center;
+}
+
+.codigo-inputs {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.codigo {
+    width: 42px;
+    height: 48px;
+    text-align: center;
+    font-size: 1.2rem;
+    border: 1.5px solid #ccc;
+    border-radius: 8px;
+    transition: border 0.3s, box-shadow 0.3s;
+}
+
+.codigo:focus {
+    border-color: var(--color-secondary, #848ea3);
+    box-shadow: 0 0 6px rgba(37,99,235,0.25);
+    outline: none;
+}
+
+.btn-rec {
+    padding: 12px;
+    background-color: var(--color-secondary, #848ea3);
+    color: white;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.btn-rec:hover {
+    background-color: #848ea3;
+    transform: translateY(-1px);
+}
+</style>
+
+<script>
+const inputs = document.querySelectorAll(".codigo");
+
+inputs.forEach((input, index) => {
+    // Movimiento normal entre inputs
+    input.addEventListener("input", (e) => {
+        const value = e.target.value;
+        if (!/^[0-9]$/.test(value)) {
+            e.target.value = ""; // Solo números
+            return;
+        }
+        if (value && index < inputs.length - 1) {
+            inputs[index + 1].focus();
+        }
+    });
+
+    // Permitir moverse hacia atrás con backspace
+    input.addEventListener("keydown", (e) => {
+        if (e.key === "Backspace" && !e.target.value && index > 0) {
+            inputs[index - 1].focus();
+        }
+    });
+
+    // Manejar el pegado del código completo
+    input.addEventListener("paste", (e) => {
+        e.preventDefault();
+        const pasted = (e.clipboardData || window.clipboardData).getData("text");
+        if (/^\d+$/.test(pasted)) { // Solo números
+            const digits = pasted.slice(0, inputs.length).split("");
+            digits.forEach((digit, i) => {
+                inputs[i].value = digit;
+            });
+            if (digits.length === inputs.length) {
+                inputs[inputs.length - 1].focus();
+            }
+        }
+    });
+});
+
+// Une los 6 dígitos en un solo campo oculto antes de enviar
+function unirCodigo() {
+    const codigo = Array.from(inputs).map(i => i.value).join("");
+    document.getElementById("codigo").value = codigo;
+}
+</script>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recuperar Contraseña | Sabores Peruanos</title>
+    <link rel="stylesheet" href="/css/colors.css">
+    <link rel="stylesheet" href="/css/fonts.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f9f9f9, #eef2f7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .rec-container {
+            background: white;
+            border: 2px solid #111827;
+            border-radius: 1rem;
+            box-shadow: 8px 8px 0 rgba(17, 24, 39, 1);
+            width: 90%;
+            max-width: 600px;
+            overflow: hidden;
+        }
+
+        .rec-header {
+            text-align: center;
+            padding: 25px 20px;
+            background: var(--color-secondary);
+            color: white;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        section.section-recuperar {
+            padding: 25px 30px;
+            position: relative;
+        }
+
+        .steps-indicator {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .step-indicator {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: 2px solid #111827;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            transition: 0.3s;
+            background: white;
+        }
+
+        .step-indicator.active {
+            background: var(--color-secondary);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        #mensaje {
+            text-align: center;
+            font-weight: 600;
+            margin-top: 15px;
+        }
+
+        #mensaje.success { color: green; }
+        #mensaje.error { color: red; }
+
+        /*ANIMACIONES DE TRANSICIÓN*/
+        .form-step {
+            animation: fadeSlideIn 0.6s ease forwards;
+        }
+
+        @keyframes fadeSlideIn {
+            0% {
+                opacity: 0;
+                transform: translateY(25px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* BOTÓN DE SALIDA*/
+        .exit-button {
+            display: block;
+            width: fit-content;
+            margin: 25px auto 0;
+            padding: 10px 18px;
+            background: #111827;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.3s, transform 0.2s;
+        }
+
+        .exit-button:hover {
+            background: var(--color-secondary);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="rec-container">
+        <div class="rec-header league-spartan">Recuperar Contraseña</div>
+
+        <section class="section-recuperar">
+
+            <!-- Indicadores de pasos -->
+            <div class="steps-indicator cabin">
+                <span class="step-indicator" th:classappend="${step == 1} ? 'active'">1</span>
+                <span class="step-indicator" th:classappend="${step == 2} ? 'active'">2</span>
+                <span class="step-indicator" th:classappend="${step == 3} ? 'active'">3</span>
+            </div>
+
+            <!-- Paso 1 -->
+            <div th:if="${step == 1}" class="form-step">
+                <div th:replace="components/recuperar_paso1"></div>
+            </div>
+
+            <!-- Paso 2 -->
+            <div th:if="${step == 2}" class="form-step">
+                <div th:replace="components/recuperar_paso2"></div>
+            </div>
+
+            <!-- Paso 3 -->
+            <div th:if="${step == 3}" class="form-step">
+                <div th:replace="components/recuperar_paso3"></div>
+            </div>
+
+            <div id="mensaje" th:text="${mensaje}"></div>
+
+            <!--Botón para volver al login -->
+            <a th:href="@{/login}" class="exit-button"> Volver al inicio de sesión</a>
+        </section>
+    </div>
+</body>
+</html>

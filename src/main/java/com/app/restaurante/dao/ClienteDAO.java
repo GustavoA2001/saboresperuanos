@@ -18,26 +18,23 @@ public class ClienteDAO {
     @Autowired
     private JdbcTemplate jdbcTemplate; // Inyección de JdbcTemplate para ejecutar consultas SQL
 
-    // Metodo que devuelve el nombre de la tabla en la base de datos donde se almacenan los clientes
+    // Metodo que devuelve el nombre de la tabla en la base de datos donde se
+    // almacenan los clientes
     protected String getTableName() {
         return "cliente"; // Nombre de la tabla en la base de datos
     }
 
-    // Metodo que devuelve el RowMapper para mapear los resultados a objetos Cliente
     protected RowMapper<Cliente> getRowMapper() {
-        return new RowMapper<Cliente>() {
-            @Override
-            public Cliente mapRow(ResultSet rs, int rowNum) throws SQLException {
-                Cliente cliente = new Cliente();
-                cliente.setIdCliente(rs.getLong("idCliente"));
-                cliente.setNombre(rs.getString("nombre")); 
-                cliente.setApellido(rs.getString("apellido"));
-                cliente.setUsuario(rs.getString("usuario"));
-                cliente.setContrasena(rs.getString("contrasena"));
-                cliente.setCorreo(rs.getString("correo"));  
-                cliente.setCorreo(rs.getString("dni"));              
-                return cliente;
-            }
+        return (rs, rowNum) -> {
+            Cliente cliente = new Cliente();
+            cliente.setIdCliente(rs.getLong("idCliente"));
+            cliente.setNombre(rs.getString("nombre"));
+            cliente.setApellido(rs.getString("apellido"));
+            cliente.setUsuario(rs.getString("usuario"));
+            cliente.setContrasena(rs.getString("contrasena"));
+            cliente.setCorreo(rs.getString("correo")); // CORRECTO
+            cliente.setDni(rs.getString("dni")); // DNI separado
+            return cliente;
         };
     }
 
@@ -46,25 +43,23 @@ public class ClienteDAO {
         if (cliente.getIdCliente() == null) {
             // Si el cliente no tiene ID, es un nuevo cliente, hacemos un INSERT
             String sql = "INSERT INTO " + getTableName() + " (nombre, apellido, usuario, correo, contrasena, dni) " +
-                         "VALUES (?, ?, ?, ?, ?, ?)";
+                    "VALUES (?, ?, ?, ?, ?, ?)";
             jdbcTemplate.update(sql,
-                cliente.getNombre(),
-                cliente.getApellido(),
-                cliente.getUsuario(),
-                cliente.getCorreo(),
-                cliente.getContrasena(),                
-                cliente.getDni()
-            );
+                    cliente.getNombre(),
+                    cliente.getApellido(),
+                    cliente.getUsuario(),
+                    cliente.getCorreo(),
+                    cliente.getContrasena(),
+                    cliente.getDni());
         } else {
             // Si el cliente tiene ID, es un cliente existente, hacemos un UPDATE
             String sql = "UPDATE " + getTableName() + " SET nombre = ?, apellido = ?, usuario = ?, " +
-                         "correo = ? WHERE idCliente = ?";
+                    "correo = ? WHERE idCliente = ?";
             jdbcTemplate.update(sql,
-                cliente.getNombre(),
-                cliente.getApellido(),
-                cliente.getUsuario(),
-                cliente.getCorreo()
-            );
+                    cliente.getNombre(),
+                    cliente.getApellido(),
+                    cliente.getUsuario(),
+                    cliente.getCorreo());
         }
     }
 
@@ -109,15 +104,15 @@ public class ClienteDAO {
     // Metodo para detectar si el cliente tiene una direccion
     public Cliente findDireccionByID(Long idCliente) {
         String sql = "SELECT * FROM cliente cli " +
-                     "JOIN direccion d ON cli.idCliente = d.idCliente " +
-                     "WHERE cli.idCliente = ?";
+                "JOIN direccion d ON cli.idCliente = d.idCliente " +
+                "WHERE cli.idCliente = ?";
         List<Cliente> results = jdbcTemplate.query(sql, getRowMapper(), idCliente);
         return results.isEmpty() ? null : results.get(0);
     }
-    
+
     // Metodo para almacenar una direccion para el cliente
     public boolean saveDireccion(Long idCliente, String direccion, String ciudad) {
-        try { 
+        try {
             String sql = "INSERT INTO direccion (idCliente, direccion, ciudad) VALUES (?, ?, ?)";
             int rows = jdbcTemplate.update(sql, idCliente, direccion, ciudad);
             return rows > 0;
@@ -125,26 +120,23 @@ public class ClienteDAO {
             e.printStackTrace();
             return false;
         }
-    }    
+    }
 
     public boolean hasDireccion(Long idCliente) {
         String sql = "SELECT COUNT(*) FROM direccion WHERE idCliente = ?";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, idCliente);
         return count != null && count > 0;
     }
-    
 
     // Metodo para obtener la lista de distritos
     public List<Direccion> findAllDistritos() {
-        String sql = "SELECT IDDistrito, distrito FROM distrito"; 
+        String sql = "SELECT IDDistrito, distrito FROM distrito";
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
             Direccion direccion = new Direccion();
-            direccion.setIdDistrito(rs.getLong("IDDistrito")); 
+            direccion.setIdDistrito(rs.getLong("IDDistrito"));
             direccion.setDistrito(rs.getString("distrito"));
             return direccion;
         });
     }
 
-    
-    
 }

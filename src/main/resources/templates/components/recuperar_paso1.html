@@ -1,0 +1,80 @@
+<form th:action="@{/recuperar/enviarCorreo}" method="post" class="form-recuperar">
+    <h2 class="league-spartan">Recuperar contraseña</h2>
+    <p class="league-spartan">Ingresa tu correo electrónico para recibir un código de verificación.</p>
+
+    <label for="correo" class="cabin">Correo electrónico</label>
+    <div class="input-wrapper">
+        <input type="email" id="correo" name="correo" class="league-spartan" placeholder="ejemplo@correo.com" required>
+    </div>
+
+    <button type="submit" class="btn-rec cabin">Enviar código</button>
+</form>
+
+<style>
+.form-recuperar {
+    max-width: 360px;
+    margin: 50px auto;
+    padding: 30px 25px;
+    background: #fff;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.form-recuperar h2 {
+    text-align: center;
+    color: #111827;
+    margin-bottom: 0;
+    font-size: 1.35rem;
+}
+
+.form-recuperar p {
+    font-size: 0.9rem;
+    color: #555;
+    text-align: center;
+    margin-bottom: 5px;
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.form-recuperar label {
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.form-recuperar input[type="email"] {
+    width: 100%;
+    padding: 11px 12px;
+    border: 1.5px solid #ccc;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border 0.3s, box-shadow 0.3s;
+}
+
+.form-recuperar input[type="email"]:focus {
+    border-color: var(--color-secondary, #848ea3);
+    box-shadow: 0 0 6px rgba(37,99,235,0.25);
+    outline: none;
+}
+
+.btn-rec {
+    padding: 12px;
+    background-color: var(--color-secondary, #848ea3);
+    color: white;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.btn-rec:hover {
+    background-color: #848ea3;
+    transform: translateY(-1px);
+}
+</style>
