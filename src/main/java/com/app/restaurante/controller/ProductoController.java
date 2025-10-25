@@ -103,15 +103,14 @@ public class ProductoController {
      * Metodo que maneja la solicitud GET para obtener los detalles de un producto
      * especifico
      */
-    @GetMapping("/producto/{idProducto}")
-    public String obtenerDetalleProducto(@PathVariable("idProducto") int idProducto, Model model) {
-        Cliente cliente = (Cliente) session.getAttribute("cliente");
-        model.addAttribute("cliente", cliente);
-
-        Productos producto = productosDAO.obtenerProductoPorId(idProducto);
+    @GetMapping("/detalle/{idProducto}")
+    public String detalleProducto(@PathVariable int idProducto, Model model) {
+        Productos producto = productosDAO.obtenerPorId(idProducto);
         model.addAttribute("producto", producto);
-        return "modalproducto";
+        return "detalle_productos"; // busca templates/detalle_producto.html
     }
+
+
 
     /**
      * Metodo que maneja la solicitud POST para registrar un nuevo producto

@@ -237,6 +237,9 @@ public List<Productos> buscarProductosPorCategoria(Long idCategoria) {
     return jdbcTemplate.query(sql, new Object[]{idCategoria}, getRowMapper());
 }
 
-
+    public Productos obtenerPorId(int idProducto) {
+        String sql = "SELECT * FROM producto WHERE idProducto = ?";
+        return jdbcTemplate.queryForObject(sql, new BeanPropertyRowMapper<>(Productos.class), idProducto);
+    }
 }
 

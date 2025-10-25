@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${producto.nomProducto} + ' | Detalle del producto'">Detalle del producto</title>
+
+    <!-- Fuentes y estilos -->
+    <link th:include="components/link">
+    <link rel="stylesheet" th:href="@{/css/menu.css}">
+    <script src="https://kit.fontawesome.com/35db202371.js" crossorigin="anonymous"></script>
+
+    <style>
+        body {
+            font-family: 'Cabin', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f6f6f6;
+            color: #333;
+        }
+
+        main {
+            margin-top: 90px;
+            display: flex;
+            justify-content: center;
+            padding: 30px 20px;
+        }
+
+        .detalle-container {
+            width: 100%;
+            max-width: 1100px;
+            background-color: #fff;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-wrap: wrap;
+            transition: all 0.3s ease;
+        }
+
+        .detalle-imagen {
+            flex: 1 1 50%;
+            background-color: #fafafa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+        }
+
+        .detalle-imagen img {
+            width: 95%;
+            max-width: 480px;
+            border-radius: 14px;
+            object-fit: cover;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .detalle-info {
+            flex: 1 1 50%;
+            padding: 50px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .detalle-info h1 {
+            font-family: 'League Spartan', sans-serif;
+            font-size: 2.3rem;
+            margin-bottom: 15px;
+            color: #222;
+        }
+
+        .detalle-descripcion {
+            font-size: 1rem;
+            line-height: 1.7;
+            color: #555;
+            margin-bottom: 25px;
+        }
+
+        .detalle-precio {
+            font-family: 'League Spartan', sans-serif;
+            font-size: 2rem;
+            color: #e63946;
+            margin-bottom: 25px;
+        }
+
+        /* ---------- CANTIDAD ---------- */
+        .cantidad-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            gap: 15px;
+        }
+
+        .cantidad-container button {
+            width: 45px;
+            height: 45px;
+            font-size: 22px;
+            font-weight: bold;
+            color: #333;
+            background-color: #f1f1f1;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .cantidad-container button:hover {
+            background-color: #e6e6e6;
+        }
+
+        .cantidad-container span {
+            font-size: 1.3rem;
+            font-weight: bold;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        /* ---------- BOTONES ---------- */
+        .detalle-acciones {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .detalle-acciones a,
+        .detalle-acciones button {
+            font-family: 'League Spartan', sans-serif;
+            font-size: 1rem;
+            background-color: #e63946;
+            color: #fff;
+            border: none;
+            padding: 12px 26px;
+            border-radius: 10px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+        }
+
+        .detalle-acciones a {
+            background-color: #6c757d;
+        }
+
+        .detalle-acciones a:hover {
+            background-color: #5a6268;
+        }
+
+        .detalle-acciones button:hover {
+            background-color: #c72f3c;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 950px) {
+            .detalle-container {
+                flex-direction: column;
+            }
+
+            .detalle-imagen,
+            .detalle-info {
+                flex: 1 1 100%;
+                padding: 30px;
+            }
+
+            main {
+                margin-top: 80px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .detalle-info h1 {
+                font-size: 1.8rem;
+            }
+
+            .detalle-precio {
+                font-size: 1.6rem;
+            }
+
+            .detalle-acciones {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header th:replace="components/menu :: menu"></header>
+
+    <main>
+        <div class="detalle-container">
+            <div class="detalle-imagen">
+                <img th:src="@{/upload/productos/{filename}(filename=${producto.fotoProducto})}" alt="Imagen del producto">
+            </div>
+
+            <div class="detalle-info">
+                <form id="form-agregar" action="/carrito/agregar" method="POST">
+                    <input type="hidden" name="idproducto" th:value="${producto.idProducto}">
+                    <input type="hidden" name="precioUnitario" id="precio-input" th:value="${producto.precioUnitario}">
+                    <input type="hidden" name="cantidad" id="cantidad-input" value="1">
+
+                    <h1 th:text="${producto.nomProducto}">Nombre del producto</h1>
+                    <p class="detalle-descripcion" th:text="${producto.descripcion}">Descripción del producto...</p>
+                    <p class="detalle-precio" th:text="'S/ ' + ${producto.precioUnitario}">S/ 0.00</p>
+
+                    <div class="cantidad-container">
+                        <button type="button" id="btn-decrementar">-</button>
+                        <span id="cantidad">1</span>
+                        <button type="button" id="btn-incrementar">+</button>
+                    </div>
+
+                    <div class="detalle-acciones">
+                        <a th:href="@{/carta}"><i class="fas fa-arrow-left"></i> Volver a la carta</a>
+                        <button type="submit"><i class="fas fa-cart-plus"></i> Agregar al carrito</button>
+                        <button type="button" id="btn-comprar" style="background-color:#007bff"><i class="fas fa-credit-card"></i> Comprar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const btnDecrementar = document.getElementById('btn-decrementar');
+            const btnIncrementar = document.getElementById('btn-incrementar');
+            const cantidadSpan = document.getElementById('cantidad');
+            const cantidadInput = document.getElementById('cantidad-input');
+            const btnComprar = document.getElementById('btn-comprar');
+
+            let cantidad = 1;
+
+            btnDecrementar.addEventListener('click', function() {
+                if (cantidad > 1) {
+                    cantidad--;
+                    cantidadSpan.textContent = cantidad;
+                    cantidadInput.value = cantidad;
+                }
+            });
+
+            btnIncrementar.addEventListener('click', function() {
+                cantidad++;
+                cantidadSpan.textContent = cantidad;
+                cantidadInput.value = cantidad;
+            });
+
+            btnComprar.addEventListener('click', function() {
+                alert('Botón "Comprar" presionado.');
+            });
+        });
+    </script>
+</body>
+</html>

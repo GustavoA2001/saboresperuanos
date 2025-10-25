@@ -14,11 +14,12 @@
                 <p class="pedido-fecha-unico" th:text="${pedido.fechaPedido}">Fecha del Pedido</p>
                 <p class="pedido-total-unico" th:text="${pedido.totalPago}">Total del Pago</p>
 
-                <button class="boton-ver-recibo-unico">
-                    <a href="/recibo_modal/{idPedido}" th:href="@{/recibo_modal/{idPedido}(idPedido=${pedido.idPedido})}">
-                        Ver Recibo
-                    </a>
-                </button>
+<button class="boton-ver-recibo-unico" 
+        th:attr="data-id=${pedido.idPedido}" 
+        onclick="verFactura(this)">
+    Ver Recibo
+</button>
+
                 
             </div>
         </div>
@@ -451,4 +452,46 @@
         });
     }
 
+</script>
+
+
+<script>
+function verFactura(button) {
+    const idPedido = button.getAttribute('data-id');
+
+    fetch(`/recibo_modal/${idPedido}`)
+        .then(response => response.json())
+        .then(data => {
+            // Asignar datos del recibo al modal
+            document.getElementById('idPedido').textContent = data.idPedido;
+            document.getElementById('nombreCliente').textContent = data.nombreCliente;
+            document.getElementById('direccionCliente').textContent = data.direccionCliente;
+            document.getElementById('totalPago').textContent = 'S/. ' + data.totalPago;
+            document.getElementById('fechaPago').textContent = data.fechaPago;
+
+            // Limpiar tabla y volver a llenarla
+            const tabla = document.getElementById('productosComprados');
+            tabla.innerHTML = '';
+            data.productos.forEach(prod => {
+                const fila = document.createElement('tr');
+                fila.innerHTML = `
+                    <td>${prod.nomProducto}</td>
+                    <td>${prod.cantidad}</td>
+                    <td>S/. ${prod.precioUnitario}</td>
+                `;
+                tabla.appendChild(fila);
+            });
+
+            // Mostrar modal
+            document.getElementById('facturaModal').style.display = 'flex';
+        })
+        .catch(err => {
+            console.error('Error al cargar el recibo:', err);
+            alert('No se pudo mostrar el recibo.');
+        });
+}
+
+function cerrarFacturaModal() {
+    document.getElementById('facturaModal').style.display = 'none';
+}
 </script>

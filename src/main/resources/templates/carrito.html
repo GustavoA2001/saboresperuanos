@@ -4,84 +4,246 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carrito de Compras</title>
+
     <link th:include="components/link"></link>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/menu.css}">
+    <script src="https://kit.fontawesome.com/35db202371.js" crossorigin="anonymous"></script>
+
+    <style>
+        body {
+            font-family: 'Cabin', sans-serif;
+            background: #f7f7f7;
+            margin: 0;
+            padding-top: 90px; /* espacio por el menú fijo */
+            color: #333;
+        }
+
+        .carrito-container {
+            max-width: 1100px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 16px;
+            padding: 30px 40px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            font-family: 'League Spartan', sans-serif;
+            font-size: 2rem;
+            margin-bottom: 30px;
+            text-align: center;
+            color: #222;
+        }
+
+        .pedido-numero {
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 15px;
+            text-align: right;
+        }
+
+        .carrito-lista {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .carrito-item {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr auto;
+            align-items: center;
+            background: #fafafa;
+            padding: 15px 20px;
+            border-radius: 12px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .carrito-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .carrito-item strong {
+            font-family: 'League Spartan', sans-serif;
+            font-size: 1.1rem;
+        }
+
+        .carrito-item input {
+            width: 70px;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            padding: 5px;
+        }
+
+        .carrito-item button {
+            background: #e63946;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 14px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .carrito-item button:hover {
+            background: #c72f3c;
+        }
+
+        .total-container {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-top: 25px;
+            font-family: 'League Spartan', sans-serif;
+            font-size: 1.3rem;
+            gap: 10px;
+        }
+
+        .acciones {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 35px;
+        }
+
+        .acciones a {
+            font-family: 'League Spartan', sans-serif;
+            text-decoration: none;
+            color: #fff;
+            background: #1d3557;
+            padding: 12px 25px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .acciones a:hover {
+            background: #16324f;
+        }
+
+        .acciones .btn-pago {
+            background: #457b9d;
+        }
+
+        .acciones .btn-pago:hover {
+            background: #35617a;
+        }
+
+        /* Mensaje vacío */
+        .alert {
+            text-align: center;
+            background: #edf2f7;
+            border-radius: 12px;
+            padding: 25px;
+            color: #444;
+            font-size: 1.1rem;
+        }
+
+        /* Modal pago */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content-pago {
+            background: #fff;
+            padding: 30px 40px;
+            border-radius: 16px;
+            width: 400px;
+            max-width: 90%;
+            box-shadow: 0 6px 25px rgba(0,0,0,0.2);
+            animation: zoomIn 0.3s ease;
+        }
+
+        @keyframes zoomIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-content-pago h2 {
+            text-align: center;
+            font-family: 'League Spartan', sans-serif;
+            margin-bottom: 20px;
+        }
+
+        .modal-content-pago button {
+            display: block;
+            width: 100%;
+            margin-top: 10px;
+            background: #1d3557;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .modal-content-pago button:hover {
+            background: #14223d;
+        }
+
+        @media (max-width: 768px) {
+            .carrito-item {
+                grid-template-columns: 1.5fr 1fr 1fr 1fr;
+                grid-row-gap: 10px;
+                text-align: center;
+            }
+        }
+    </style>
 </head>
 
 <body>
-    <header th:include="components/nav_panel"></header>
-    <br>
-
+    <header th:include="components/menu"></header>
     <div th:include="components/mensajes"></div>
 
-<br>
-    <div class="container mt-5">
+    <div class="carrito-container">
         <h2>Mi Carrito de Compras</h2>
-        
-        <div th:if="${#lists.isEmpty(carrito)}" class="alert alert-info">
+
+        <div th:if="${#lists.isEmpty(carrito)}" class="alert">
             Tu carrito está vacío
         </div>
 
-        <div th:unless="${#lists.isEmpty(carrito)}" class="table-responsive">
+        <div th:unless="${#lists.isEmpty(carrito)}">
+            <p class="pedido-numero" th:text="'Pedido N° ' + ${idPedido}"></p>
 
-            <p th:text="'Pedido N° ' + ${idPedido}"></p>
+            <div class="carrito-lista">
+                <div class="carrito-item" th:each="item : ${carrito}">
+                    <strong th:text="${item.producto}">Producto</strong>
+                    <span th:text="${'S/. ' + item.precioUnitario}">S/. 0.00</span>
+                    <input type="number" min="1" th:value="${item.cantidad}" 
+                           th:data-id="${item.idProducto}"
+                           onchange="actualizarCantidad(this)">
+                    <span th:text="${'S/. ' + item.precioUnitario * item.cantidad}">S/. 0.00</span>
+                    <button th:onclick="'eliminarProducto(' + ${item.idCarrito} + ', ' + ${item.idPedido} + ')'">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>
+            </div>
 
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Producto</th>
-                        <th>Precio</th>
-                        <th>Cantidad</th>
-                        <th>Subtotal</th>
-                        <th>Acciones</th>                        
-                        <th>idProducto</th>
-                        <th>idCarrito</th>
-                        <th>idPedido</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="item : ${carrito}">
-                        <td th:text="${item.producto}"></td>
-                        <td th:text="${'S/. ' + item.precioUnitario}"></td>
-                        <td>
-                            <input type="number" class="form-control" style="width: 80px"
-                                   th:value="${item.cantidad}" min="1"
-                                   th:data-id="${item.idProducto}"
-                                   onchange="actualizarCantidad(this)">
-                        </td>
-                        <td th:text="${'S/. ' + item.precioUnitario * item.cantidad}"></td>
-                        <td>
-                            <button class="btn btn-danger btn-sm" 
-                                    th:onclick="'eliminarProducto(' + ${item.idCarrito} + ', ' + ${item.idPedido} + ')'">
-                                Eliminar
-                            </button>
-                        </td>                        
-                        <td th:text="${item.idProducto}"></td>
-                        <td th:text="${item.idCarrito}"></td>
-                        <td th:text="${item.idPedido}"></td>
-                    </tr>
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <td colspan="3" class="text-end"><strong>Total:</strong></td>
-                        <td th:text="${'S/. ' + total}"></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                </tfoot>
-            </table>
+            <div class="total-container">
+                <strong>Total:</strong> <span th:text="${'S/. ' + total}"></span>
+            </div>
 
-            <div class="d-flex justify-content-between mt-3">
-                <a href="/carta" class="btn btn-secondary">Seguir Comprando</a>
-
-                <a href="#" class="btn btn-primary" 
-                th:onclick="'abrirModalPago(' + ${idPedido} + ', ' + ${total} + ')'">Procesar Pago</a>
+            <div class="acciones">
+                <a href="/carta">← Seguir Comprando</a>
+                <a href="#" class="btn-pago" 
+                   th:onclick="'abrirModalPago(' + ${idPedido} + ', ' + ${total} + ')'">
+                   Procesar Pago
+                </a>
             </div>
         </div>
     </div>
 
-    <!-- Modal de del formulario de pago -->
+    <!-- Modal de pago -->
     <div id="modal" th:classappend="${mostrarModal} ? 'active' : ''" class="modal">
         <div class="modal-content-pago">
             <h2>Realizar pago</h2>
@@ -94,51 +256,36 @@
     </div>
 
     <div th:include="components/footer"></div>
+
+    <script>
+        function actualizarCantidad(input) {
+            const idProducto = input.getAttribute('data-id');
+            const cantidad = input.value;
+            fetch(`/carrito/actualizar/${idProducto}/${cantidad}`, { method: 'POST' })
+                .then(() => window.location.reload());
+        }
+
+        function eliminarProducto(idCarrito, idPedido) {
+            if(confirm('¿Estás seguro de eliminar este producto?')) {
+                fetch(`/carrito/eliminar/${idCarrito}/${idPedido}`, { method: 'POST' })
+                    .then(() => window.location.reload());
+            }
+        }
+
+        function abrirModalPago(idPedido, total) {
+            document.getElementById('modalIdPedido').value = idPedido;
+            document.getElementById('modalTotal').value = total;
+            document.getElementById('modal').style.display = 'flex';
+        }
+
+        function cerrarModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        setTimeout(() => {
+            const mensajeContainer = document.querySelector('.mensaje-container');
+            if (mensajeContainer) mensajeContainer.style.display = 'none';
+        }, 3000);
+    </script>
 </body>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-<script>
-    function actualizarCantidad(input) {
-        const idProducto = input.getAttribute('data-id');
-        const cantidad = input.value;
-        
-        fetch(`/carrito/actualizar/${idProducto}/${cantidad}`, {
-            method: 'POST'
-        }).then(() => window.location.reload());
-    }
-
-    function eliminarProducto(idCarrito, idPedido) {
-        if(confirm('¿Estás seguro de eliminar este producto?')) {
-            fetch(`/carrito/eliminar/${idCarrito}/${idPedido}`, {
-                method: 'POST'
-            }).then(() => window.location.reload());
-        }
-    }
-</script>
-
-<script>
-    function abrirModalPago(idPedido, total) {
-        // Asignar los valores al modal
-        document.getElementById('modalIdPedido').value = idPedido;
-        document.getElementById('modalTotal').value = total;
-        
-        // Mostrar el modal
-        document.getElementById('modal').style.display = 'block';
-    }
-
-    function cerrarModal() {
-        // Ocultar el modal
-        document.getElementById('modal').style.display = 'none';
-    }
-</script>
-<script>
-    // Esperar 3 segundos y ocultar el mensaje
-    setTimeout(function() {
-        const mensajeContainer = document.querySelector('.mensaje-container');
-        if (mensajeContainer) {
-            mensajeContainer.style.display = 'none';
-        }
-    }, 3000);
-</script>
 </html>

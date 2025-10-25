@@ -1,49 +1,36 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Menu-Sp</title>
-  <link rel="stylesheet" href="./css/menu.css">
-  <script src="https://kit.fontawesome.com/35db202371.js" crossorigin="anonymous"></script>
-</head>
+<!-- No incluyas DOCTYPE ni <html>, ni <head> -->
+<nav th:fragment="menu" class="sp-menu">
+  <!-- Botón hamburguesa -->
+  <button class="sp-hamburger" id="hamburger-btn">
+    <i class="fas fa-bars"></i>
+  </button>
 
-<body>
-  <header id="sp-header">
-    <nav class="sp-menu">
-      <!-- Botón hamburguesa -->
-      <button class="sp-hamburger" id="hamburger-btn">
-        <i class="fas fa-bars"></i>
-      </button>
+  <div class="sp-list-container" id="menu-list">
+    <ul class="sp-lists">
+      <li><a th:classappend="${activePage == 'index'} ? 'sp-bg-hover'" th:href="@{/}">Inicio</a></li>
+      <li><a th:classappend="${activePage == 'carta'} ? 'sp-bg-hover'" th:href="@{/carta}">Carta</a></li>
+      <li><a th:href="@{/Nosotros}">Nosotros</a></li>
+    </ul>
 
-      <div class="sp-list-container" id="menu-list">
-        <ul class="sp-lists">
-          <li><a th:classappend="${activePage == 'index'} ? 'sp-bg-hover'" th:href="@{/}">Inicio</a></li>
-          <li><a th:classappend="${activePage == 'carta'} ? 'sp-bg-hover'" th:href="@{/carta}">Carta</a></li>
-          <li><a th:href="@{/Nosotros}">Nosotros</a></li>
-        </ul>
-
-        <div class="sp-user-actions">
-          <div th:if="${session.usuario != null}" class="sp-user-info">
-            <span th:text="${session.usuario}"></span>
-            <button class="sp-toggle-logout" onclick="toggleLogout(event)">▼</button>
-            <div class="sp-logout-container">
-              <a href="/micuenta" class="sp-buttoncerrar">Mi cuenta</a>
-              <a href="/logout" class="sp-buttoncerrar">Cerrar Sesión</a>
-            </div>
-          </div>
-          <div th:if="${session.usuario == null}">
-            <a href="/login" class="sp-button">
-              <i class="fas fa-user"></i> Iniciar Sesión
-            </a>
-          </div>
-          <a th:classappend="${activePage == 'carrito'} ? 'sp-bg-hover'" th:href="@{/carrito_compra}" class="sp-button">
-            <i class="fas fa-shopping-cart"></i> Carrito
-          </a>
+    <div class="sp-user-actions">
+      <div th:if="${session.usuario != null}" class="sp-user-info">
+        <span th:text="${session.usuario}"></span>
+        <button class="sp-toggle-logout" onclick="toggleLogout(event)">▼</button>
+        <div class="sp-logout-container">
+          <a href="/micuenta" class="sp-buttoncerrar">Mi cuenta</a>
+          <a href="/logout" class="sp-buttoncerrar">Cerrar Sesión</a>
         </div>
       </div>
-    </nav>
-  </header>
+      <div th:if="${session.usuario == null}">
+        <a href="/login" class="sp-button">
+          <i class="fas fa-user"></i> Iniciar Sesión
+        </a>
+      </div>
+      <a th:classappend="${activePage == 'carrito'} ? 'sp-bg-hover'" th:href="@{/carrito_compra}" class="sp-button">
+        <i class="fas fa-shopping-cart"></i> Carrito
+      </a>
+    </div>
+  </div>
 
   <script>
     function toggleLogout(event) {
@@ -62,5 +49,4 @@
       hamburgerBtn.classList.toggle("open");
     });
   </script>
-</body>
-</html>
+</nav>

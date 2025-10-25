@@ -46,6 +46,7 @@ public class LoginController {
         }
     }
     
+    
     @GetMapping("/logout")
     public String logout(HttpServletRequest request, HttpServletResponse response) {
         HttpSession session = request.getSession(false);
