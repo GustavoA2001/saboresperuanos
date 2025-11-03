@@ -155,6 +155,7 @@
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
     overflow: hidden;
     z-index: 1200;
+    padding: 10px;
 }
 
 .sp-logout-container a {

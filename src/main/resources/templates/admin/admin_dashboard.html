@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>ADM | Dashboard</title>
+
+    <link th:include="components/link">
+    <link rel="stylesheet" th:href="@{/css/menu.css}">
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+
+    <style>
+        body {
+            background-color: var(--base-color);
+            color: var(--text-color);
+            font-family: "Segoe UI", Roboto, sans-serif;
+            margin: 0;
+        }
+
+        main.adm-main {
+            flex-grow: 1;
+            padding: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .card {
+            background: var(--color-light);
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            border: 1px solid var(--base-variant);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transition: background 0.3s, color 0.3s, box-shadow 0.3s;
+        }
+
+        .darkmode .card {
+            background: var(--base-variant);
+            box-shadow: 0 4px 10px rgba(255,255,255,0.05);
+        }
+
+        .title {
+            font-size: 16px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 10px;
+            color: var(--color-secondary);
+        }
+
+        .chart-box {
+            width: 100%;
+            height: 250px;
+        }
+
+        .card:hover {
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            main.adm-main {
+                grid-template-columns: 1fr;
+            }
+            .chart-box {
+                height: 220px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header th:include="/admin/adminMenu"></header>
+
+<main class="adm-main">
+
+    <!-- Gráfico 1: Pedidos -->
+    <div class="card border_pri rad20">
+        <div class="title color_secondary">Pedidos por Mes</div>
+        <div id="chartPedidos" class="chart-box"></div>
+    </div>
+
+    <!-- Gráfico 2: Ventas -->
+    <div class="card border_sec rad20">
+        <div class="title color_fifth">Ventas Totales</div>
+        <div id="chartVentas" class="chart-box"></div>
+    </div>
+
+</main>
+
+<script th:inline="javascript">
+    // Datos reales desde el backend
+    const mesesRaw = /*[[${meses}]]*/ [];  // Ej: ["2025-01", "2025-02", "2025-03"]
+    const pedidos = /*[[${pedidos}]]*/ [];
+    const ventas = /*[[${ventas}]]*/ [];
+
+    // Convertir fechas tipo "2025-01" → "Ene 2025"
+    const nombresMeses = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+    const meses = mesesRaw.map(fecha => {
+        const [anio, mes] = fecha.split("-");
+        return `${nombresMeses[parseInt(mes) - 1]} ${anio}`;
+    });
+
+    // ----- Gráfico 1: Pedidos -----
+    const chartPedidos = echarts.init(document.getElementById('chartPedidos'));
+    chartPedidos.setOption({
+        backgroundColor: 'transparent',
+        tooltip: { trigger: 'axis' },
+        xAxis: {
+            type: 'category',
+            data: meses,
+            axisLabel: {
+                color: 'var(--color-third)',
+                rotate: 25
+            },
+            axisLine: { lineStyle: { color: 'var(--color-fourth)' } }
+        },
+        yAxis: {
+            type: 'value',
+            name: 'Pedidos',
+            axisLabel: { color: 'var(--color-third)' },
+            splitLine: { lineStyle: { color: 'var(--base-variant)' } }
+        },
+        series: [{
+            data: pedidos,
+            type: 'bar',
+            itemStyle: {
+                color: 'var(--color-secondary)',
+                borderRadius: [5, 5, 0, 0]
+            },
+            emphasis: {
+                itemStyle: { color: 'var(--color-fifth)' }
+            }
+        }]
+    });
+
+    // ----- Gráfico 2: Ventas -----
+    const chartVentas = echarts.init(document.getElementById('chartVentas'));
+    chartVentas.setOption({
+        backgroundColor: 'transparent',
+        tooltip: { trigger: 'axis' },
+        xAxis: {
+            type: 'category',
+            data: meses,
+            axisLabel: {
+                color: 'var(--color-third)',
+                rotate: 25
+            },
+            axisLine: { lineStyle: { color: 'var(--color-fourth)' } }
+        },
+        yAxis: {
+            type: 'value',
+            name: 'S/ Ventas',
+            axisLabel: { color: 'var(--color-third)' },
+            splitLine: { lineStyle: { color: 'var(--base-variant)' } }
+        },
+        series: [{
+            data: ventas,
+            type: 'line',
+            smooth: true,
+            itemStyle: {
+                color: 'var(--color-fifth)'
+            },
+            areaStyle: {
+                color: 'rgba(150, 58, 61, 0.1)'
+            }
+        }]
+    });
+
+    // 🔁 Responsividad
+    window.addEventListener('resize', () => {
+        chartPedidos.resize();
+        chartVentas.resize();
+    });
+</script>
+</body>
+</html>

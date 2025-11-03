@@ -12,6 +12,7 @@
 </head>
 <body>
     <div th:include="components/adminMenu"></div>
+
     <h1 th:text="${empleado.idEmpleado} == null ? 'Agregar Empleado' : 'Editar Empleado'"></h1>
     <form th:action="@{/empleados}" th:object="${empleado}" method="post">
         <input type="hidden" th:field="*{idEmpleado}"/>
@@ -26,15 +27,6 @@
         <label>Contraseña:</label>
         <input type="password" th:field="*{contrasena}" required/>
 
-        <!-- Campos para DetalleEmpleado 
-        <h3>Detalles del Empleado</h3>
-        <label>Teléfono:</label>
-        <input type="text" th:field="*{detalleEmpleado.telefono}" required/>
-        <label>Correo:</label>
-        <input type="email" th:field="*{detalleEmpleado.correo}" required/>
-        <label>Foto:</label>
-        <input type="text" th:field="*{detalleEmpleado.foto}" required/>
--->
         <label>Rol:</label>
         <select th:field="*{rol.idRol}" required onchange="if(this.value === 'nuevo') redirectToCreateRole()">
             <option th:each="rol : ${roles}" th:value="${rol.idRol}" th:text="${rol.nomRol}"></option>

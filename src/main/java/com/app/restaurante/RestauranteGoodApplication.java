@@ -8,7 +8,7 @@ import org.springframework.stereotype.Controller;
 
 @SpringBootApplication
 @EntityScan(basePackages = "com.app.restaurante.model")
-@Controller  // Indica que esta clase maneja solicitudes HTTP
+@Controller 
 public class RestauranteGoodApplication {
     
     public static void main(String[] args) {

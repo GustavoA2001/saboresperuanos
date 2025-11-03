@@ -1,65 +1,204 @@
-.admin-menu {
-    background-color: #f8f9fa;
-    padding: 40px 0;
-    margin-bottom: 30px;
-    width: 100%;
-}
-.menu-item {
-    text-align: center;
-    margin-bottom: 20px;
-}
-.menu-item a {
-    display: block;
-    padding: 25px;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    text-decoration: none;
-    color: #333;
-    transition: all 0.3s ease;
-    font-size: 1.2em;
-    height: 100%;
-}
-.menu-item a:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    background-color: #007bff;
-    color: #fff;
-}
-.container-fluid {
-    padding: 0 50px;
-}
-.menu-title {
-    font-size: 2.5em;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 40px;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-}
-.row {
-    margin: 0;
-    --bs-gutter-x: 30px;
-}
-/* */
-.logout-container {
-    text-align: center;
-    margin-top: 20px;
+/* ======== BASE ======== */
+
+.adm-layout {
     display: flex;
+    min-height: 90vh;
+    overflow: hidden;
+}
+
+/* ======== SIDEBAR ======== */
+.adm-sidebar {
+    width: 260px;
+    background: var(--color-secondary);
+    color: var(--color-light);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    box-shadow: 4px 0 12px rgba(0, 0, 0, 0.2);
+    padding: 25px 0;
+    transition: width 0.3s ease, background 0.3s ease;
+}
+
+/* ======== LOGO ======== */
+.adm-logo {
+    text-align: center;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    margin-bottom: 40px;
+}
+
+.adm-logo i {
+    margin-right: 8px;
+    color: var(--color-primary);
+}
+
+/* ======== NAVIGATION ======== */
+.adm-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 0 20px;
+}
+
+.adm-link {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    text-decoration: none;
+    color: var(--color-third);
+    background: var(--color-primary);
+    padding: 12px 15px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+
+.adm-link i {
+    font-size: 1.2rem;
+    color: var(--color-fifth);
+    transition: color 0.3s ease;
+}
+
+.adm-link:hover {
+    background: var(--color-secondary);
+    color: var(--color-light);
+    border-color: var(--color-fifth);
+    transform: translateX(5px);
+}
+
+.adm-link:hover i {
+    color: var(--color-light);
+}
+
+.adm-link.active {
+    background: var(--color-fifth);
+    color: var(--color-light);
+    border-color: var(--color-secondary);
+}
+
+.adm-link.active i {
+    color: var(--color-light);
+}
+
+/* ======== LOGOUT BUTTON ======== */
+.adm-logout {
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 20px;
+}
+
+.adm-btn-logout {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--color-danger);
+    color: var(--color-light);
+    padding: 10px 14px;
+    border-radius: 8px;
+    text-decoration: none;
     justify-content: center;
+    transition: all 0.3s ease;
 }
-.buttoncerrar {
-    padding: 12px 25px;
-    background-color: red;
-    color: white;
-    font-size: 1.2em;
-    font-weight: bold;
-    text-decoration: none;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
-    margin-bottom: 30px;
+
+.adm-btn-logout:hover {
+    background: var(--color-fifth);
+    transform: scale(1.05);
 }
-.buttoncerrar:hover {
-    background-color: darkred;
-    text-decoration: none;
+
+/* ======== MAIN CONTENT ======== */
+.adm-main {
+    flex: 1;
+    margin-left: 260px;
+    padding: 50px;
+    background: var(--base-color);
+    transition: margin-left 0.3s ease, background 0.3s ease;
+}
+
+.adm-page-title {
+    font-size: 2rem;
+    color: var(--color-third);
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.adm-welcome {
+    font-size: 1rem;
+    color: var(--color-fourth);
+    max-width: 600px;
+}
+
+/* ======== RESPONSIVE ======== */
+@media (max-width: 900px) {
+    .adm-sidebar {
+        width: 75px;
+    }
+
+    .adm-logo span,
+    .adm-link span,
+    .adm-btn-logout span {
+        display: none;
+    }
+
+    .adm-link,
+    .adm-btn-logout {
+        justify-content: center;
+    }
+
+    .adm-main {
+        margin-left: 75px;
+        padding: 30px;
+    }
+}
+
+/* ======== WELCOME SECTION ======== */
+.adm-welcome-section {
+  text-align: left;
+  margin-top: 20px;
+}
+
+.adm-welcome-section h1 {
+  font-size: 2.2rem;
+  color: var(--color-third);
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.adm-welcome-section p {
+  font-size: 1rem;
+  color: var(--color-fourth);
+  margin-bottom: 40px;
+  max-width: 700px;
+}
+
+/* ======== DASHBOARD CARDS ======== */
+.adm-welcome-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 25px;
+}
+
+.adm-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 25px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.adm-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.adm-icon {
+  font-size: 2.5rem;
+  color: var(--color-fifth);
+  margin-bottom: 15px;
 }

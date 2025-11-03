@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:fragment="adminHead">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADMINISTRACIÓN</title>
+
+    <!-- CSS -->
+    <link th:include="components/link">
+
+    <link rel="stylesheet" th:href="@{/css/adminMenu.css}">
+    <script src="https://kit.fontawesome.com/35db202371.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <!-- FRAGMENTO DEL MENÚ LATERAL -->
+    <aside th:fragment="adminSidebar" class="adm-sidebar">
+        <div class="adm-logo league-spartan">
+            <i class="fas fa-cogs"></i>
+            <span>Administración</span>
+        </div>
+
+        <nav class="adm-nav cabin">
+            <a href="/admin/dashboard" class="adm-link"><i class="fas fa-cogs"></i><span>Dashboard</span></a>
+            <a href="/admin/parametros" class="adm-link"><i class="fas fa-cogs"></i><span>Parámetros</span></a>
+            <a href="/admin/empleados" class="adm-link"><i class="fas fa-users"></i><span>Gestión de Empleados</span></a>
+            <a href="/admin/productos" class="adm-link"><i class="fas fa-box"></i><span>Gestión de Productos</span></a>
+            <a href="/admin/clientes" class="adm-link"><i class="fas fa-user-friends"></i><span>Gestión de Clientes</span></a>
+            <a href="/admin/pedidos" class="adm-link"><i class="fas fa-shopping-cart"></i><span>Gestión de Pedidos</span></a>
+            <a href="/admin/reportes-ingresos" class="adm-link"><i class="fas fa-chart-line"></i><span>Reportes de Ingresos</span></a>
+        </nav>
+
+        <div class="adm-logout">
+            <a href="/logout" class="adm-btn-logout league-spartan">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Cerrar Sesión</span>
+            </a>
+        </div>
+    </aside>
+</body>
+</html>

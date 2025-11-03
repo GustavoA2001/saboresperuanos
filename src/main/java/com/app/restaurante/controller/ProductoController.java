@@ -70,7 +70,7 @@ public class ProductoController {
             productos = productosDAO.obtenerPorCategoriaId(idCategoria, offset, pageSize);
         } else {
             totalProductos = productosDAO.countAll();
-            productos = productosDAO.findAllPaginated(offset, pageSize);
+            productos = productosDAO.findAllProducts(offset, pageSize);
         }
 
         model.addAttribute("productos", productos);
@@ -130,7 +130,6 @@ public class ProductoController {
         nuevoProducto.setDescripcion(descripcion);
         nuevoProducto.setCantidad(cantidad);
         nuevoProducto.setIdCategoria(idCategoria);
-        nuevoProducto.setIdTipo(idTipo);
         nuevoProducto.setFotoProducto(fotoProducto);
 
         productosDAO.save(nuevoProducto);

@@ -1,0 +1,327 @@
+<!-- ==============================
+     COMPONENTE MODAL DE USUARIO
+============================== -->
+<div th:fragment="admin_form_empleado">
+
+    <!-- Botón flotante -->
+    <button class="adm-btn-add" id="openModalBtn">
+        <i class="fas fa-user-plus"></i> Nuevo Empleado
+    </button>
+
+    <!-- Modal -->
+    <div class="adm-modal" id="userModal">
+        <div class="adm-modal-content">
+            <span class="adm-modal-close" id="closeModalBtn">&times;</span>
+            <h2 class="league-spartan">Registrar Empleado</h2>
+
+            <form id="userForm" class="adm-form-grid">
+                <!-- Columna izquierda -->
+                <div class="adm-form-col">
+                    <div class="adm-form-group">
+                        <label for="nombre">Nombre</label>
+                        <input type="text" id="nombre" class="cabin" placeholder="Ingrese nombre" required>
+                    </div>
+
+                    <div class="adm-form-group">
+                        <label for="apellidoPaterno">Apellido Paterno</label>
+                        <input type="text" id="apellidoPaterno" class="cabin" placeholder="Ingrese apellido paterno" required>
+                    </div>
+
+                    <div class="adm-form-group">
+                        <label for="apellidoMaterno">Apellido Materno</label>
+                        <input type="text" id="apellidoMaterno" class="cabin" placeholder="Ingrese apellido materno" required>
+                    </div>
+                </div>
+
+                <!-- Columna derecha -->
+                <div class="adm-form-col">
+                    <div class="adm-form-group">
+                        <label for="email">Correo electrónico</label>
+                        <input type="email" id="email" class="cabin" placeholder="ejemplo@correo.com" required>
+                    </div>
+
+                    <div class="adm-form-group">
+                        <label for="usuario">Usuario</label>
+                        <input type="text" id="usuario" class="cabin" placeholder="Ingrese usuario" required>
+                    </div>
+
+                    <div class="adm-form-group">
+                        <label for="pwd">Contraseña</label>
+                        <input type="text" id="pwd" class="cabin" placeholder="Ingrese contraseña" required>
+                    </div>
+
+                    <div class="adm-form-group">
+                        <label for="rol">Rol</label>
+                        <select id="rol" class="cabin" required>
+                            <option value="">Selecciona un rol</option>
+                            <option value="1">Administrador</option>
+                            <option value="2">Mesero</option>
+                            <option value="3">Cocinero</option>
+                            <option value="4">Delivery</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Botón centrado -->
+                <div class="adm-modal-actions">
+                    <button type="submit" class="adm-btn-save">Registrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Script -->
+    <script>
+        const openModalBtn = document.getElementById("openModalBtn");
+        const closeModalBtn = document.getElementById("closeModalBtn");
+        const modal = document.getElementById("userModal");
+        const userForm = document.getElementById("userForm");
+
+        // Mostrar modal
+        openModalBtn.addEventListener("click", () => {
+            modal.style.display = "flex";
+            document.body.style.overflow = "hidden";
+        });
+
+        // Cerrar modal
+        closeModalBtn.addEventListener("click", () => {
+            modal.style.display = "none";
+            document.body.style.overflow = "auto";
+        });
+
+        // Cerrar si hace clic fuera
+        window.addEventListener("click", (e) => {
+            if (e.target === modal) {
+                modal.style.display = "none";
+                document.body.style.overflow = "auto";
+            }
+        });
+
+        // Cerrar con ESC
+        window.addEventListener("keydown", e => {
+            if (e.key === "Escape") {
+                modal.style.display = "none";
+                document.body.style.overflow = "auto";
+            }
+        });
+
+        // Envío del formulario
+        userForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            const empleado = {
+                nombre: document.getElementById("nombre").value.trim(),
+                apellidoPaterno: document.getElementById("apellidoPaterno").value.trim(),
+                apellidoMaterno: document.getElementById("apellidoMaterno").value.trim(),
+                usuario: document.getElementById("usuario").value.trim(),
+                contrasena: document.getElementById("pwd").value.trim(),
+                idRol: parseInt(document.getElementById("rol").value)
+            };
+
+            const detalle = {
+                correo: document.getElementById("email").value.trim()
+            };
+
+            try {
+                // 1️⃣ Guardar empleado
+                const responseEmpleado = await fetch("/empleado/registrar", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(empleado)
+                });
+
+                if (!responseEmpleado.ok) {
+                    const error = await responseEmpleado.text();
+                    throw new Error("Error al registrar empleado: " + error);
+                }
+
+                const nuevoEmpleado = await responseEmpleado.json();
+
+                // 2️⃣ Guardar detalle empleado
+                detalle.idEmpleado = nuevoEmpleado.idEmpleado;
+
+                const responseDetalle = await fetch("/detalleEmpleado/registrar", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(detalle)
+                });
+
+                if (!responseDetalle.ok) {
+                    console.warn("⚠ DetalleEmpleado no se registró, pero el empleado fue creado.");
+                }
+
+                alert("✅ Empleado registrado correctamente.");
+                userForm.reset();
+                modal.style.display = "none";
+                document.body.style.overflow = "auto";
+
+            } catch (err) {
+                console.error("Error:", err);
+                alert("❌ Error al registrar el empleado.");
+            }
+        });
+    </script>
+
+    <!-- Estilos (manteniendo los originales, solo se agrega grid) -->
+    <style>
+        /* Botón flotante */
+        .adm-btn-add {
+            position: fixed;
+            right: 40px;
+            bottom: 40px;
+            background-color: var(--color-fifth);
+            color: var(--color-light);
+            font-weight: 600;
+            border: none;
+            padding: 14px 22px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+            z-index: 1100;
+        }
+
+        .adm-btn-add:hover {
+            background-color: var(--color-secondary);
+            transform: translateY(-2px);
+        }
+
+        /* Fondo modal */
+        .adm-modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* Contenido modal */
+        .adm-modal-content {
+            background: var(--color-light);
+            border-radius: 12px;
+            padding: 30px;
+            width: 600px;
+            max-width: 95%;
+            position: relative;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .adm-modal-content h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: var(--color-fifth);
+            font-weight: 700;
+        }
+
+        .adm-modal-close {
+            position: absolute;
+            top: 14px;
+            right: 18px;
+            font-size: 20px;
+            cursor: pointer;
+            color: #555;
+            transition: color 0.2s ease;
+        }
+
+        .adm-modal-close:hover {
+            color: var(--color-fifth);
+        }
+
+        /* Grid de 2 columnas */
+        .adm-form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .adm-form-col {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .adm-form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+
+        .adm-form-group label {
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-color);
+        }
+
+        .adm-form-group input,
+        .adm-form-group select {
+            border: 1px solid var(--color-primary);
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+        }
+
+        .adm-form-group input:focus,
+        .adm-form-group select:focus {
+            outline: none;
+            border-color: var(--color-fifth);
+            box-shadow: 0 0 0 2px rgba(137, 88, 240, 0.2);
+        }
+
+        .adm-modal-actions {
+            grid-column: span 2;
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .adm-btn-save {
+            background-color: var(--color-fifth);
+            color: white;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .adm-btn-save:hover {
+            background-color: var(--color-secondary);
+            transform: translateY(-2px);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .adm-form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .adm-modal-content {
+                width: 90%;
+                padding: 20px;
+            }
+        }
+    </style>
+</div>

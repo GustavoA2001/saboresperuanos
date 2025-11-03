@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADM | Parámetros</title>
+
+    <link th:include="components/link">
+    <link rel="stylesheet" th:href="@{/css/menu.css}">
+    <script src="https://kit.fontawesome.com/35db202371.js" crossorigin="anonymous"></script>
+
+    <style>
+        body {
+            background-color: var(--base-color);
+            color: var(--text-color);
+        }
+
+        main.adm-main {
+            flex-grow: 1;
+            padding: 40px;
+        }
+
+        h1.adm-page-title {
+            color: var(--color-fifth);
+            font-weight: 700;
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+        .parametros {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* ====== Tarjetas ====== */
+        .adm-card {
+            max-width: 1000px;
+            padding: 0 !important;
+            background: var(--color-light);
+            border-radius: 14px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin-bottom: 35px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .adm-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .adm-card-header {
+            padding: 14px 20px;
+            color: #fff;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .adm-card-header i {
+            margin-right: 8px;
+        }
+
+        .adm-btn-add {
+            background: #fff;
+            color: #222;
+            border-radius: 6px;
+            padding: 6px 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border: none;
+            transition: 0.3s;
+            text-decoration: none;
+        }
+
+        .adm-btn-add:hover {
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .bg-primary {
+            background-color: var(--color-fifth);
+        }
+
+        .bg-success {
+            background-color: var(--color-fourth);
+        }
+
+        .bg-warning {
+            background-color: var(--second-color);
+        }
+
+        .adm-card-body {
+            padding: 15px 20px 25px;
+        }
+
+        /* ====== Tablas ====== */
+        .adm-table-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border-radius: 8px;
+        }
+
+        .col-id {
+            width: 10%;
+        }
+
+        .col-nombre {
+            width: 30%;
+        }
+
+        .col-estado {
+            width: 25%;
+        }
+
+        .col-acciones {
+            width: 35%;
+        }
+
+        table.adm-table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        .adm-table thead {
+            background-color: var(--color-third);
+            color: var(--color-light);
+        }
+
+        .adm-table th,
+        .adm-table td {
+            padding: 12px 10px;
+            border-bottom: 1px solid var(--color-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-align: left;
+        }
+
+        .adm-table tbody tr:hover {
+            background: var(--color-primary);
+            transition: background 0.3s ease;
+        }
+
+        .adm-actions {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .adm-actions button,
+        .adm-actions a {
+            border: none;
+            background: none;
+            color: var(--color-fifth);
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .adm-actions button:hover,
+        .adm-actions a:hover {
+            color: var(--color-verify);
+        }
+
+        @media (max-width: 768px) {
+            main.adm-main {
+                padding: 20px;
+            }
+
+            h1.adm-page-title {
+                font-size: 1.5rem;
+            }
+
+            .adm-card-body {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="adm-layout">
+        <header th:include="/admin/adminMenu"></header>
+
+        <main class="adm-main">
+            <h1 class="adm-page-title cabin">Gestión de Parámetros</h1>
+
+            <div class="parametros">
+
+
+                <!-- ====== ROLES ====== -->
+                <div class="adm-card">
+                    <div class="adm-card-header bg-primary cabin">
+                        <div><i class="fas fa-user-shield"></i> Roles de Usuario</div>
+                        <a th:href="@{/admin/parametros/roles/nuevo}" class="adm-btn-add">
+                            <i class="fas fa-plus"></i> Nuevo Rol
+                        </a>
+                    </div>
+                    <div class="adm-card-body">
+                        <div class="adm-table-container">
+                            <table class="adm-table league-spartan">
+                                <thead>
+                                    <th class="col-id">ID</th>
+                                    <th class="col-nombre">Rol</th>
+                                    <th class="col-estado">Estado</th>
+                                    <th class="col-acciones">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="rol : ${roles}">
+                                        <td th:text="${rol.IDRol}"></td>
+                                        <td th:text="${rol.NomRol}"></td>
+                                        <td th:text="${rol.EstadoRoles}"></td>
+                                        <td class="adm-actions">
+                                            <a th:href="@{'/admin/parametros/roles/editar/' + ${rol.IDRol}}">
+                                                <i class="fas fa-pen"></i>
+                                            </a>
+                                            <form th:action="@{'/admin/parametros/roles/eliminar/' + ${rol.IDRol}}"
+                                                method="post">
+                                                <button type="submit"><i class="fas fa-trash"></i></button>
+                                            </form>
+                                            <form th:action="@{'/admin/parametros/roles/estado/' + ${rol.IDRol}}"
+                                                method="post">
+                                                <button type="submit">
+                                                    <i class="fas fa-toggle-on"
+                                                        th:classappend="${rol.EstadoRoles == 'HABILITADO'} ? ' text-success' : ' text-muted'"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ====== CATEGORÍAS ====== -->
+                <div class="adm-card">
+                    <div class="adm-card-header bg-success cabin">
+                        <div><i class="fas fa-layer-group"></i> Categorías de Productos</div>
+                        <a th:href="@{/admin/parametros/categorias/nuevo}" class="adm-btn-add">
+                            <i class="fas fa-plus"></i> Nueva Categoría
+                        </a>
+                    </div>
+                    <div class="adm-card-body">
+                        <div class="adm-table-container">
+                            <table class="adm-table league-spartan">
+                                <thead>
+                                    <tr>
+                                        <th class="col-id">ID</th>
+                                        <th class="col-nombre">Categoria</th>
+                                        <th class="col-estado">Estado</th>
+                                        <th class="col-acciones">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="cat : ${categorias}">
+                                        <td th:text="${cat.IDCategoria}"></td>
+                                        <td th:text="${cat.NomCategoria}"></td>
+                                        <td th:text="${cat.EstadoCategoria}"></td>
+                                        <td class="adm-actions">
+                                            <a th:href="@{'/admin/parametros/categorias/editar/' + ${cat.IDCategoria}}">
+                                                <i class="fas fa-pen"></i>
+                                            </a>
+                                            <form
+                                                th:action="@{'/admin/parametros/categorias/eliminar/' + ${cat.IDCategoria}}"
+                                                method="post">
+                                                <button type="submit"><i class="fas fa-trash"></i></button>
+                                            </form>
+                                            <form
+                                                th:action="@{'/admin/parametros/categorias/estado/' + ${cat.IDCategoria}}"
+                                                method="post">
+                                                <button type="submit">
+                                                    <i class="fas fa-toggle-on"
+                                                        th:classappend="${cat.EstadoCategoria == 'HABILITADO'} ? ' text-success' : ' text-muted'"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ====== DISTRITOS ====== -->
+                <div class="adm-card">
+                    <div class="adm-card-header bg-warning cabin">
+                        <div><i class="fas fa-map-marker-alt"></i> Distritos Registrados</div>
+                        <a th:href="@{/admin/parametros/distritos/nuevo}" class="adm-btn-add">
+                            <i class="fas fa-plus"></i> Nuevo Distrito
+                        </a>
+                    </div>
+                    <div class="adm-card-body">
+                        <div class="adm-table-container">
+                            <table class="adm-table league-spartan">
+                                <thead>
+                                    <tr>
+                                        <th class="col-id">ID</th>
+                                        <th class="col-nombre">Distrito</th>
+                                        <th class="col-estado">Estado</th>
+                                        <th class="col-acciones">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="dis : ${distritos}">
+                                        <td th:text="${dis.IDDistrito}"></td>
+                                        <td th:text="${dis.Distrito}"></td>
+                                        <td th:text="${dis.EstadoDistrito}"></td>
+                                        <td class="adm-actions">
+                                            <a th:href="@{'/admin/parametros/distritos/editar/' + ${dis.IDDistrito}}">
+                                                <i class="fas fa-pen"></i>
+                                            </a>
+                                            <form
+                                                th:action="@{'/admin/parametros/distritos/eliminar/' + ${dis.IDDistrito}}"
+                                                method="post">
+                                                <button type="submit"><i class="fas fa-trash"></i></button>
+                                            </form>
+                                            <form
+                                                th:action="@{'/admin/parametros/distritos/estado/' + ${dis.IDDistrito}}"
+                                                method="post">
+                                                <button type="submit">
+                                                    <i class="fas fa-toggle-on"
+                                                        th:classappend="${dis.EstadoDistrito == 'HABILITADO'} ? ' text-success' : ' text-muted'"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+
+</html>

@@ -97,7 +97,6 @@ public String guardarProducto(@ModelAttribute Productos producto, @RequestParam(
             productoExistente.setDescripcion(producto.getDescripcion());
             productoExistente.setCantidad(producto.getCantidad());
             productoExistente.setIdCategoria(producto.getIdCategoria());
-            productoExistente.setIdTipo(producto.getIdTipo());
 
             // Actualizar la imagen si se ha subido una nueva
             if (!file.isEmpty()) {

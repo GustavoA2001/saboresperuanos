@@ -6,6 +6,8 @@ import com.app.restaurante.model.Direccion;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.ResultSet;
@@ -139,4 +141,11 @@ public class ClienteDAO {
         });
     }
 
+    
+    @PostMapping("/eliminar/{id}")
+    public String eliminarCliente(@PathVariable Long id) {
+        String sql = "DELETE FROM cliente WHERE idCliente = ?";
+        jdbcTemplate.update(sql, id);
+        return "redirect:/admin/clientes";
+    }
 }

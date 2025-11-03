@@ -14,7 +14,7 @@
             font-family: 'Cabin', sans-serif;
             background: #f7f7f7;
             margin: 0;
-            padding-top: 90px; /* espacio por el menú fijo */
+            padding-top: 90px;
             color: #333;
         }
 
@@ -42,10 +42,22 @@
             text-align: right;
         }
 
+        .carrito-encabezado {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr auto;
+            font-weight: 600;
+            color: #1d3557;
+            text-align: left;
+            padding: 10px 20px;
+            border-bottom: 2px solid #ddd;
+            font-family: 'League Spartan', sans-serif;
+        }
+
         .carrito-lista {
             display: flex;
             flex-direction: column;
             gap: 15px;
+            margin-top: 10px;
         }
 
         .carrito-item {
@@ -63,9 +75,17 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
         }
 
-        .carrito-item strong {
-            font-family: 'League Spartan', sans-serif;
-            font-size: 1.1rem;
+        .carrito-producto-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .carrito-foto {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 10px;
         }
 
         .carrito-item input {
@@ -102,7 +122,7 @@
 
         .acciones {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-end;
             margin-top: 35px;
         }
 
@@ -110,25 +130,16 @@
             font-family: 'League Spartan', sans-serif;
             text-decoration: none;
             color: #fff;
-            background: #1d3557;
+            background: #457b9d;
             padding: 12px 25px;
             border-radius: 10px;
             transition: all 0.3s ease;
         }
 
         .acciones a:hover {
-            background: #16324f;
-        }
-
-        .acciones .btn-pago {
-            background: #457b9d;
-        }
-
-        .acciones .btn-pago:hover {
             background: #35617a;
         }
 
-        /* Mensaje vacío */
         .alert {
             text-align: center;
             background: #edf2f7;
@@ -138,64 +149,13 @@
             font-size: 1.1rem;
         }
 
-        /* Modal pago */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6);
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content-pago {
-            background: #fff;
-            padding: 30px 40px;
-            border-radius: 16px;
-            width: 400px;
-            max-width: 90%;
-            box-shadow: 0 6px 25px rgba(0,0,0,0.2);
-            animation: zoomIn 0.3s ease;
-        }
-
-        @keyframes zoomIn {
-            from { transform: scale(0.9); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-
-        .modal-content-pago h2 {
-            text-align: center;
-            font-family: 'League Spartan', sans-serif;
-            margin-bottom: 20px;
-        }
-
-        .modal-content-pago button {
-            display: block;
-            width: 100%;
-            margin-top: 10px;
-            background: #1d3557;
-            color: #fff;
-            border: none;
-            padding: 10px;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        .modal-content-pago button:hover {
-            background: #14223d;
-        }
-
         @media (max-width: 768px) {
-            .carrito-item {
+            .carrito-item, .carrito-encabezado {
                 grid-template-columns: 1.5fr 1fr 1fr 1fr;
-                grid-row-gap: 10px;
                 text-align: center;
+            }
+            .carrito-producto-info {
+                justify-content: center;
             }
         }
     </style>
@@ -203,7 +163,6 @@
 
 <body>
     <header th:include="components/menu"></header>
-    <div th:include="components/mensajes"></div>
 
     <div class="carrito-container">
         <h2>Mi Carrito de Compras</h2>
@@ -215,13 +174,22 @@
         <div th:unless="${#lists.isEmpty(carrito)}">
             <p class="pedido-numero" th:text="'Pedido N° ' + ${idPedido}"></p>
 
+            <div class="carrito-encabezado">
+                <span>Producto</span>
+                <span>Precio</span>
+                <span>Cantidad</span>
+                <span>Subtotal</span>
+                <span>Acción</span>
+            </div>
+
             <div class="carrito-lista">
                 <div class="carrito-item" th:each="item : ${carrito}">
-                    <strong th:text="${item.producto}">Producto</strong>
+                    <div class="carrito-producto-info">
+                        <img th:src="@{/upload/productos/{filename}(filename=${item.fotoProducto})}" class="carrito-foto">
+                        <strong th:text="${item.producto}">Producto</strong>
+                    </div>
                     <span th:text="${'S/. ' + item.precioUnitario}">S/. 0.00</span>
-                    <input type="number" min="1" th:value="${item.cantidad}" 
-                           th:data-id="${item.idProducto}"
-                           onchange="actualizarCantidad(this)">
+                    <input type="number" min="1" th:value="${item.cantidad}" th:data-id="${item.idProducto}" onchange="actualizarCantidad(this)">
                     <span th:text="${'S/. ' + item.precioUnitario * item.cantidad}">S/. 0.00</span>
                     <button th:onclick="'eliminarProducto(' + ${item.idCarrito} + ', ' + ${item.idPedido} + ')'">
                         <i class="fa-solid fa-trash"></i>
@@ -234,58 +202,66 @@
             </div>
 
             <div class="acciones">
-                <a href="/carta">← Seguir Comprando</a>
-                <a href="#" class="btn-pago" 
-                   th:onclick="'abrirModalPago(' + ${idPedido} + ', ' + ${total} + ')'">
-                   Procesar Pago
-                </a>
+                <a href="#" th:onclick="'abrirModalPago(' + ${idPedido} + ', ' + ${total} + ')'">Procesar Pago</a>
             </div>
         </div>
     </div>
 
-    <!-- Modal de pago -->
-    <div id="modal" th:classappend="${mostrarModal} ? 'active' : ''" class="modal">
-        <div class="modal-content-pago">
-            <h2>Realizar pago</h2>
-            <form th:action="@{/guardarPago}" method="post" class="form-pago">
-                <main th:include="components/form_pago"></main>
-                <button type="submit" class="button-p2">Pagar</button>
-            </form>
-            <button onclick="cerrarModal()">Cerrar</button>
-        </div>
-    </div>
 
     <div th:include="components/footer"></div>
 
     <script>
         function actualizarCantidad(input) {
-            const idProducto = input.getAttribute('data-id');
+            const idProducto = input.dataset.id;
             const cantidad = input.value;
+
             fetch(`/carrito/actualizar/${idProducto}/${cantidad}`, { method: 'POST' })
                 .then(() => window.location.reload());
         }
 
         function eliminarProducto(idCarrito, idPedido) {
-            if(confirm('¿Estás seguro de eliminar este producto?')) {
+            if(confirm('¿Deseas eliminar este producto?')) {
                 fetch(`/carrito/eliminar/${idCarrito}/${idPedido}`, { method: 'POST' })
                     .then(() => window.location.reload());
             }
         }
 
-        function abrirModalPago(idPedido, total) {
-            document.getElementById('modalIdPedido').value = idPedido;
-            document.getElementById('modalTotal').value = total;
-            document.getElementById('modal').style.display = 'flex';
-        }
 
-        function cerrarModal() {
-            document.getElementById('modal').style.display = 'none';
-        }
-
-        setTimeout(() => {
-            const mensajeContainer = document.querySelector('.mensaje-container');
-            if (mensajeContainer) mensajeContainer.style.display = 'none';
-        }, 3000);
     </script>
 </body>
 </html>
+<script>
+    function abrirModalPago(idPedido, total) {
+function abrirModalPago(idPedido, total) {
+    const modal = document.getElementById('modalPago');
+
+    if (!modal) {
+        alert("⚠️ No se encontró el componente form_Pago en el DOM.");
+        return;
+    }
+
+    // Asigna los valores del pedido al modal
+    const idField = document.getElementById('modalIdPedido');
+    const totalField = document.getElementById('modalTotal');
+
+    if (idField) idField.value = idPedido;
+    if (totalField) totalField.value = `S/. ${parseFloat(total).toFixed(2)}`;
+
+    // Mostrar el modal
+    modal.style.display = 'block';
+}
+
+function cerrarModalPago() {
+    const modal = document.getElementById('modalPago');
+    if (modal) modal.style.display = 'none';
+}
+
+window.onclick = function(event) {
+    const modal = document.getElementById('modalPago');
+    if (event.target === modal) {
+        cerrarModalPago();
+    }
+};
+
+    }
+</script>
