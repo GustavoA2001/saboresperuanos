@@ -52,8 +52,8 @@ public class CarritoController {
         }
 
         // Guardar el producto en el carrito del pedido
-        carritoDAO.guardarEnCarrito(cliente.getIdCliente(), idProducto, cantidad, precioProducto, idPedido);
-
+        carritoDAO.guardarEnCarrito(cliente.getIdCliente(), idProducto, cantidad, precioUnitario, idPedido);
+        
         // Retraso de 2 segundos antes de redirigir
         try {
             Thread.sleep(2000); 

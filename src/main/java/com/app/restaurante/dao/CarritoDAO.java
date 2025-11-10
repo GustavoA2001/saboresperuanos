@@ -21,24 +21,25 @@ public class CarritoDAO {
     /**
      * Método para agregar un producto al carrito asociado a un pedido
      */
-    public void guardarEnCarrito(Long idCliente, Long idProducto, int cantidad, double precioUnitario, Integer idPedido) {
+    public void guardarEnCarrito(Long idCliente, Long idProducto, int cantidad, double precioUnitario,
+            Integer idPedido) {
         // Insertar producto en el carrito
         String sqlCarrito = """
-            INSERT INTO carrito (IDPedido, IDProducto, Cantidad, PrecioProducto)
-            VALUES (?, ?, ?, ?)
-        """;
+                    INSERT INTO carrito (IDPedido, IDProducto, Cantidad, PrecioProducto)
+                    VALUES (?, ?, ?, ?)
+                """;
         jdbcTemplate.update(sqlCarrito, idPedido, idProducto, cantidad, precioUnitario);
 
         // Actualizar el monto final del pedido
         String sqlActualizarMonto = """
-            UPDATE pedido p 
-            SET p.MontoFinal = (
-                SELECT SUM(c.Cantidad * c.PrecioProducto)
-                FROM carrito c
-                WHERE c.IDPedido = ?
-            )
-            WHERE p.IDPedido = ?
-        """;
+                    UPDATE pedido p
+                    SET p.MontoFinal = (
+                        SELECT SUM(c.Cantidad * c.PrecioProducto)
+                        FROM carrito c
+                        WHERE c.IDPedido = ?
+                    )
+                    WHERE p.IDPedido = ?
+                """;
         jdbcTemplate.update(sqlActualizarMonto, idPedido, idPedido);
     }
 
@@ -47,15 +48,15 @@ public class CarritoDAO {
      */
     public Integer obtenerUltimoPedidoPorCliente(Long idCliente) {
         String sql = """
-            SELECT IDPedido 
-            FROM pedido 
-            WHERE IDCliente = ? 
-            AND DATE(FechaPedido) = CURDATE() 
-            AND EstadoPedido = 'Activo'
-            ORDER BY FechaPedido DESC 
-            LIMIT 1
-        """;
-        List<Integer> resultados = jdbcTemplate.queryForList(sql, new Object[]{idCliente}, Integer.class);
+                    SELECT IDPedido
+                    FROM pedido
+                    WHERE IDCliente = ?
+                    AND DATE(FechaPedido) = CURDATE()
+                    AND EstadoPedido = 'Activo'
+                    ORDER BY FechaPedido DESC
+                    LIMIT 1
+                """;
+        List<Integer> resultados = jdbcTemplate.queryForList(sql, new Object[] { idCliente }, Integer.class);
         return resultados.isEmpty() ? null : resultados.get(0);
     }
 
@@ -64,9 +65,9 @@ public class CarritoDAO {
      */
     public Integer crearNuevoPedido(Long idCliente) {
         String sqlPedido = """
-            INSERT INTO pedido (IDCliente, FechaPedido, MontoFinal, EstadoPedido)
-            VALUES (?, NOW(), 0, 'Activo')
-        """;
+                    INSERT INTO pedido (IDCliente, FechaPedido, MontoFinal, EstadoPedido)
+                    VALUES (?, NOW(), 0, 'Activo')
+                """;
         jdbcTemplate.update(sqlPedido, idCliente);
 
         // Obtener el ID del nuevo pedido
@@ -76,31 +77,33 @@ public class CarritoDAO {
     /**
      * Obtener detalles del carrito
      */
+    /**
+     * Obtener detalles del carrito
+     */
     public List<Carrito> obtenerDetallesCarrito(int idPedido) {
         String sql = """
-            SELECT 
-                p.IDProducto,
-                ph.NomProducto AS Producto,
-                c.Cantidad AS Cantidad,
-                p.PrecioUnitario AS PrecioUnitario,
-                (c.Cantidad * p.PrecioUnitario) AS TotalProducto,
-                c.IDCarrito,
-                c.IDPedido,
-                COALESCE(fp.FotoPrincipal, 'default.jpg') AS FotoProducto,
-                pe.MontoFinal AS TotalCarrito,
-                cli.Nombre AS ClienteNombre,
-                cli.Apellido AS ClienteApellido,
-                COALESCE(fp.FotoPrincipal, 'default.jpg') AS FotoProducto
-            FROM carrito c
-            JOIN producto p ON c.IDProducto = p.IDProducto
-            LEFT JOIN productohistoria ph ON p.IDProducto = ph.IDProducto
-            LEFT JOIN fotoproducto fp ON p.IDProducto = fp.IDProducto
-            JOIN pedido pe ON c.IDPedido = pe.IDPedido
-            JOIN cliente cli ON pe.IDCliente = cli.IDCliente
-            WHERE c.IDPedido = ?
-        """;
+                    SELECT
+                        p.IDProducto,
+                        ph.NomProducto AS producto,
+                        c.Cantidad AS cantidad,
+                        p.PrecioUnitario AS precioUnitario,
+                        (c.Cantidad * p.PrecioUnitario) AS totalProducto,
+                        c.IDCarrito AS idCarrito,
+                        c.IDPedido AS idPedido,
+                        COALESCE(fp.FotoPrincipal, 'default.jpg') AS fotoProducto,
+                        pe.MontoFinal AS totalCarrito,
+                        cli.Nombre AS clienteNombre,
+                        cli.Apellido AS clienteApellido
+                    FROM carrito c
+                    JOIN producto p ON c.IDProducto = p.IDProducto
+                    LEFT JOIN productohistoria ph ON p.IDProdHistoria = ph.IDProdHistoria
+                    LEFT JOIN fotoproducto fp ON p.IDProdHistoria = fp.IDProdHistoria
+                    JOIN pedido pe ON c.IDPedido = pe.IDPedido
+                    JOIN cliente cli ON pe.IDCliente = cli.IDCliente
+                    WHERE c.IDPedido = ?
+                """;
 
-        return jdbcTemplate.query(sql, new Object[]{idPedido}, new BeanPropertyRowMapper<>(Carrito.class));
+        return jdbcTemplate.query(sql, new Object[] { idPedido }, new BeanPropertyRowMapper<>(Carrito.class));
     }
 
     /**
@@ -111,14 +114,14 @@ public class CarritoDAO {
         jdbcTemplate.update(sql, idCarrito, idPedido);
 
         String sqlActualizarMonto = """
-            UPDATE pedido p 
-            SET p.MontoFinal = (
-                SELECT IFNULL(SUM(c.Cantidad * c.PrecioProducto), 0)
-                FROM carrito c 
-                WHERE c.IDPedido = ?
-            )
-            WHERE p.IDPedido = ?
-        """;
+                    UPDATE pedido p
+                    SET p.MontoFinal = (
+                        SELECT IFNULL(SUM(c.Cantidad * c.PrecioProducto), 0)
+                        FROM carrito c
+                        WHERE c.IDPedido = ?
+                    )
+                    WHERE p.IDPedido = ?
+                """;
         jdbcTemplate.update(sqlActualizarMonto, idPedido, idPedido);
     }
 }

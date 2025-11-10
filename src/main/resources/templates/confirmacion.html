@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pago Confirmado</title>
+
+    <link th:include="components/link">
+    <link rel="stylesheet" th:href="@{/css/menu.css}">
+    <script src="https://kit.fontawesome.com/35db202371.js" crossorigin="anonymous"></script>
+
+    <style>
+        body {
+            font-family: 'Cabin', sans-serif;
+            background: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: #333;
+        }
+
+        .confirmacion-container {
+            text-align: center;
+            background: #fff;
+            padding: 40px 50px;
+            border-radius: 16px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            animation: fadeInScale 0.5s ease forwards;
+        }
+
+        /* Círculo */
+        .checkmark {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            border: 5px solid #28a745;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 25px;
+            position: relative;
+            animation: pop 0.6s ease forwards;
+        }
+
+        /* Check dentro del círculo */
+        .checkmark::after {
+            content: '';
+            position: absolute;
+            width: 50px;
+            height: 15px;
+            border-left: 5px solid #28a745;
+            border-bottom: 5px solid #28a745;
+            transform: rotate(-45deg);
+            opacity: 0;
+            animation: draw 0.5s ease forwards 0.5s;
+        }
+
+        @keyframes pop {
+            0% { transform: scale(0); }
+            70% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes draw {
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        h2 {
+            color: #28a745;
+            margin-bottom: 10px;
+        }
+
+        p {
+            font-size: 1.1em;
+            margin-bottom: 25px;
+        }
+
+        /* Botones */
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .btn {
+            background: #457b9d;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 20px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #1d3557;
+        }
+
+        .btn-secondary {
+            background: #adb5bd;
+        }
+
+        .btn-secondary:hover {
+            background: #6c757d;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="confirmacion-container">
+        <div class="checkmark"></div>
+        <h2>¡Pago realizado con éxito!</h2>
+        <p>Gracias por su compra. Su pedido <strong th:text="${idPedido}">#1234</strong> ha sido procesado.</p>
+
+        <div class="btn-container">
+            <a th:href="@{/recibo/{id}(id=${idPedido})}" class="btn">
+                <i class="fas fa-file-invoice"></i> Ver Recibo
+            </a>
+            <a th:href="@{/index}" class="btn btn-secondary">
+                <i class="fas fa-home"></i> Volver al Inicio
+            </a>
+        </div>
+    </div>
+</body>
+
+</html>

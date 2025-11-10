@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADM | Carta</title>
+
+    <link th:include="components/link">
+    <link rel="stylesheet" th:href="@{/css/menu.css}">
+    <script src="https://kit.fontawesome.com/35db202371.js" crossorigin="anonymous"></script>
+
+    <style>
+        body {
+            background-color: var(--base-color);
+            color: var(--text-color);
+            font-family: 'Cabin', sans-serif;
+        }
+
+        main.adm-main {
+            flex-grow: 1;
+            padding: 40px;
+        }
+
+        h1.adm-page-title {
+            font-weight: 700;
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            text-align: left;
+            color: var(--color-fifth);
+        }
+
+        .tables-flex {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .adm-card {
+            flex: 1;
+            min-width: 350px;
+            background: var(--color-light);
+            border-radius: 14px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-bottom: 30px;
+            padding: 0 !important;
+        }
+
+        .adm-card-header {
+            padding: 14px 20px;
+            color: #fff;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .bg-primary {
+            background-color: var(--color-fifth);
+        }
+
+        .bg-success {
+            background-color: var(--color-fourth);
+        }
+
+        .adm-btn-add {
+            background: #fff;
+            color: var(--color-fifth);
+            border-radius: 6px;
+            padding: 6px 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .adm-btn-add:hover {
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .adm-card-body {
+            padding: 15px 20px 25px;
+        }
+
+        .adm-table-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border-radius: 8px;
+        }
+
+        table.adm-table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        .adm-table thead {
+            background-color: var(--color-third);
+            color: var(--color-light);
+        }
+
+        .adm-table th,
+        .adm-table td {
+            padding: 12px 10px;
+            border-bottom: 1px solid var(--color-primary);
+            text-align: center;
+        }
+
+        .adm-table tbody tr:hover {
+            background: var(--color-primary);
+            color: #fff;
+            transition: 0.3s;
+        }
+
+        .foto-producto {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .adm-actions {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .adm-actions button,
+        .adm-actions a {
+            border: none;
+            background: none;
+            color: var(--color-fifth);
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .adm-actions button:hover,
+        .adm-actions a:hover {
+            color: var(--color-verify);
+        }
+
+        @media (max-width: 900px) {
+            .tables-flex {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header th:include="/admin/adminMenu"></header>
+
+    <main class="adm-main">
+        <h1 class="adm-page-title">Gestión de la Carta</h1>
+
+        <div class="tables-flex">
+            <!-- Productos del día anterior -->
+            <div class="adm-card">
+                <div class="adm-card-header bg-primary">
+                    <div>Productos del Día Anterior</div>
+                </div>
+                <div class="adm-card-body">
+                    <div class="adm-table-container">
+                        <table class="adm-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombre</th>
+                                    <th>Precio</th>
+                                    <th>Cantidad</th>
+                                    <th>Fecha</th>
+                                    <th>Vendidos</th>
+                                    <th>Sobro</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="prod : ${productosDiaAnterior}">
+                                    <td th:text="${prod['idProducto']}"></td>
+                                    <td th:text="${prod['nomProducto']}"></td>
+                                    <td th:text="'S/. ' + ${prod['precioUnitario']}"></td>
+                                    <td th:text="${prod['cantidadInicial']}"></td>
+
+                                    <td th:text="${#temporals.format(prod['fechaProducto'], 'dd/MM/yyyy HH:mm')}"></td>
+
+                                    <td th:text="${prod['vendidos']}"></td>
+                                    <td th:text="${prod['stock']}"></td>
+                                    <td class="adm-actions">
+                                        <button type="button" th:onclick="'subirACarta(' + ${prod['idProducto']} + ')'">
+                                            <i class="fas fa-arrow-up"></i>
+                                        </button>
+                                    </td>
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Productos recientes -->
+            <div class="adm-card">
+                <div class="adm-card-header bg-success">
+                    <div>Productos Recientes</div>
+                </div>
+                <div class="adm-card-body">
+                    <div class="adm-table-container">
+                        <table class="adm-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombre</th>
+                                    <th>Precio</th>
+                                    <th>Cantidad Inicial</th>
+                                    <th>Vendidos</th>
+                                    <th>Stock</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="prod : ${productosRecientes}">
+                                    <td th:text="${prod.idProducto}"></td>
+                                    <td th:text="${prod.nomProducto}"></td>
+                                    <td th:text="'S/. ' + ${prod.precioUnitario}"></td>
+                                    <td th:text="${prod.cantidadInicial}"></td>
+                                    <td th:text="${prod.vendidos}"></td>
+                                    <td th:text="${prod.stock}"></td>
+                                    <td class="adm-actions">
+                                        <!-- Editar -->
+                                        <a th:href="@{'/admin/carta/editar/' + ${prod.idProducto}}" title="Editar">
+                                            <i class="fas fa-pen"></i>
+                                        </a>
+
+                                        <!-- Ocultar / Mostrar -->
+                                        <button type="button" th:if="${prod.estado == 'Habilitado'}"
+                                            th:onclick="'cambiarEstado(' + ${prod.idProducto} + ', \'Ocultar\')'"
+                                            title="Ocultar">
+                                            <i class="fas fa-eye-slash"></i>
+                                        </button>
+                                        <button type="button" th:if="${prod.estado != 'Habilitado'}"
+                                            th:onclick="'cambiarEstado(' + ${prod.idProducto} + ', \'Mostrar\')'"
+                                            title="Mostrar">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+
+                                        <!-- Eliminar -->
+                                        <button type="button"
+                                            th:onclick="'eliminarProducto(' + ${prod.idProducto} + ')'"
+                                            title="Eliminar">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div th:replace="admin/components/admin_add_carta"></div>
+
+    <script>
+        function eliminarProducto(idProducto) {
+            if (confirm('¿Deseas eliminar este producto?')) {
+                fetch(`/admin/carta/eliminar/${idProducto}`, { method: 'POST' })
+                    .then(() => window.location.reload());
+            }
+        }
+    </script>
+</body>
+
+</html>

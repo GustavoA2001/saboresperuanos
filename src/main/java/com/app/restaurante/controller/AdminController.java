@@ -9,11 +9,18 @@ import com.app.restaurante.model.Empleados;
 import com.app.restaurante.model.Productos;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class AdminController {
@@ -40,6 +47,23 @@ public class AdminController {
         model.addAttribute("empleados", empleados);
         model.addAttribute("activeSection", "empleados");
         return "admin/admin_empleados";
+    }
+
+    @PostMapping("/admin/empleado/registrar")
+    public String registrarEmpleado(@ModelAttribute Empleados empleado, RedirectAttributes redirectAttributes) {
+        try {
+            int idGenerado = empleadosDAO.registrarEmpleadoCompleto(empleado);
+            System.out.println("Empleado insertado con ID: " + idGenerado);
+
+            redirectAttributes.addFlashAttribute("mensaje", "Empleado registrado correctamente. ID: " + idGenerado);
+        } catch (Exception e) {
+            System.out.println("Error al registrar empleado:");
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("error", "Error al registrar el empleado: " + e.getMessage());
+        }
+
+        System.out.println("Redirigiendo a /admin/empleados");
+        return "redirect:/admin/empleados";
     }
 
     // =========================================
@@ -82,6 +106,21 @@ public class AdminController {
         return "admin/admin_parametros";
     }
 
+    // =========================================
+    // CARTA
+    // =========================================
+    @GetMapping("/admin/carta")
+    public String gestionarCarta(Model model) {
+        List<Map<String, Object>> productosDiaAnterior = productosDAO.obtenerProductosDiaAnterior();
+        List<Map<String, Object>> productosRecientes = productosDAO.obtenerProductosRecientes();
+        List<Map<String, Object>> productosPasados = productosDAO.obtenerProductosPasados();
 
+        model.addAttribute("productosPasados", productosPasados);
+
+        model.addAttribute("productosDiaAnterior", productosDiaAnterior);
+        model.addAttribute("productosRecientes", productosRecientes);
+        model.addAttribute("activeSection", "carta");
+        return "admin/admin_carta";
+    }
 
 }

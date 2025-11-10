@@ -1,0 +1,218 @@
+<div class="admin_add_carta">
+
+    <!-- Botón flotante -->
+    <button class="adm-btn-add" id="openProdAnteriorModal" title="Agregar productos anteriores">
+        <i class="fas fa-plus small-plus"></i>
+        Más productos
+    </button>
+
+    <!-- Modal -->
+    <div class="adm-modal" id="prodAnteriorModal">
+        <div class="adm-modal-content">
+            <span class="adm-modal-close" id="closeProdAnteriorModal">&times;</span>
+
+            <h2 class="league-spartan">Productos de días anteriores</h2>
+            <p class="descripcion">
+                Selecciona los productos para agregarlos a la carta de hoy.
+            </p>
+
+            <form id="formProductosAnteriores">
+                <div class="productos_lista">
+                    <div th:each="prod : ${productosPasados}" class="producto_item">
+                        <label>
+                            <input type="checkbox" name="productosSeleccionados" th:value="${prod.idProducto}">
+                            <div class="producto_info">
+                                <span class="nombre" th:text="${prod.nomProducto}">Nombre Producto</span>
+                                <span class="info" th:text="'Cantidad: ' + ${prod.cantidadInicial} + 
+                                    ', Stock: ' + ${prod.stock} + 
+                                    ', Ventas: ' + ${prod.vendidos} + 
+                                    ', Fecha: ' + ${#temporals.format(prod.fechaProducto, 'dd/MM/yyyy')}">
+                                    Cantidad: 0, Stock: 0, Ventas: 0, Fecha: 00/00/0000
+                                </span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="adm-modal-actions">
+                    <button type="submit" class="adm-btn-save">Agregar a carta de hoy</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Script -->
+<script>
+    const btnOpenProdModal = document.getElementById("openProdAnteriorModal");
+    const btnCloseProdModal = document.getElementById("closeProdAnteriorModal");
+    const modalProd = document.getElementById("prodAnteriorModal");
+    const formProdAnteriores = document.getElementById("formProductosAnteriores");
+
+    btnOpenProdModal.addEventListener("click", () => {
+        modalProd.style.display = "flex";
+        document.body.style.overflow = "hidden";
+    });
+
+    btnCloseProdModal.addEventListener("click", () => {
+        modalProd.style.display = "none";
+        document.body.style.overflow = "auto";
+    });
+
+    window.addEventListener("click", (e) => {
+        if (e.target === modalProd) {
+            modalProd.style.display = "none";
+            document.body.style.overflow = "auto";
+        }
+    });
+
+    window.addEventListener("keydown", e => {
+        if (e.key === "Escape") {
+            modalProd.style.display = "none";
+            document.body.style.overflow = "auto";
+        }
+    });
+
+    formProdAnteriores.addEventListener("submit", (event) => {
+        event.preventDefault();
+        alert("✅ Productos agregados a la carta de hoy (simulado)");
+        modalProd.style.display = "none";
+        document.body.style.overflow = "auto";
+    });
+</script>
+
+<style>
+    .adm-btn-add {
+        position: fixed;
+        right: 40px;
+        bottom: 40px;
+        background-color: #00734d;
+        color: white;
+        font-weight: 600;
+        border: none;
+        padding: 14px 22px;
+        border-radius: 50px;
+        cursor: pointer;
+        font-size: 0.95rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+        transition: 0.3s;
+        z-index: 1100;
+    }
+
+    .adm-btn-add:hover {
+        background-color: #005f3d;
+        transform: translateY(-2px);
+    }
+
+    .adm-modal {
+        display: none;
+        position: fixed;
+        z-index: 2000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, .45);
+        justify-content: center;
+        align-items: center;
+        padding: 15px;
+    }
+
+    .adm-modal-content {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        width: 450px;
+        max-width: 95%;
+        position: relative;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+        animation: fadeIn .3s ease;
+    }
+
+    .adm-modal-close {
+        position: absolute;
+        top: 10px;
+        right: 14px;
+        font-size: 25px;
+        cursor: pointer;
+        color: #444;
+        font-weight: bold;
+    }
+
+    .adm-modal-close:hover {
+        color: red;
+    }
+
+    .productos_lista {
+        margin: 20px 0;
+        max-height: 300px;
+        overflow-y: auto;
+        padding-right: 5px;
+    }
+
+    .producto_item {
+        background: #f7f7f7;
+        padding: 12px 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .producto_item label {
+        width: 100%;
+        cursor: pointer;
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .producto_item input {
+        transform: scale(1.2);
+        margin-top: 4px;
+    }
+
+    .producto_info {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .adm-modal-actions {
+        text-align: center;
+        margin-top: 15px;
+    }
+
+    .adm-btn-save {
+        background-color: #00734d;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .adm-btn-save:hover {
+        background-color: #005f3d;
+        transform: translateY(-2px);
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>

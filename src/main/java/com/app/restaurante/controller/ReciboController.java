@@ -1,78 +1,60 @@
 package com.app.restaurante.controller;
 
-import java.util.ArrayList;
+
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.app.restaurante.dao.ReciboDAO;
-import com.app.restaurante.model.Cliente;
-import com.app.restaurante.model.Pedido;
-import com.app.restaurante.model.Productos;
-import com.app.restaurante.model.Recibo;
-
-import jakarta.servlet.http.HttpSession;
-
-import org.springframework.ui.Model;
+import com.app.restaurante.dao.CheckoutDAO;
 
 @Controller
 public class ReciboController {
-    
-    @Autowired
-    private HttpSession session;
 
     @Autowired
-    private ReciboDAO reciboDao;
-
-    @GetMapping("/recibo")
-    public String mostrarRecibo(Model model) {
-        return "recibo"; 
-    }
+    private CheckoutDAO checkoutDAO;
 
     @GetMapping("/recibo/{idPedido}")
-    public String mostrarRecibo(@PathVariable("idPedido") int idPedido,
-                                Model model,
-                                RedirectAttributes redirectAttributes) {
+    public String verRecibo(@PathVariable int idPedido, Model model) {
+        System.out.println("[ReciboController] Cargando recibo para pedido #" + idPedido);
 
-        // Verificar la sesión del cliente
-        Cliente cliente = (Cliente) session.getAttribute("cliente");
-        if (cliente == null) {
-            redirectAttributes.addFlashAttribute("error", "Debe iniciar sesión para continuar.");
-            return "redirect:/login";
+        try {
+            List<Map<String, Object>> datos = checkoutDAO.obtenerDatosPedido(idPedido);
+            if (datos.isEmpty()) {
+                System.out.println("[ReciboController] No se encontró el pedido #" + idPedido);
+                model.addAttribute("error", "No se encontró información del pedido #" + idPedido);
+                return "error";
+            }
+
+            Map<String, Object> pedido = datos.get(0);
+            System.out.println("[ReciboController] Datos del pedido: " + pedido);
+
+            List<Map<String, Object>> productos = checkoutDAO.obtenerProductosPedido(idPedido);
+            System.out.println("[ReciboController] Productos obtenidos: " + productos.size());
+
+            model.addAttribute("pedido", pedido);
+            model.addAttribute("productos", productos);
+
+            System.out.println("[ReciboController] Datos enviados a la vista recibo.html");
+            return "recibo";
+
+        } catch (Exception e) {
+            System.err.println("[ReciboController] Error al generar recibo: " + e.getMessage());
+            e.printStackTrace();
+            model.addAttribute("error", "Error interno al generar el recibo");
+            return "error";
         }
-
-        // Obtener el recibo desde el ReciboDAO
-        Recibo recibo = reciboDao.obtenerReciboPorIdPedido(idPedido);
-
-        if (recibo == null) {
-            redirectAttributes.addFlashAttribute("error", "No se encontró el recibo para este pedido.");
-            return "redirect:/carrito_compra";
-        }
-
-        // Pasar el objeto Recibo al modelo
-        model.addAttribute("recibo", recibo);
-
-        return "recibo";
     }
 
-    
-    @GetMapping("/recibo_modal/{idPedido}")
-@ResponseBody
-public Recibo obtenerReciboModal(@PathVariable Integer idPedido) {
-    Recibo recibo = reciboDao.obtenerReciboPorIdPedido(idPedido);
-    return recibo;
+    // Permitir /recibo?idPedido=...
+    @GetMapping("/recibo")
+    public String verReciboParam(@RequestParam int idPedido, Model model) {
+        System.out.println("📥 [ReciboController] Recibo solicitado por parámetro idPedido=" + idPedido);
+        return verRecibo(idPedido, model);
+    }
 }
-
-    
-    /* 
-    En la base de datos hemos creado una tabla que puede o no estar relacionada con el pago
-    es la TABLA RECIBO que almacena los id en cadena de lo que se quiere
-    asi manejamos todos los recibos, tenemos los id solo se harian consultas con todos los ID
-    */
-}
-

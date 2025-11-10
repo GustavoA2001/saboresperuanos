@@ -164,6 +164,9 @@
 <body>
     <header th:include="components/menu"></header>
 
+    <!--Componente logo-->
+    <div th:include="components/logo"></div>
+
     <div class="carrito-container">
         <h2>Mi Carrito de Compras</h2>
 
@@ -203,6 +206,7 @@
 
             <div class="acciones">
                 <a href="#" th:onclick="'abrirModalPago(' + ${idPedido} + ', ' + ${total} + ')'">Procesar Pago</a>
+                <a th:href="@{/checkout(idPedido=${idPedido})}" class="btn">Pagar</a>
             </div>
         </div>
     </div>
@@ -236,7 +240,7 @@ function abrirModalPago(idPedido, total) {
     const modal = document.getElementById('modalPago');
 
     if (!modal) {
-        alert("⚠️ No se encontró el componente form_Pago en el DOM.");
+        alert(" No se encontró el componente form_Pago en el DOM.");
         return;
     }
 

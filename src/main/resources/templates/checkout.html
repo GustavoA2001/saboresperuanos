@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Checkout - Confirmar Pedido</title>
+    <link th:include="components/link">
+    </link>
+    <link rel="stylesheet" th:href="@{/css/menu.css}">
+    <script src="https://kit.fontawesome.com/35db202371.js" crossorigin="anonymous"></script>
+
+    <style>
+        body {
+            font-family: 'Cabin', sans-serif;
+            background: #f8f9fa;
+            padding-top: 90px;
+            color: #333;
+        }
+
+        .checkout-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            max-width: 1200px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .checkout-left {
+            border-right: 1px solid #ddd;
+            padding-right: 25px;
+        }
+
+        .checkout-left h2 {
+            font-family: 'League Spartan', sans-serif;
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            color: #1d3557;
+        }
+
+        .producto-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+        }
+
+        .producto-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .producto-info img {
+            width: 70px;
+            height: 70px;
+            border-radius: 10px;
+            object-fit: cover;
+        }
+
+        .producto-info h4 {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .producto-precio {
+            font-weight: 600;
+        }
+
+        .direccion-section {
+            margin-top: 30px;
+            background: #f8f9fa;
+            padding: 25px 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .direccion-section h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #1d3557;
+            margin-bottom: 20px;
+        }
+
+        .direccion-form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .direccion-form label {
+            font-weight: 600;
+            color: #333;
+            font-size: 0.9rem;
+        }
+
+        .direccion-form input,
+        .direccion-form select {
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border 0.2s ease;
+        }
+
+        .direccion-form input:focus,
+        .direccion-form select:focus {
+            border-color: #457b9d;
+        }
+
+        .btn-azul {
+            background: #457b9d;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 16px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .btn-azul:hover {
+            background: #1d3557;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 20px 0;
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .divider:not(:empty)::before {
+            margin-right: .75em;
+        }
+
+        .divider:not(:empty)::after {
+            margin-left: .75em;
+        }
+
+        .checkout-right {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .resumen {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 12px;
+        }
+
+        .resumen h3 {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            color: #1d3557;
+        }
+
+        .resumen-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+
+        .total {
+            border-top: 1px solid #ccc;
+            margin-top: 15px;
+            padding-top: 10px;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        /* Formulario pago */
+        #pagoContainer {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 12px;
+            margin-top: 25px;
+            display: none;
+            /* Oculto inicialmente */
+        }
+
+        #pagoContainer h3 {
+            font-size: 1.3rem;
+            color: #1d3557;
+            margin-bottom: 15px;
+        }
+
+        .loading {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            color: #1d3557;
+        }
+
+        @media (max-width: 900px) {
+            .checkout-container {
+                grid-template-columns: 1fr;
+                padding: 25px;
+            }
+
+            .checkout-left {
+                border: none;
+                padding: 0;
+            }
+        }
+
+        @keyframes slideFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideFadeOut {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            to {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+        }
+
+        .fade-in {
+            animation: slideFadeIn 0.4s ease forwards;
+        }
+
+        .fade-out {
+            animation: slideFadeOut 0.3s ease forwards;
+        }
+    </style>
+</head>
+
+<body>
+    <header th:include="components/menu"></header>
+
+    <div class="checkout-container">
+        <div class="checkout-left">
+            <h2>Resumen del Pedido</h2>
+
+            <div th:each="item : ${carrito}" class="producto-item">
+                <div class="producto-info">
+                    <img th:src="@{/upload/productos/{filename}(filename=${item.fotoProducto})}" alt="Producto">
+                    <div>
+                        <h4 th:text="${item.producto}">Producto</h4>
+                        <p th:text="'Cantidad: ' + ${item.cantidad}"></p>
+                    </div>
+                </div>
+                <div class="producto-precio" th:text="${'S/. ' + (item.precioUnitario * item.cantidad)}"></div>
+            </div>
+
+            <div class="direccion-section" id="direccionContainer">
+                <h3>Dirección de entrega</h3>
+
+                <div id="formulariosDireccion">
+                    <form th:action="@{/checkout/seleccionarDireccion}" method="post" class="direccion-form">
+                        <input type="hidden" name="idPedido" th:value="${idPedido}">
+                        <label for="idDireccion">Seleccionar dirección existente:</label>
+                        <select name="idDireccion" id="idDireccion" required>
+                            <option value="">-- Seleccionar --</option>
+                            <option th:each="dir : ${direcciones}" th:value="${dir.IDDireccion}"
+                                th:text="${dir.DireccionCompleta + ' (' + dir.Distrito + ')'}"></option>
+                        </select>
+                        <button type="submit" class="btn-azul"><i class="fas fa-check"></i> Usar dirección</button>
+                    </form>
+
+                    <div class="divider">
+                        <span>O agrega una nueva</span>
+                    </div>
+
+                    <form th:action="@{/checkout/agregarDireccion}" method="post" class="direccion-form">
+                        <input type="hidden" name="idPedido" th:value="${idPedido}">
+                        <label for="direccionCompleta">Dirección completa:</label>
+                        <input type="text" id="direccionCompleta" name="direccionCompleta"
+                            placeholder="Ej. Av. Primavera 123 - Surco" required>
+                        <label for="referencia">Referencia:</label>
+                        <input type="text" id="referencia" name="referencia"
+                            placeholder="Cerca al parque / edificio azul">
+                        <label for="idDistrito">Distrito:</label>
+                        <select id="idDistrito" name="idDistrito" required>
+                            <option value="">-- Seleccionar distrito --</option>
+                            <option th:each="dist : ${distritos}" th:value="${dist.IDDistrito}"
+                                th:text="${dist.Distrito}"></option>
+                        </select>
+                        <button type="submit" class="btn-azul"><i class="fas fa-plus"></i> Agregar dirección</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="checkout-right">
+            <div class="resumen">
+                <h3>Resumen</h3>
+                <div class="resumen-item">
+                    <span>Subtotal:</span>
+                    <span th:text="${'S/. ' + total}"></span>
+                </div>
+                <div class="resumen-item">
+                    <span>Envío:</span>
+                    <span>S/. 5.00</span>
+                </div>
+                <div class="resumen-item total">
+                    <span>Total:</span>
+                    <span th:text="${'S/. ' + (total + 5)}"></span>
+                </div>
+            </div>
+
+            <!-- FORMULARIO DE PAGO -->
+            <div id="pagoContainer" class="fade-in">
+                <h3><i class="fas fa-credit-card"></i> Pago con Tarjeta</h3>
+                <form id="formPago" class="direccion-form">
+                    <label for="numeroTarjeta">Número de tarjeta:</label>
+                    <input type="text" id="numeroTarjeta" name="numeroTarjeta" maxlength="16"
+                        placeholder="1234 5678 9012 3456" required>
+                    <label for="nombreTitular">Nombre del titular:</label>
+                    <input type="text" id="nombreTitular" name="nombreTitular" placeholder="Como aparece en la tarjeta"
+                        required>
+                    <div style="display:flex;gap:10px;">
+                        <div style="flex:1;">
+                            <label for="fechaExp">Fecha de expiración:</label>
+                            <input type="text" id="fechaExp" name="fechaExp" maxlength="5" placeholder="MM/AA" required>
+                        </div>
+                        <div style="flex:1;">
+                            <label for="cvv">CVV:</label>
+                            <input type="password" id="cvv" name="cvv" maxlength="3" placeholder="123" required>
+                        </div>
+                    </div>
+                    <input type="hidden" name="idPedido" th:value="${idPedido}">
+                    <button type="submit" class="btn-azul" id="btnPagarFinal"><i class="fas fa-lock"></i> Pagar
+                        ahora</button>
+                    <div id="pagoLoading" class="loading"><i class="fas fa-spinner fa-spin"></i> Procesando pago...
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const formSelect = document.querySelector('form[action*="seleccionarDireccion"]');
+            const formAdd = document.querySelector('form[action*="agregarDireccion"]');
+            const contenedor = document.getElementById('direccionContainer');
+            const formularios = document.getElementById('formulariosDireccion');
+            const pagoContainer = document.getElementById('pagoContainer');
+            const formPago = document.getElementById('formPago');
+            const loading = document.getElementById('pagoLoading');
+
+            function mostrarDireccionSeleccionada(dir) {
+                formularios.classList.add('fade-out');
+                setTimeout(() => {
+                    formularios.style.display = 'none';
+                    contenedor.innerHTML = `
+            <div class="fade-in">
+              <h3>Dirección seleccionada</h3>
+              <p><strong>${dir.DireccionCompleta}</strong></p>
+              <p>${dir.Distrito}</p>
+              ${dir.Referencia ? `<p><em>Ref: ${dir.Referencia}</em></p>` : ''}
+              <button class="btn-azul" id="cambiarDireccion"><i class="fas fa-sync"></i> Cambiar dirección</button>
+            </div>
+          `;
+                    document.getElementById('cambiarDireccion').addEventListener('click', mostrarFormularios);
+                    // Mostrar el formulario de pago
+                    pagoContainer.style.display = 'block';
+                }, 300);
+            }
+
+            function mostrarFormularios() {
+                const bloqueSeleccionado = contenedor.querySelector('.fade-in');
+                bloqueSeleccionado.classList.remove('fade-in');
+                bloqueSeleccionado.classList.add('fade-out');
+                setTimeout(() => {
+                    contenedor.innerHTML = '';
+                    contenedor.appendChild(formularios);
+                    formularios.style.display = 'block';
+                    formularios.classList.remove('fade-out');
+                    formularios.classList.add('fade-in');
+                    // Ocultar el formulario de pago
+                    pagoContainer.style.display = 'none';
+                }, 300);
+            }
+
+            formSelect.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(formSelect);
+                const response = await fetch('/checkout/api/seleccionarDireccion', { method: 'POST', body: formData });
+                const data = await response.json();
+                if (data.success) mostrarDireccionSeleccionada(data.direccion);
+            });
+
+            formAdd.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(formAdd);
+                const response = await fetch('/checkout/api/agregarDireccion', { method: 'POST', body: formData });
+                const data = await response.json();
+                if (data.success) {
+                    mostrarDireccionSeleccionada(data.direccion);
+                    formAdd.reset();
+                }
+            });
+
+            // --- Manejo del pago con AJAX ---
+            formPago.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const formData = new FormData(formPago);
+
+                // Validación simple
+                const num = formPago.numeroTarjeta.value.trim();
+                const fecha = formPago.fechaExp.value.trim();
+                const cvv = formPago.cvv.value.trim();
+                const regexFecha = /^(0[1-9]|1[0-2])\/\d{2}$/;
+                if (num.length !== 16 || isNaN(num)) return;
+                if (!regexFecha.test(fecha)) return;
+                if (cvv.length !== 3 || isNaN(cvv)) return;
+
+                loading.style.display = 'flex';
+
+                fetch('/checkout/api/simularPago', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        loading.style.display = 'none';
+                        if (data.success) {
+                            window.location.href = '/confirmacion?idPedido=' + formPago.idPedido.value;
+                        } else {
+                            alert(data.message);
+                        }
+                    })
+                    .catch(err => {
+                        loading.style.display = 'none';
+                        alert("Error al procesar el pago");
+                    });
+            });
+
+        });
+    </script>
+</body>
+
+</html>
