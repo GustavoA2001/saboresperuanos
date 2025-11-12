@@ -82,11 +82,6 @@ public class CheckoutDAO {
         return jdbcTemplate.queryForMap(sql, idCliente);
     }
 
-    public void registrarPago(int idPedido, int idTarjeta, double total) {
-        String sql = "INSERT INTO pago (IDPedido, IDTarjeta, PagoTotal, FechaPago) VALUES (?, ?, ?, NOW())";
-        jdbcTemplate.update(sql, idPedido, idTarjeta, total);
-    }
-
     public List<Map<String, Object>> obtenerDatosPedido(int idPedido) {
         System.out.println("[CheckoutDAO] Ejecutando obtenerDatosPedido() para IDPedido = " + idPedido);
 
@@ -164,14 +159,22 @@ public class CheckoutDAO {
         }
     }
 
-    // Crear registro de delivery al confirmar pago
-    public void crearDeliveryParaPedido(int idPedido, double costoEnvio) {
-        String sql = """
-                    INSERT INTO delivery (IDPedido, CostoDelivery, Estado, FechaDelivery)
-                    VALUES (?, ?, 'Pendiente', NOW())
-                """;
-        jdbcTemplate.update(sql, idPedido, costoEnvio);
+    // Actualizar IGV del pedido
+    public void actualizarIGVPedido(int idPedido, double igv) {
+        String sql = "UPDATE pedido SET IGV = ? WHERE IDPedido = ?";
+        jdbcTemplate.update(sql, igv, idPedido);
+    }
 
+    // Crear registro delivery
+    public void crearDeliveryParaPedido(int idPedido, double costo) {
+        String sql = "INSERT INTO delivery (CostoDelivery, Estado, FechaDelivery, FechaPedido, IDPedido) VALUES (?, 'Pendiente', NOW(), NOW(), ?)";
+        jdbcTemplate.update(sql, costo, idPedido);
+    }
+
+    // Registrar pago total
+    public void registrarPago(int idPedido, int idTarjeta, double totalPago) {
+        String sql = "INSERT INTO pago (PagoTotal, FechaPago, IDPedido, IDTarjeta) VALUES (?, NOW(), ?, ?)";
+        jdbcTemplate.update(sql, totalPago, idPedido, idTarjeta);
     }
 
     // Validar si una tarjeta existe en la base de datos y devolver su ID
@@ -190,20 +193,36 @@ public class CheckoutDAO {
     }
 
     // Obtener el monto total del pedido directamente desde la tabla pedido
-public double obtenerMontoPedido(int idPedido) {
-    String sql = """
+    public double obtenerMontoPedido(int idPedido) {
+        String sql = """
                 SELECT MontoFinal
                 FROM pedido
                 WHERE IDPedido = ?
                 """;
-    try {
-        Double total = jdbcTemplate.queryForObject(sql, Double.class, idPedido);
-        return total != null ? total : 0.0;
-    } catch (Exception e) {
-        System.err.println("[CheckoutDAO] Error al obtener monto total del pedido: " + e.getMessage());
-        return 0.0;
+        try {
+            Double total = jdbcTemplate.queryForObject(sql, Double.class, idPedido);
+            return total != null ? total : 0.0;
+        } catch (Exception e) {
+            System.err.println("[CheckoutDAO] Error al obtener monto total del pedido: " + e.getMessage());
+            return 0.0;
+        }
     }
-}
 
+    // Obtener el saldo actual de la tarjeta
+    public Double obtenerSaldoTarjeta(int idTarjeta) {
+        String sql = "SELECT SaldoDisponible FROM tarjetapago WHERE IDTarjeta = ?";
+        try {
+            return jdbcTemplate.queryForObject(sql, Double.class, idTarjeta);
+        } catch (Exception e) {
+            System.err.println("[CheckoutDAO] Error al obtener saldo de tarjeta: " + e.getMessage());
+            return null;
+        }
+    }
+
+    // Actualizar el saldo de la tarjeta tras un pago exitoso
+    public void actualizarSaldoTarjeta(int idTarjeta, double nuevoSaldo) {
+        String sql = "UPDATE tarjetapago SET SaldoDisponible = ? WHERE IDTarjeta = ?";
+        jdbcTemplate.update(sql, nuevoSaldo, idTarjeta);
+    }
 
 }

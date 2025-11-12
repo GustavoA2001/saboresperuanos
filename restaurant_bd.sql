@@ -108,6 +108,7 @@ CREATE TABLE `pedido` (
   `FechaPedido` datetime DEFAULT NULL,
   `EstadoPedido` varchar(50) DEFAULT NULL,
   `MontoFinal` decimal(10,2) DEFAULT 0.00,
+  `IGV` decimal(10,2) DEFAULT 0.00,
   `IDCliente` int(11) DEFAULT NULL,
   `IDDireccion` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

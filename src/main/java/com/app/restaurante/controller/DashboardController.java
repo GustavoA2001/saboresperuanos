@@ -14,7 +14,7 @@ public class DashboardController {
 
         @GetMapping("/admin/dashboard")
         public String dashboard(Model model) {
-                
+
                 // === Pedidos y Ventas por Mes ===
                 var data = dashboardDAO.obtenerPedidosYVentasPorMes();
 
@@ -25,32 +25,34 @@ public class DashboardController {
                                 .toList();
 
                 // === Clientes activos/inactivos ===
-                int clientesActivos = dashboardDAO.obtenerClientesActivos();
+                int clientesActivosMes = dashboardDAO.obtenerClientesActivosMesActual();
                 int totalClientes = dashboardDAO.obtenerTotalClientes();
-                int clientesInactivos = totalClientes - clientesActivos;
+                int clientesInactivosMes = totalClientes - clientesActivosMes;
 
                 // === Porcentaje de ventas por producto ===
-                var productosData = dashboardDAO.obtenerPorcentajeVentasPorProducto();
-                List<String> productos = productosData.stream().map(r -> r.get("producto").toString()).toList();
-                List<Double> porcentajeVentas = productosData.stream()
+                var productosDataMes = dashboardDAO.obtenerPorcentajeVentasPorProductoMesActual();
+                List<String> productosMes = productosDataMes.stream().map(r -> r.get("producto").toString()).toList();
+                List<Double> porcentajeVentasMes = productosDataMes.stream()
                                 .map(r -> Double.parseDouble(r.get("porcentaje").toString())).toList();
 
                 // === Ventas totales por producto (TODOS) ===
-                var ventasPorProducto = dashboardDAO.obtenerVentasTotalesPorProducto();
-                List<String> productosTotales = ventasPorProducto.stream().map(r -> r.get("producto").toString())
+                var ventasPorProductoMes = dashboardDAO.obtenerVentasTotalesPorProductoMesActual();
+                List<String> productosTotalesMes = ventasPorProductoMes.stream().map(r -> r.get("producto").toString())
                                 .toList();
-                List<Double> totalVentasProducto = ventasPorProducto.stream()
+                List<Double> totalVentasProductoMes = ventasPorProductoMes.stream()
                                 .map(r -> Double.parseDouble(r.get("total_venta").toString())).toList();
 
                 model.addAttribute("meses", meses);
                 model.addAttribute("pedidos", pedidos);
                 model.addAttribute("ventas", ventas);
-                model.addAttribute("clientesActivos", clientesActivos);
-                model.addAttribute("clientesInactivos", clientesInactivos);
-                model.addAttribute("productos", productos);
-                model.addAttribute("porcentajeVentas", porcentajeVentas);
-                model.addAttribute("productosTotales", productosTotales);
-                model.addAttribute("totalVentasProducto", totalVentasProducto);
+                model.addAttribute("clientesActivosMes", clientesActivosMes);
+                model.addAttribute("clientesInactivosMes", clientesInactivosMes);
+                model.addAttribute("totalClientes", totalClientes);
+
+                model.addAttribute("productosMes", productosMes);
+                model.addAttribute("porcentajeVentasMes", porcentajeVentasMes);
+                model.addAttribute("productosTotalesMes", productosTotalesMes);
+                model.addAttribute("totalVentasProductoMes", totalVentasProductoMes);
                 model.addAttribute("activeSection", "dashboard");
                 return "admin/admin_dashboard";
         }

@@ -9,7 +9,7 @@
     <ul class="sp-lists">
       <li><a th:classappend="${activePage == 'index'} ? 'sp-bg-hover'" th:href="@{/}">Inicio</a></li>
       <li><a th:classappend="${activePage == 'carta'} ? 'sp-bg-hover'" th:href="@{/carta}">Carta</a></li>
-      <li><a th:href="@{/Nosotros}">Nosotros</a></li>
+      <li><a th:classappend="${activePage == 'nosotros'} ? 'sp-bg-hover'" th:href="@{/nosotros}">Nosotros</a></li>
     </ul>
 
     <div class="sp-user-actions">

@@ -1,10 +1,41 @@
+<!-- Componente de mensajes -->
+<div class="mensajes" th:if="${mensaje != null}" th:text="${mensaje}">
+</div>
+<style>
+    .mensajes {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background-color: #333;
+        color: #fff;
+        padding: 15px 25px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        opacity: 0;
+        transform: translateX(100%);
+        transition: all 0.5s ease;
+        font-family: sans-serif;
+        z-index: 1000;
+    }
 
-    <!--
-    Mensajes para mostrar el error, observaciones o acciones
-    -->
-    <div th:fragment="mostrarMensaje(mensaje)" class="mensaje-container" th:if="${mensaje != null}">
-        <div class="alert alert-info custom-alert" role="alert">
-            <span th:text="${mensaje}"></span>
-        </div>
-    </div>
-    
+    /* Cuando el mensaje está visible */
+    .mensajes.mostrar {
+        opacity: 1;
+        transform: translateX(0);
+    }
+</style>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const mensaje = document.querySelector(".mensajes");
+        if (mensaje && mensaje.textContent.trim() !== "") {
+            // Mostrar el mensaje
+            mensaje.classList.add("mostrar");
+
+            // Desaparecer después de 5 segundos
+            setTimeout(() => {
+                mensaje.classList.remove("mostrar");
+                setTimeout(() => mensaje.remove(), 500); // Remover del DOM
+            }, 5000);
+        }
+    });
+</script>

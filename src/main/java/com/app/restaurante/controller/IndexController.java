@@ -4,6 +4,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import com.app.restaurante.model.Cliente;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
@@ -25,5 +29,13 @@ public class IndexController {
 
         // Retorna la vista index.html (desde templates)
         return "index";
+    }
+
+    @GetMapping("/nosotros")
+    public String nosotros(Model model, HttpSession session) {
+        Cliente cliente = (Cliente) session.getAttribute("cliente");
+        model.addAttribute("cliente", cliente);
+        model.addAttribute("activePage", "nosotros");
+        return "Nosotros";
     }
 }

@@ -159,12 +159,14 @@
         const mesesRaw = /*[[${meses}]]*/[];
         const pedidos = /*[[${pedidos}]]*/[];
         const ventas = /*[[${ventas}]]*/[];
-        const activos = /*[[${clientesActivos}]]*/0;
-        const inactivos = /*[[${clientesInactivos}]]*/0;
-        const productos = /*[[${productos}]]*/[];
-        const porcentajeVentas = /*[[${porcentajeVentas}]]*/[];
-        const productosTotales = /*[[${productosTotales}]]*/[];
-        const totalVentasProducto = /*[[${totalVentasProducto}]]*/[];
+        const activos = /*[[${clientesActivosMes}]]*/0;
+        const inactivos = /*[[${clientesInactivosMes}]]*/0;
+        const totalClientes = /*[[${totalClientes}]]*/0;
+        const productos = /*[[${productosMes}]]*/[];
+        const porcentajeVentas = /*[[${porcentajeVentasMes}]]*/[];
+        const productosTotales = /*[[${productosTotalesMes}]]*/[];
+        const totalVentasProducto = /*[[${totalVentasProductoMes}]]*/[];
+
 
         const nombresMeses = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
         const meses = mesesRaw.map(f => {

@@ -268,6 +268,8 @@
 <body>
     <header th:include="components/menu"></header>
 
+    <div th:include="components/mensajes"></div>
+
     <div class="checkout-container">
         <div class="checkout-left">
             <h2>Resumen del Pedido</h2>
@@ -325,19 +327,30 @@
         <div class="checkout-right">
             <div class="resumen">
                 <h3>Resumen</h3>
+
                 <div class="resumen-item">
                     <span>Subtotal:</span>
                     <span th:text="${'S/. ' + total}"></span>
                 </div>
+
+                <div class="resumen-item">
+                    <span>IGV (18%):</span>
+                    <span th:text="${'S/. ' + #numbers.formatDecimal(total * 0.18, 1, 'COMMA', 2, 'POINT')}"></span>
+                </div>
+
                 <div class="resumen-item">
                     <span>Envío:</span>
-                    <span>S/. 5.00</span>
+                    <span
+                        th:text="${total >= 100 ? 'S/. 0.00' : 'S/. ' + #numbers.formatDecimal(total * 0.05, 1, 'COMMA', 2, 'POINT')}"></span>
                 </div>
+
                 <div class="resumen-item total">
-                    <span>Total:</span>
-                    <span th:text="${'S/. ' + (total + 5)}"></span>
+                    <span>Total a pagar:</span>
+                    <span
+                        th:text="${'S/. ' + #numbers.formatDecimal(total + (total * 0.18) + (total >= 100 ? 0 : total * 0.05), 1, 'COMMA', 2, 'POINT')}"></span>
                 </div>
             </div>
+
 
             <!-- FORMULARIO DE PAGO -->
             <div id="pagoContainer" class="fade-in">
@@ -368,6 +381,12 @@
             </div>
         </div>
     </div>
+
+
+
+</body>
+
+</html>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -469,6 +488,3 @@
 
         });
     </script>
-</body>
-
-</html>

@@ -1,5 +1,7 @@
 package com.app.restaurante.controller;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
 
@@ -167,43 +169,79 @@ public class CheckoutController {
             @RequestParam("cvv") String cvv) {
 
         try {
+            // Validación básica
             if (numeroTarjeta.length() != 16 || cvv.length() != 3) {
                 return Map.of("success", false, "message", "Datos de tarjeta inválidos");
             }
 
-            // Simula retardo de validación
-            Thread.sleep(2000);
+            Thread.sleep(1500); // simulación validación
 
-            // 1. Validar tarjeta en BD
+            // 1 Validar tarjeta
             Integer idTarjeta = checkoutDAO.validarTarjeta(numeroTarjeta, nombreTitular, fechaExp, cvv);
             if (idTarjeta == null) {
                 return Map.of("success", false, "message", "Tarjeta no registrada o inválida");
             }
 
-            // 2. Obtener el monto del pedido
+            // 2 Subtotal (solo productos)
             double subtotal = checkoutDAO.obtenerMontoPedido(idPedido);
-            double costoEnvio = 5.00;
-            double totalPago = subtotal + costoEnvio;
 
-            // 3. Actualizar estado del pedido a "Pagado"
+            // 3 IGV (18%)
+            BigDecimal subtotalBD = BigDecimal.valueOf(subtotal);
+            BigDecimal igvBD = subtotalBD.multiply(BigDecimal.valueOf(0.18)).setScale(2, RoundingMode.HALF_UP);
+
+            // 4 Envío variable
+            BigDecimal costoEnvioBD;
+            if (subtotal >= 100) {
+                costoEnvioBD = BigDecimal.ZERO;
+            } else {
+                costoEnvioBD = subtotalBD.multiply(BigDecimal.valueOf(0.05)).setScale(2, RoundingMode.HALF_UP);
+            }
+
+            // 5 Total general (para el pago)
+            BigDecimal totalPagoBD = subtotalBD.add(igvBD).add(costoEnvioBD).setScale(2, RoundingMode.HALF_UP);
+
+            // 6 Obtener saldo actual de la tarjeta
+            Double saldoActual = checkoutDAO.obtenerSaldoTarjeta(idTarjeta);
+            if (saldoActual == null) {
+                return Map.of("success", false, "message", "No se pudo verificar el saldo de la tarjeta");
+            }
+
+            // 7 Verificar si hay saldo suficiente
+            if (saldoActual < totalPagoBD.doubleValue()) {
+                return Map.of(
+                        "success", false,
+                        "message", "Saldo insuficiente. Saldo disponible: S/ " + saldoActual);
+            }
+
+            // 8 Descontar saldo
+            double nuevoSaldo = saldoActual - totalPagoBD.doubleValue();
+            checkoutDAO.actualizarSaldoTarjeta(idTarjeta, nuevoSaldo);
+
+            // 9 Guardar IGV en pedido
+            checkoutDAO.actualizarIGVPedido(idPedido, igvBD.doubleValue());
+
+            // 10 Crear registro de delivery
+            checkoutDAO.crearDeliveryParaPedido(idPedido, costoEnvioBD.doubleValue());
+
+            // 11 Registrar pago
+            checkoutDAO.registrarPago(idPedido, idTarjeta, totalPagoBD.doubleValue());
+
+            // 12 Actualizar estado del pedido
             checkoutDAO.actualizarEstadoPedido(idPedido, "Pagado", "Tarjeta");
 
-            // 4. Crear registro de delivery
-            checkoutDAO.crearDeliveryParaPedido(idPedido, costoEnvio);
-
-            // 5. Registrar el pago con la tarjeta validada
-            checkoutDAO.registrarPago(idPedido, idTarjeta, subtotal);
-
+            // 13 Retornar respuesta
             return Map.of(
                     "success", true,
-                    "message", "Pago exitoso. Delivery y pago registrados.",
-                    "subtotal", subtotal,
-                    "envio", costoEnvio,
-                    "total", totalPago);
+                    "message", "Pago exitoso",
+                    "subtotal", subtotalBD.doubleValue(),
+                    "igv", igvBD.doubleValue(),
+                    "envio", costoEnvioBD.doubleValue(),
+                    "total", totalPagoBD.doubleValue(),
+                    "saldoRestante", nuevoSaldo);
 
         } catch (Exception e) {
             e.printStackTrace();
-            return Map.of("success", false, "message", "Error en el servidor: " + e.getMessage());
+            return Map.of("success", false, "message", "Error interno: " + e.getMessage());
         }
     }
 
