@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pago Confirmado</title>
+    <title th:text="${exito} ? 'Pago Confirmado' : 'Error en el Pago'">Pago Confirmado</title>
 
     <link th:include="components/link">
     <link rel="stylesheet" th:href="@{/css/menu.css}">
@@ -29,9 +29,43 @@
             border-radius: 16px;
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
             animation: fadeInScale 0.5s ease forwards;
+            max-width: 420px;
         }
 
-        /* Círculo */
+        /* Animaciones */
+        @keyframes pop {
+            0% {
+                transform: scale(0);
+            }
+
+            70% {
+                transform: scale(1.2);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes draw {
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Éxito */
         .checkmark {
             width: 90px;
             height: 90px;
@@ -45,7 +79,6 @@
             animation: pop 0.6s ease forwards;
         }
 
-        /* Check dentro del círculo */
         .checkmark::after {
             content: '';
             position: absolute;
@@ -58,24 +91,31 @@
             animation: draw 0.5s ease forwards 0.5s;
         }
 
-        @keyframes pop {
-            0% { transform: scale(0); }
-            70% { transform: scale(1.2); }
-            100% { transform: scale(1); }
-        }
-
-        @keyframes draw {
-            to { opacity: 1; }
-        }
-
-        @keyframes fadeInScale {
-            from { opacity: 0; transform: scale(0.8); }
-            to { opacity: 1; transform: scale(1); }
+        /* Error */
+        .error-icon {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            border: 5px solid #dc3545;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 25px;
+            font-size: 50px;
+            color: #dc3545;
+            animation: pop 0.6s ease forwards;
         }
 
         h2 {
-            color: #28a745;
             margin-bottom: 10px;
+        }
+
+        .success-text {
+            color: #28a745;
+        }
+
+        .error-text {
+            color: #dc3545;
         }
 
         p {
@@ -83,7 +123,6 @@
             margin-bottom: 25px;
         }
 
-        /* Botones */
         .btn-container {
             display: flex;
             justify-content: center;
@@ -121,18 +160,42 @@
 
 <body>
     <div class="confirmacion-container">
-        <div class="checkmark"></div>
-        <h2>¡Pago realizado con éxito!</h2>
-        <p>Gracias por su compra. Su pedido <strong th:text="${idPedido}">#1234</strong> ha sido procesado.</p>
 
-        <div class="btn-container">
-            <a th:href="@{/recibo/{id}(id=${idPedido})}" class="btn">
-                <i class="fas fa-file-invoice"></i> Ver Recibo
-            </a>
-            <a th:href="@{/index}" class="btn btn-secondary">
-                <i class="fas fa-home"></i> Volver al Inicio
-            </a>
+        <!-- Bloque ÉXITO -->
+        <div th:if="${exito}">
+            <div class="checkmark"></div>
+            <h2 class="success-text">¡Pago realizado con éxito!</h2>
+            <p>Gracias por su compra. Su pedido <strong th:text="${idPedido}">#1234</strong> ha sido procesado.</p>
+
+            <div class="btn-container">
+                <a th:href="@{/recibo/{id}(id=${idPedido})}" class="btn">
+                    <i class="fas fa-file-invoice"></i> Ver Recibo
+                </a>
+                <a th:href="@{/index}" class="btn btn-secondary">
+                    <i class="fas fa-home"></i> Volver al Inicio
+                </a>
+            </div>
         </div>
+
+        <!-- Bloque ERROR -->
+        <div th:if="${!exito}">
+            <div class="error-icon">
+                <i class="fas fa-times"></i>
+            </div>
+            <h2 class="error-text">Error en el pago</h2>
+            <p th:text="${mensajeError}">No se pudo procesar su pago. Intente nuevamente.</p>
+
+            <div class="btn-container">
+                <a th:href="@{/checkout(idPedido=${idPedido})}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Regresar al Checkout
+                </a>
+
+                <a th:href="@{/index}" class="btn btn-secondary">
+                    <i class="fas fa-home"></i> Volver al Inicio
+                </a>
+            </div>
+        </div>
+
     </div>
 </body>
 

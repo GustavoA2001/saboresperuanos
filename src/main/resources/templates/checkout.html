@@ -477,8 +477,8 @@
                         if (data.success) {
                             window.location.href = '/confirmacion?idPedido=' + formPago.idPedido.value;
                         } else {
-                            alert(data.message);
-                        }
+    window.location.href = '/confirmacion?error=' + encodeURIComponent(data.message) 
+        + '&idPedido=' + formPago.idPedido.value;                        }
                     })
                     .catch(err => {
                         loading.style.display = 'none';

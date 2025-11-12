@@ -84,13 +84,6 @@ public class CheckoutController {
         return "redirect:/confirmacion?idPedido=" + idPedido;
     }
 
-    // Vista final de confirmación
-    @GetMapping("/confirmacion")
-    public String mostrarConfirmacion(@RequestParam("idPedido") Integer idPedido, Model model) {
-        model.addAttribute("idPedido", idPedido);
-        return "confirmacion";
-    }
-
     @PostMapping("/checkout/agregarDireccion")
     public String agregarDireccion(
             @RequestParam("direccionCompleta") String direccionCompleta,
@@ -210,7 +203,7 @@ public class CheckoutController {
             if (saldoActual < totalPagoBD.doubleValue()) {
                 return Map.of(
                         "success", false,
-                        "message", "Saldo insuficiente. Saldo disponible: S/ " + saldoActual);
+                        "message", "Saldo insuficiente. Verifique su método de pago o use otra tarjeta.");
             }
 
             // 8 Descontar saldo
@@ -243,6 +236,35 @@ public class CheckoutController {
             e.printStackTrace();
             return Map.of("success", false, "message", "Error interno: " + e.getMessage());
         }
+    }
+
+    @GetMapping("/confirmacion")
+    public String mostrarConfirmacion(
+            @RequestParam(value = "idPedido", required = false) String idPedidoStr,
+            @RequestParam(value = "error", required = false) String error,
+            Model model) {
+
+        Integer idPedido = null;
+        if (idPedidoStr != null && !idPedidoStr.isBlank()) {
+            try {
+                idPedido = Integer.parseInt(idPedidoStr);
+            } catch (NumberFormatException e) {
+                // ignoramos si no es un número válido
+            }
+        }
+
+        if (error != null) {
+            model.addAttribute("exito", false);
+            model.addAttribute("mensajeError", error);
+
+            if (idPedido != null)
+                model.addAttribute("idPedido", idPedido);
+        } else {
+            model.addAttribute("exito", true);
+            model.addAttribute("idPedido", idPedido);
+        }
+
+        return "confirmacion";
     }
 
 }
