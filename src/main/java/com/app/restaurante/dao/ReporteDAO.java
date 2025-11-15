@@ -1,11 +1,11 @@
 package com.app.restaurante.dao;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
-
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 @Repository
 public class ReporteDAO {
@@ -16,39 +16,127 @@ public class ReporteDAO {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    // Obtener Ingresos Totales
-    public BigDecimal obtenerIngresosTotales() {
-        String sql = "SELECT SUM(pg.TotalPago) AS IngresosTotales " +
-                     "FROM pedido p " +
-                     "INNER JOIN pago pg ON p.IDPedido = pg.IDPedido " +
-                     "WHERE p.Estado = 'Pagado'";
+    // ==========================================================
+    // 1. REPORTE: VENTAS TOTALES
+    // ==========================================================
+    public Double obtenerVentasTotales(Date inicio, Date fin) {
+        String sql = """
+                    SELECT IFNULL(SUM(p.MontoFinal), 0)
+                    FROM pedido p
+                    WHERE p.FechaPedido BETWEEN ? AND ?
+                      AND p.EstadoPedido = 'Pagado'
+                """;
 
-        return jdbcTemplate.queryForObject(sql, BigDecimal.class);
+        return jdbcTemplate.queryForObject(sql, Double.class, inicio, fin);
     }
 
-    // Obtener Ingresos por Producto
-    public List<Map<String, Object>> obtenerIngresosPorProducto() {
-        String sql = "SELECT p.NomProducto, SUM(p.Cantidad * p.PrecioUnitario) AS IngresosTotales " +
-                     "FROM producto p " +
-                     "INNER JOIN carrito c ON p.IDProducto = c.IDProducto " +
-                     "INNER JOIN pedido pd ON c.IDPedido = pd.IDPedido " +
-                     "INNER JOIN pago pg ON pd.IDPedido = pg.IDPedido " +
-                     "WHERE pd.Estado = 'Pagado' " +
-                     "GROUP BY p.NomProducto";
+    // ==========================================================
+    // 2. REPORTE: TOTAL DE PRODUCTOS VENDIDOS
+    // ==========================================================
+    public Integer obtenerCantidadProductosVendidos(Date inicio, Date fin) {
+        String sql = """
+                    SELECT IFNULL(SUM(c.Cantidad), 0)
+                    FROM carrito c
+                    INNER JOIN pedido p ON c.IDPedido = p.IDPedido
+                    WHERE p.FechaPedido BETWEEN ? AND ?
+                      AND p.EstadoPedido = 'Pagado'
+                """;
 
-        return jdbcTemplate.queryForList(sql);
+        return jdbcTemplate.queryForObject(sql, Integer.class, inicio, fin);
     }
 
-    // Obtener Ingresos por Cliente
-    public List<Map<String, Object>> obtenerIngresosPorCliente() {
-        String sql = "SELECT cl.Nombre, SUM(pg.TotalPago) AS TotalGastado " +
-                     "FROM cliente cl " +
-                     "INNER JOIN pedido pd ON cl.IDCliente = pd.IDCliente " +
-                     "INNER JOIN pago pg ON pd.IDPedido = pg.IDPedido " +
-                     "WHERE pd.Estado = 'Pagado' " +
-                     "GROUP BY cl.Nombre " +
-                     "ORDER BY TotalGastado DESC";
+    // ==========================================================
+    // 3. REPORTE: CATEGORÍAS MÁS VENDIDAS
+    // ==========================================================
+    public List<Map<String, Object>> obtenerCategoriasMasVendidas(Date inicio, Date fin) {
+        String sql = """
+                    SELECT cat.NomCategoria,
+                           IFNULL(SUM(c.Cantidad), 0) AS totalVendidos
+                    FROM carrito c
+                    INNER JOIN pedido p ON c.IDPedido = p.IDPedido
+                    INNER JOIN producto prod ON prod.IDProducto = c.IDProducto
+                    INNER JOIN productohistoria h ON h.IDProdHistoria = prod.IDProdHistoria
+                    INNER JOIN categoriaproducto cat ON cat.IDCategoria = h.IDCategoria
+                    WHERE p.FechaPedido BETWEEN ? AND ?
+                      AND p.EstadoPedido = 'Pagado'
+                    GROUP BY cat.NomCategoria
+                    ORDER BY totalVendidos DESC
+                """;
 
-        return jdbcTemplate.queryForList(sql);
+        return jdbcTemplate.queryForList(sql, inicio, fin);
+    }
+
+    // ==========================================================
+    // 4. REPORTE: CLIENTES FRECUENTES
+    // ==========================================================
+    public List<Map<String, Object>> obtenerClientesFrecuentes(Date inicio, Date fin) {
+        String sql = """
+                    SELECT cl.Nombre, cl.Apellido,
+                           COUNT(p.IDPedido) AS pedidosRealizados
+                    FROM pedido p
+                    INNER JOIN cliente cl ON cl.IDCliente = p.IDCliente
+                    WHERE p.FechaPedido BETWEEN ? AND ?
+                      AND p.EstadoPedido = 'Pagado'
+                    GROUP BY cl.IDCliente
+                    ORDER BY pedidosRealizados DESC
+                    LIMIT 10
+                """;
+
+        return jdbcTemplate.queryForList(sql, inicio, fin);
+    }
+
+    // ==========================================================
+    // 5. REPORTE: INGRESO TOTAL POR DÍA
+    // ==========================================================
+    public Double obtenerIngresosPorDia(Date fecha) {
+        String sql = """
+                    SELECT IFNULL(SUM(p.MontoFinal), 0)
+                    FROM pedido p
+                    WHERE DATE(p.FechaPedido) = DATE(?)
+                      AND p.EstadoPedido = 'Pagado'
+                """;
+
+        return jdbcTemplate.queryForObject(sql, Double.class, fecha);
+    }
+
+    // ==========================================================
+    // 6. REPORTE: EVOLUCIÓN TEMPORAL
+    // ==========================================================
+    public List<Map<String, Object>> obtenerEvolucion(Date inicio, Date fin) {
+
+        String sql = """
+                    SELECT
+                        DATE(p.FechaPedido) AS fecha,
+                        SUM(COALESCE(p.MontoFinal, 0)) AS total
+                    FROM pedido p
+                    WHERE DATE(p.FechaPedido) BETWEEN DATE(?) AND DATE(?)
+                      AND p.EstadoPedido = 'Pagado'
+                    GROUP BY DATE(p.FechaPedido)
+                    ORDER BY fecha ASC
+                """;
+
+        return jdbcTemplate.queryForList(sql, inicio, fin);
+    }
+
+    // ==========================================================
+    // 7. REPORTE DETALLADO
+    // ==========================================================
+    public List<Map<String, Object>> obtenerDetalleReporte(Date inicio, Date fin) {
+        String sql = """
+                    SELECT p.FechaPedido,
+                           CONCAT('Pedido #', p.IDPedido) AS detalle,
+                           (
+                                SELECT IFNULL(SUM(c.Cantidad), 0)
+                                FROM carrito c
+                                WHERE c.IDPedido = p.IDPedido
+                           ) AS movimientos,
+                           p.MontoFinal AS total
+                    FROM pedido p
+                    WHERE p.FechaPedido BETWEEN ? AND ?
+                      AND p.EstadoPedido = 'Pagado'
+                    ORDER BY p.FechaPedido DESC
+                """;
+
+        return jdbcTemplate.queryForList(sql, inicio, fin);
     }
 }

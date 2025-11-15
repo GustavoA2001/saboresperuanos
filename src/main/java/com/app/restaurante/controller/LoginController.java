@@ -41,7 +41,8 @@ public class LoginController {
 
             return new ModelAndView("redirect:/");
         } else {
-            redirectAttributes.addFlashAttribute("error", "Correo electrónico o contraseña inválidos");
+            redirectAttributes.addFlashAttribute("mensaje", "Usuario o contraseña incorrectos");
+            redirectAttributes.addFlashAttribute("active", "error");
             return new ModelAndView("redirect:/login");
         }
     }

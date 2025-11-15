@@ -4,311 +4,225 @@
 --
 
 -- --------------------------------------------------------
-CREATE TABLE `carrito` (
-  `IDCarrito` int(11) NOT NULL,
-  `Cantidad` int(11) DEFAULT NULL,
-  `PrecioProducto` decimal(10,2) DEFAULT NULL,
-  `IDProducto` int(11) DEFAULT NULL,
-  `IDPedido` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
--- --------------------------------------------------------
-CREATE TABLE `categoriaproducto` (
-  `IDCategoria` int(11) NOT NULL,
-  `NomCategoria` varchar(50) DEFAULT NULL,
-  `Descripcion` varchar(100) DEFAULT NULL,
-  `EstadoCategoria` varchar(20) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
--- --------------------------------------------------------
-CREATE TABLE `cliente` (
-  `IDCliente` int(11) NOT NULL,
-  `Nombre` varchar(50) DEFAULT NULL,
-  `Apellido` varchar(50) DEFAULT NULL,
-  `Usuario` varchar(50) DEFAULT NULL,
-  `Correo` varchar(100) DEFAULT NULL,
-  `Contrasena` varchar(100) DEFAULT NULL,
-  `DNI` varchar(20) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
--- --------------------------------------------------------
-CREATE TABLE `delivery` (
-  `IDDelivery` int(11) NOT NULL,
-  `CostoDelivery` decimal(10,2) DEFAULT NULL,
-  `Estado` varchar(50) DEFAULT NULL,
-  `FechaDelivery` datetime DEFAULT NULL,
-  `FechaPedido` datetime DEFAULT NULL,
-  `IDPedido` int(11) DEFAULT NULL,
-  `IDEmpleado` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
--- --------------------------------------------------------
-CREATE TABLE `detallecliente` (
-  `IDDetalleCliente` int(11) NOT NULL,
-  `Telefono` varchar(20) DEFAULT NULL,
-  `Foto` varchar(100) DEFAULT NULL,
-  `IDCliente` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
--- --------------------------------------------------------
-CREATE TABLE `detalleempleado` (
-  `IDDetalleEmpleado` int(11) NOT NULL,
-  `Telefono` varchar(20) DEFAULT NULL,
-  `Correo` varchar(200) DEFAULT NULL,
-  `Foto` varchar(100) DEFAULT NULL,
-  `IDEmpleado` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
--- --------------------------------------------------------
-CREATE TABLE `direccion` (
-  `IDDireccion` int(11) NOT NULL,
-  `DireccionCompleta` varchar(150) DEFAULT NULL,
-  `Referencia` varchar(100) DEFAULT NULL,
-  `IDCliente` int(11) DEFAULT NULL,
-  `IDDistrito` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
--- --------------------------------------------------------
-CREATE TABLE `distrito` (
-  `IDDistrito` int(11) NOT NULL,
-  `Distrito` varchar(100) DEFAULT NULL,
-  `EstadoDistrito` varchar(20) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
--- --------------------------------------------------------
-CREATE TABLE `empleado` (
-  `IDEmpleado` int(11) NOT NULL,
-  `Nombre` varchar(50) DEFAULT NULL,
-  `ApellidoPaterno` varchar(50) DEFAULT NULL,
-  `ApellidoMaterno` varchar(50) DEFAULT NULL,
-  `Usuario` varchar(50) DEFAULT NULL,
-  `Contrasena` varchar(150) DEFAULT NULL,
-  `IDRol` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
--- --------------------------------------------------------
-CREATE TABLE `entrega` (
-  `IDEntrega` int(11) NOT NULL,
-  `HoraSalida` datetime DEFAULT NULL,
-  `HoraEntrega` datetime DEFAULT NULL,
-  `IDDelivery` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
--- --------------------------------------------------------
-CREATE TABLE `fotoproducto` (
-  `IDFoto` int(11) NOT NULL,
-  `IDProdHistoria` int(11) DEFAULT NULL,
-  `FotoPrincipal` varchar(100) DEFAULT NULL,
-  `FotoDos` varchar(100) DEFAULT NULL,
-  `FotoTres` varchar(100) DEFAULT NULL,
-  `FotoCuatro` varchar(100) DEFAULT NULL,
-  `FotoCinco` varchar(100) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
--- --------------------------------------------------------
-CREATE TABLE `pago` (
-  `IDPago` int(11) NOT NULL,
-  `PagoTotal` decimal(10,2) DEFAULT NULL,
-  `FechaPago` datetime DEFAULT NULL,
-  `IDPedido` int(11) DEFAULT NULL,
-  `IDTarjeta` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
--- --------------------------------------------------------
-CREATE TABLE `pedido` (
-  `IDPedido` int(11) NOT NULL,
-  `FechaPedido` datetime DEFAULT NULL,
-  `EstadoPedido` varchar(50) DEFAULT NULL,
-  `MontoFinal` decimal(10,2) DEFAULT 0.00,
-  `IGV` decimal(10,2) DEFAULT 0.00,
-  `IDCliente` int(11) DEFAULT NULL,
-  `IDDireccion` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
--- --------------------------------------------------------
-CREATE TABLE `producto` (
-  `IDProducto` int(11) NOT NULL,
-  `IDProdHistoria` int(11) DEFAULT NULL,
-  `PrecioUnitario` decimal(10,2) DEFAULT NULL,
-  `Cantidad` int(11) DEFAULT NULL,
-  `FechaProducto` datetime DEFAULT NULL,
-  `EnCarta` tinyint(1) DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
--- --------------------------------------------------------
-CREATE TABLE `productohistoria` (
-  `IDProdHistoria` int(11) NOT NULL,
-  `NomProducto` varchar(100) DEFAULT NULL,
-  `Descripcion` varchar(100) DEFAULT NULL,
-  `EstadoProducto` varchar(50) DEFAULT NULL,
-  `IDCategoria` int(11) DEFAULT NULL,
-  `EnCarta` tinyint(1) DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
--- --------------------------------------------------------
-CREATE TABLE `roles` (
-  `IDRol` int(11) NOT NULL,
-  `NomRol` varchar(50) DEFAULT NULL,
-  `Descripcion` varchar(100) DEFAULT NULL,
-  `EstadoRoles` varchar(20) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
--- --------------------------------------------------------
-CREATE TABLE `tarjetapago` (
-  `IDTarjeta` int(11) NOT NULL,
-  `NumeroTarjeta` varchar(20) DEFAULT NULL,
-  `FechaVencimiento` varchar(8) DEFAULT NULL,
-  `CodigoSeguridad` varchar(5) DEFAULT NULL,
-  `NombreTitular` varchar(100) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+CREATE TABLE carrito (
+  IDCarrito INT(11) NOT NULL,
+  Cantidad INT(11) DEFAULT NULL,
+  PrecioProducto DECIMAL(10,2) DEFAULT NULL,
+  IDProducto INT(11) DEFAULT NULL,
+  IDPedido INT(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE categoriaproducto (
+  IDCategoria INT(11) NOT NULL,
+  NomCategoria VARCHAR(50) DEFAULT NULL,
+  Descripcion VARCHAR(100) DEFAULT NULL,
+  EstadoCategoria VARCHAR(20) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE cliente (
+  IDCliente INT(11) NOT NULL,
+  Nombre VARCHAR(50) DEFAULT NULL,
+  Apellido VARCHAR(50) DEFAULT NULL,
+  Usuario VARCHAR(50) DEFAULT NULL,
+  Correo VARCHAR(100) DEFAULT NULL,
+  Contrasena VARCHAR(100) DEFAULT NULL,
+  DNI VARCHAR(20) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE delivery (
+  IDDelivery INT(11) NOT NULL,
+  CostoDelivery DECIMAL(10,2) DEFAULT NULL,
+  Estado VARCHAR(50) DEFAULT NULL,
+  FechaDelivery DATETIME DEFAULT NULL,
+  FechaPedido DATETIME DEFAULT NULL,
+  IDPedido INT(11) DEFAULT NULL,
+  IDEmpleado INT(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE detallecliente (
+  IDDetalleCliente INT(11) NOT NULL,
+  Telefono VARCHAR(20) DEFAULT NULL,
+  Foto VARCHAR(100) DEFAULT NULL,
+  IDCliente INT(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE detalleempleado (
+  IDDetalleEmpleado INT(11) NOT NULL,
+  Telefono VARCHAR(20) DEFAULT NULL,
+  Correo VARCHAR(200) DEFAULT NULL,
+  Foto VARCHAR(100) DEFAULT NULL,
+  IDEmpleado INT(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE direccion (
+  IDDireccion INT(11) NOT NULL,
+  DireccionCompleta VARCHAR(150) DEFAULT NULL,
+  Referencia VARCHAR(100) DEFAULT NULL,
+  IDCliente INT(11) DEFAULT NULL,
+  IDDistrito INT(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE distrito (
+  IDDistrito INT(11) NOT NULL,
+  Distrito VARCHAR(100) DEFAULT NULL,
+  EstadoDistrito VARCHAR(20) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE roles (
+  IDRol INT(11) NOT NULL,
+  NomRol VARCHAR(50) DEFAULT NULL,
+  Descripcion VARCHAR(100) DEFAULT NULL,
+  EstadoRoles VARCHAR(20) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE empleado (
+  IDEmpleado INT(11) NOT NULL,
+  Nombre VARCHAR(50) DEFAULT NULL,
+  ApellidoPaterno VARCHAR(50) DEFAULT NULL,
+  ApellidoMaterno VARCHAR(50) DEFAULT NULL,
+  Usuario VARCHAR(50) DEFAULT NULL,
+  Contrasena VARCHAR(150) DEFAULT NULL,
+  IDRol INT(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE entrega (
+  IDEntrega INT(11) NOT NULL,
+  HoraSalida DATETIME DEFAULT NULL,
+  HoraEntrega DATETIME DEFAULT NULL,
+  IDDelivery INT(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE productohistoria (
+  IDProdHistoria INT(11) NOT NULL,
+  NomProducto VARCHAR(100) DEFAULT NULL,
+  Descripcion VARCHAR(100) DEFAULT NULL,
+  EstadoProducto VARCHAR(50) DEFAULT NULL,
+  IDCategoria INT(11) DEFAULT NULL,
+  EnCarta TINYINT(1) DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE fotoproducto (
+  IDFoto INT(11) NOT NULL,
+  IDProdHistoria INT(11) DEFAULT NULL,
+  FotoPrincipal VARCHAR(100) DEFAULT NULL,
+  FotoDos VARCHAR(100) DEFAULT NULL,
+  FotoTres VARCHAR(100) DEFAULT NULL,
+  FotoCuatro VARCHAR(100) DEFAULT NULL,
+  FotoCinco VARCHAR(100) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE producto (
+  IDProducto INT(11) NOT NULL,
+  IDProdHistoria INT(11) DEFAULT NULL,
+  PrecioUnitario DECIMAL(10,2) DEFAULT NULL,
+  Cantidad INT(11) DEFAULT NULL,
+  FechaProducto DATETIME DEFAULT NULL,
+  EnCarta TINYINT(1) DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE pedido (
+  IDPedido INT(11) NOT NULL,
+  FechaPedido DATETIME DEFAULT NULL,
+  EstadoPedido VARCHAR(50) DEFAULT NULL,
+  MontoFinal DECIMAL(10,2) DEFAULT 0.00,
+  IGV DECIMAL(10,2) DEFAULT 0.00,
+  IDCliente INT(11) DEFAULT NULL,
+  IDDireccion INT(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE tarjetapago (
+  IDTarjeta INT(11) NOT NULL,
+  NumeroTarjeta VARCHAR(20) DEFAULT NULL,
+  FechaVencimiento VARCHAR(8) DEFAULT NULL,
+  CodigoSeguridad VARCHAR(5) DEFAULT NULL,
+  NombreTitular VARCHAR(100) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE pago (
+  IDPago INT(11) NOT NULL,
+  PagoTotal DECIMAL(10,2) DEFAULT NULL,
+  FechaPago DATETIME DEFAULT NULL,
+  IDPedido INT(11) DEFAULT NULL,
+  IDTarjeta INT(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
-ALTER TABLE `carrito`
-  ADD PRIMARY KEY (`IDCarrito`),
-  ADD KEY `IDProducto` (`IDProducto`),
-  ADD KEY `IDPedido` (`IDPedido`);
+ALTER TABLE carrito ADD PRIMARY KEY (IDCarrito);
+ALTER TABLE categoriaproducto ADD PRIMARY KEY (IDCategoria);
+ALTER TABLE cliente ADD PRIMARY KEY (IDCliente);
+ALTER TABLE delivery ADD PRIMARY KEY (IDDelivery);
+ALTER TABLE detallecliente ADD PRIMARY KEY (IDDetalleCliente);
+ALTER TABLE detalleempleado ADD PRIMARY KEY (IDDetalleEmpleado);
+ALTER TABLE direccion ADD PRIMARY KEY (IDDireccion);
+ALTER TABLE distrito ADD PRIMARY KEY (IDDistrito);
+ALTER TABLE roles ADD PRIMARY KEY (IDRol);
+ALTER TABLE empleado ADD PRIMARY KEY (IDEmpleado);
+ALTER TABLE entrega ADD PRIMARY KEY (IDEntrega);
+ALTER TABLE productohistoria ADD PRIMARY KEY (IDProdHistoria);
+ALTER TABLE fotoproducto ADD PRIMARY KEY (IDFoto);
+ALTER TABLE producto ADD PRIMARY KEY (IDProducto);
+ALTER TABLE pedido ADD PRIMARY KEY (IDPedido);
+ALTER TABLE tarjetapago ADD PRIMARY KEY (IDTarjeta);
+ALTER TABLE pago ADD PRIMARY KEY (IDPago);
 
-ALTER TABLE `categoriaproducto`
-  ADD PRIMARY KEY (`IDCategoria`);
+ALTER TABLE carrito MODIFY IDCarrito INT(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE categoriaproducto MODIFY IDCategoria INT(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE cliente MODIFY IDCliente INT(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE delivery MODIFY IDDelivery INT(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE detallecliente MODIFY IDDetalleCliente INT(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE detalleempleado MODIFY IDDetalleEmpleado INT(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE direccion MODIFY IDDireccion INT(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE distrito MODIFY IDDistrito INT(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE roles MODIFY IDRol INT(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE empleado MODIFY IDEmpleado INT(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE entrega MODIFY IDEntrega INT(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE productohistoria MODIFY IDProdHistoria INT(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE fotoproducto MODIFY IDFoto INT(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE producto MODIFY IDProducto INT(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE pedido MODIFY IDPedido INT(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE tarjetapago MODIFY IDTarjeta INT(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE pago MODIFY IDPago INT(11) NOT NULL AUTO_INCREMENT;
 
-ALTER TABLE `cliente`
-  ADD PRIMARY KEY (`IDCliente`);
+ALTER TABLE carrito 
+  ADD FOREIGN KEY (IDProducto) REFERENCES producto(IDProducto),
+  ADD FOREIGN KEY (IDPedido) REFERENCES pedido(IDPedido);
 
-ALTER TABLE `delivery`
-  ADD PRIMARY KEY (`IDDelivery`),
-  ADD KEY `IDPedido` (`IDPedido`),
-  ADD KEY `IDEmpleado` (`IDEmpleado`);
+ALTER TABLE delivery
+  ADD FOREIGN KEY (IDPedido) REFERENCES pedido(IDPedido),
+  ADD FOREIGN KEY (IDEmpleado) REFERENCES empleado(IDEmpleado);
 
-ALTER TABLE `detallecliente`
-  ADD PRIMARY KEY (`IDDetalleCliente`),
-  ADD KEY `IDCliente` (`IDCliente`);
+ALTER TABLE detallecliente
+  ADD FOREIGN KEY (IDCliente) REFERENCES cliente(IDCliente);
 
-ALTER TABLE `detalleempleado`
-  ADD PRIMARY KEY (`IDDetalleEmpleado`),
-  ADD KEY `IDEmpleado` (`IDEmpleado`);
+ALTER TABLE detalleempleado
+  ADD FOREIGN KEY (IDEmpleado) REFERENCES empleado(IDEmpleado);
 
-ALTER TABLE `direccion`
-  ADD PRIMARY KEY (`IDDireccion`),
-  ADD KEY `IDCliente` (`IDCliente`),
-  ADD KEY `IDDistrito` (`IDDistrito`);
+ALTER TABLE direccion
+  ADD FOREIGN KEY (IDCliente) REFERENCES cliente(IDCliente),
+  ADD FOREIGN KEY (IDDistrito) REFERENCES distrito(IDDistrito);
 
-ALTER TABLE `distrito`
-  ADD PRIMARY KEY (`IDDistrito`);
+ALTER TABLE empleado
+  ADD FOREIGN KEY (IDRol) REFERENCES roles(IDRol);
 
-ALTER TABLE `empleado`
-  ADD PRIMARY KEY (`IDEmpleado`),
-  ADD KEY `IDRol` (`IDRol`);
+ALTER TABLE entrega
+  ADD FOREIGN KEY (IDDelivery) REFERENCES delivery(IDDelivery);
 
-ALTER TABLE `entrega`
-  ADD PRIMARY KEY (`IDEntrega`),
-  ADD KEY `IDDelivery` (`IDDelivery`);
+ALTER TABLE productohistoria
+  ADD FOREIGN KEY (IDCategoria) REFERENCES categoriaproducto(IDCategoria);
 
-ALTER TABLE `fotoproducto`
-  ADD PRIMARY KEY (`IDFoto`),
-  ADD KEY `fk_foto_historia` (`IDProdHistoria`);
+ALTER TABLE fotoproducto
+  ADD FOREIGN KEY (IDProdHistoria) REFERENCES productohistoria(IDProdHistoria);
 
-ALTER TABLE `pago`
-  ADD PRIMARY KEY (`IDPago`),
-  ADD KEY `IDPedido` (`IDPedido`),
-  ADD KEY `pago_ibfk_2` (`IDTarjeta`);
+ALTER TABLE producto
+  ADD FOREIGN KEY (IDProdHistoria) REFERENCES productohistoria(IDProdHistoria);
 
-ALTER TABLE `pedido`
-  ADD PRIMARY KEY (`IDPedido`),
-  ADD KEY `IDCliente` (`IDCliente`),
-  ADD KEY `IDDireccion` (`IDDireccion`);
+ALTER TABLE pedido
+  ADD FOREIGN KEY (IDCliente) REFERENCES cliente(IDCliente),
+  ADD FOREIGN KEY (IDDireccion) REFERENCES direccion(IDDireccion);
 
-ALTER TABLE `producto`
-  ADD PRIMARY KEY (`IDProducto`),
-  ADD KEY `fk_producto_historia` (`IDProdHistoria`);
-
-ALTER TABLE `productohistoria`
-  ADD PRIMARY KEY (`IDProdHistoria`),
-  ADD KEY `fk_historia_categoria` (`IDCategoria`);
-
-ALTER TABLE `roles`
-  ADD PRIMARY KEY (`IDRol`);
-
-ALTER TABLE `tarjetapago`
-  ADD PRIMARY KEY (`IDTarjeta`);
-
-
-ALTER TABLE `carrito`
-  MODIFY `IDCarrito` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=206;
-
-ALTER TABLE `categoriaproducto`
-  MODIFY `IDCategoria` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
-
-ALTER TABLE `cliente`
-  MODIFY `IDCliente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
-
-ALTER TABLE `delivery`
-  MODIFY `IDDelivery` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=97;
-
-ALTER TABLE `detallecliente`
-  MODIFY `IDDetalleCliente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
-
-ALTER TABLE `detalleempleado`
-  MODIFY `IDDetalleEmpleado` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
-
-ALTER TABLE `direccion`
-  MODIFY `IDDireccion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
-
-ALTER TABLE `distrito`
-  MODIFY `IDDistrito` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
-
-ALTER TABLE `empleado`
-  MODIFY `IDEmpleado` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
-
-ALTER TABLE `entrega`
-  MODIFY `IDEntrega` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=95;
-
-ALTER TABLE `fotoproducto`
-  MODIFY `IDFoto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
-
-ALTER TABLE `pago`
-  MODIFY `IDPago` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=96;
-
-ALTER TABLE `pedido`
-  MODIFY `IDPedido` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=105;
-
-ALTER TABLE `producto`
-  MODIFY `IDProducto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
-
-ALTER TABLE `productohistoria`
-  MODIFY `IDProdHistoria` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
-
-ALTER TABLE `roles`
-  MODIFY `IDRol` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
-
-ALTER TABLE `tarjetapago`
-  MODIFY `IDTarjeta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
-
-
-ALTER TABLE `carrito`
-  ADD CONSTRAINT `carrito_ibfk_1` FOREIGN KEY (`IDProducto`) REFERENCES `producto` (`IDProducto`),
-  ADD CONSTRAINT `carrito_ibfk_2` FOREIGN KEY (`IDPedido`) REFERENCES `pedido` (`IDPedido`);
-
-ALTER TABLE `delivery`
-  ADD CONSTRAINT `delivery_ibfk_1` FOREIGN KEY (`IDPedido`) REFERENCES `pedido` (`IDPedido`),
-  ADD CONSTRAINT `delivery_ibfk_2` FOREIGN KEY (`IDEmpleado`) REFERENCES `empleado` (`IDEmpleado`);
-
-ALTER TABLE `detallecliente`
-  ADD CONSTRAINT `detallecliente_ibfk_1` FOREIGN KEY (`IDCliente`) REFERENCES `cliente` (`IDCliente`);
-
-ALTER TABLE `detalleempleado`
-  ADD CONSTRAINT `detalleempleado_ibfk_1` FOREIGN KEY (`IDEmpleado`) REFERENCES `empleado` (`IDEmpleado`);
-
-ALTER TABLE `direccion`
-  ADD CONSTRAINT `direccion_ibfk_1` FOREIGN KEY (`IDCliente`) REFERENCES `cliente` (`IDCliente`),
-  ADD CONSTRAINT `direccion_ibfk_2` FOREIGN KEY (`IDDistrito`) REFERENCES `distrito` (`IDDistrito`);
-
-ALTER TABLE `empleado`
-  ADD CONSTRAINT `empleado_ibfk_1` FOREIGN KEY (`IDRol`) REFERENCES `roles` (`IDRol`);
-
-ALTER TABLE `entrega`
-  ADD CONSTRAINT `entrega_ibfk_1` FOREIGN KEY (`IDDelivery`) REFERENCES `delivery` (`IDDelivery`);
-
-ALTER TABLE `fotoproducto`
-  ADD CONSTRAINT `fk_foto_historia` FOREIGN KEY (`IDProdHistoria`) REFERENCES `productohistoria` (`IDProdHistoria`);
-
-ALTER TABLE `pago`
-  ADD CONSTRAINT `pago_ibfk_1` FOREIGN KEY (`IDPedido`) REFERENCES `pedido` (`IDPedido`),
-  ADD CONSTRAINT `pago_ibfk_2` FOREIGN KEY (`IDTarjeta`) REFERENCES `tarjetapago` (`IDTarjeta`);
-
-ALTER TABLE `pedido`
-  ADD CONSTRAINT `pedido_ibfk_1` FOREIGN KEY (`IDCliente`) REFERENCES `cliente` (`IDCliente`),
-  ADD CONSTRAINT `pedido_ibfk_2` FOREIGN KEY (`IDDireccion`) REFERENCES `direccion` (`IDDireccion`);
-
-ALTER TABLE `producto`
-  ADD CONSTRAINT `fk_producto_historia` FOREIGN KEY (`IDProdHistoria`) REFERENCES `productohistoria` (`IDProdHistoria`);
-
-ALTER TABLE `productohistoria`
-  ADD CONSTRAINT `fk_historia_categoria` FOREIGN KEY (`IDCategoria`) REFERENCES `categoriaproducto` (`IDCategoria`);
-COMMIT;
+ALTER TABLE pago
+  ADD FOREIGN KEY (IDPedido) REFERENCES pedido(IDPedido),
+  ADD FOREIGN KEY (IDTarjeta) REFERENCES tarjetapago(IDTarjeta);
 
 
 

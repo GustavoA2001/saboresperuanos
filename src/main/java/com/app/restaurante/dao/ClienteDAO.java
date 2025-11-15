@@ -148,4 +148,18 @@ public class ClienteDAO {
         jdbcTemplate.update(sql, id);
         return "redirect:/admin/clientes";
     }
+
+    /** Verifica si el correo ya existe */
+    public boolean existsByCorreo(String correo) {
+        String sql = "SELECT COUNT(*) FROM cliente WHERE correo = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, correo);
+        return count != null && count > 0;
+    }
+
+    /** Verifica si el usuario ya existe */
+    public boolean existsByUsuario(String usuario) {
+        String sql = "SELECT COUNT(*) FROM cliente WHERE usuario = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, usuario);
+        return count != null && count > 0;
+    }
 }

@@ -123,4 +123,8 @@ public class AdminController {
         return "admin/admin_carta";
     }
 
+    // =========================================
+    // REPORTE
+    // =========================================
+    // SE CREO UN CONTROLLER PARA LOS REPORTES
 }

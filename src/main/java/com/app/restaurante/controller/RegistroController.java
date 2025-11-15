@@ -50,23 +50,43 @@ public class RegistroController {
             @RequestParam("repetircontrasena") String repetirContrasena,
             RedirectAttributes redirectAttributes) {
 
+        // Validar DNI duplicado
         if (clienteDAO.existsByDni(dni)) {
-            redirectAttributes.addFlashAttribute("error", "El DNI ya está registrado");
+            redirectAttributes.addFlashAttribute("mensaje", "El DNI ya está registrado.");
+            redirectAttributes.addFlashAttribute("active", "error");
             return "redirect:/registro";
         }
 
+        // Validar correo duplicado
+        if (clienteDAO.existsByCorreo(correo)) {
+            redirectAttributes.addFlashAttribute("mensaje", "El correo ya está registrado. Intenta con otro.");
+            redirectAttributes.addFlashAttribute("active", "error");
+            return "redirect:/registro";
+        }
+
+        // Validar usuario duplicado
+        if (clienteDAO.existsByUsuario(usuario)) {
+            redirectAttributes.addFlashAttribute("mensaje", "El nombre de usuario ya está en uso.");
+            redirectAttributes.addFlashAttribute("active", "error");
+            return "redirect:/registro";
+        }
+
+        // Validar contraseñas
         if (!contrasena.equals(repetirContrasena)) {
-            redirectAttributes.addFlashAttribute("error", "Las contraseñas no coinciden");
+            redirectAttributes.addFlashAttribute("mensaje", "Las contraseñas no coinciden.");
+            redirectAttributes.addFlashAttribute("active", "error");
             return "redirect:/registro";
         }
 
+        // Validar DNI con API
         Map<String, Object> dniData = validarDni(dni);
         if (dniData == null || dniData.isEmpty()) {
-            redirectAttributes.addFlashAttribute("error", "DNI inválido o no encontrado");
+            redirectAttributes.addFlashAttribute("mensaje", "DNI inválido o no encontrado.");
+            redirectAttributes.addFlashAttribute("active", "error");
             return "redirect:/registro";
         }
 
-        // Encriptar con el servicio unificado
+        // Encriptar contraseña
         String hashedPassword = encriptacionService.encriptarMD5(contrasena);
 
         Cliente cliente = new Cliente();
@@ -83,6 +103,9 @@ public class RegistroController {
         session.setAttribute("usuario", cliente.getUsuario());
         session.setAttribute("nombre", cliente.getNombre());
         session.setAttribute("cliente", cliente);
+
+        redirectAttributes.addFlashAttribute("mensaje", "¡Registro exitoso! Bienvenido a Sabores Peruanos 🍽️");
+        redirectAttributes.addFlashAttribute("active", "success");
 
         return "redirect:/";
     }

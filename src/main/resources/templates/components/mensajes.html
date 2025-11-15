@@ -1,40 +1,169 @@
-<!-- Componente de mensajes -->
-<div class="mensajes" th:if="${mensaje != null}" th:text="${mensaje}">
+<!-- ============================== -->
+<!-- Componente de mensajes moderno -->
+<!-- ============================== -->
+<div class="toast-container" 
+     th:if="${mensaje != null}" 
+     th:classappend="${active == 'error'} ? ' error' : (${active == 'success'} ? ' success' : (${active == 'warning'} ? ' warning' : ' info'))">
+    <div class="toast-content">
+        <div class="toast-icon"></div>
+        <div class="toast-message" th:text="${mensaje}"></div>
+        <button class="toast-close" onclick="this.parentElement.parentElement.remove()">×</button>
+    </div>
+    <div class="toast-progress"></div>
 </div>
+
 <style>
-    .mensajes {
+    /* ============================== */
+    /* Contenedor general */
+    /* ============================== */
+    .toast-container {
         position: fixed;
-        top: 20px;
-        right: 20px;
-        background-color: #333;
-        color: #fff;
-        padding: 15px 25px;
-        border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        top: 25px;
+        right: 25px;
+        width: 340px;
+        background: #fff;
+        color: #333;
+        border-radius: 14px;
+        box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
         opacity: 0;
-        transform: translateX(100%);
-        transition: all 0.5s ease;
-        font-family: sans-serif;
-        z-index: 1000;
+        transform: translateY(-30px);
+        transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        font-family: "Poppins", sans-serif;
+        z-index: 3000;
     }
 
-    /* Cuando el mensaje está visible */
-    .mensajes.mostrar {
+    .toast-container.mostrar {
         opacity: 1;
-        transform: translateX(0);
+        transform: translateY(0);
+    }
+
+    /* ============================== */
+    /* Contenido del toast */
+    /* ============================== */
+    .toast-content {
+        display: flex;
+        align-items: center;
+        padding: 16px 18px;
+        gap: 12px;
+        position: relative;
+    }
+
+    .toast-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        flex-shrink: 0;
+    }
+
+    .toast-message {
+        flex: 1;
+        font-size: 15px;
+        font-weight: 500;
+        line-height: 1.4;
+    }
+
+    .toast-close {
+        background: none;
+        border: none;
+        color: #666;
+        font-size: 22px;
+        cursor: pointer;
+        transition: color 0.3s;
+    }
+
+    .toast-close:hover {
+        color: #000;
+    }
+
+    /* ============================== */
+    /* Barra de progreso inferior */
+    /* ============================== */
+    .toast-progress {
+        height: 4px;
+        width: 100%;
+        background: rgba(0, 0, 0, 0.1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .toast-progress::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
+        animation: progress-bar 5s linear forwards;
+    }
+
+    @keyframes progress-bar {
+        from { width: 100%; }
+        to { width: 0%; }
+    }
+
+    /* ============================== */
+    /* TIPOS */
+    /* ============================== */
+    .toast-container.success .toast-icon {
+        background: #dcfce7;
+        color: #15803d;
+    }
+    .toast-container.success .toast-progress::after {
+        background: #22c55e;
+    }
+    .toast-container.success .toast-icon::before {
+        content: "✔";
+    }
+
+    .toast-container.error .toast-icon {
+        background: #fee2e2;
+        color: #b91c1c;
+    }
+    .toast-container.error .toast-progress::after {
+        background: #ef4444;
+    }
+    .toast-container.error .toast-icon::before {
+        content: "✖";
+    }
+
+    .toast-container.warning .toast-icon {
+        background: #fef9c3;
+        color: #92400e;
+    }
+    .toast-container.warning .toast-progress::after {
+        background: #f59e0b;
+    }
+    .toast-container.warning .toast-icon::before {
+        content: "⚠";
+    }
+
+    .toast-container.info .toast-icon {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+    .toast-container.info .toast-progress::after {
+        background: #3b82f6;
+    }
+    .toast-container.info .toast-icon::before {
+        content: "ℹ";
     }
 </style>
+
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        const mensaje = document.querySelector(".mensajes");
-        if (mensaje && mensaje.textContent.trim() !== "") {
-            // Mostrar el mensaje
-            mensaje.classList.add("mostrar");
+        const toast = document.querySelector(".toast-container");
+        if (toast && toast.textContent.trim() !== "") {
+            toast.classList.add("mostrar");
 
-            // Desaparecer después de 5 segundos
+            // Quitar automáticamente después de 5 segundos
             setTimeout(() => {
-                mensaje.classList.remove("mostrar");
-                setTimeout(() => mensaje.remove(), 500); // Remover del DOM
+                toast.classList.remove("mostrar");
+                setTimeout(() => toast.remove(), 500);
             }, 5000);
         }
     });
