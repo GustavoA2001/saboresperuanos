@@ -1,0 +1,380 @@
+<div class="admin_auditoria_producto">
+
+    <h3 class="titulo-reporte">
+        <i class="fas fa-clipboard-list"></i> Auditoría por Producto
+    </h3>
+
+    <!-- FILTROS -->
+    <div class="filtros-reporte">
+
+        <div class="campo">
+            <label>Producto:</label>
+            <select id="idProducto" class="form-select"></select>
+        </div>
+
+        <div class="campo">
+            <label>Tipo de Bloque:</label>
+            <select id="tipo" class="form-select">
+                <option value="semana">Semana</option>
+                <option value="mes">Mes</option>
+                <option value="anio">Año</option>
+                <option value="rango">Rango de fechas</option>
+            </select>
+        </div>
+
+        <div class="campo campo-fecha" style="display:none;">
+            <label>Fecha inicio:</label>
+            <input type="date" id="fechaInicio" class="form-control">
+        </div>
+
+        <div class="campo campo-fecha" style="display:none;">
+            <label>Fecha fin:</label>
+            <input type="date" id="fechaFin" class="form-control">
+        </div>
+
+        <button class="btn-buscar" onclick="generarBloques()">
+            <i class="fas fa-search"></i> Generar Bloques
+        </button>
+
+    </div>
+
+    <!-- BLOQUES -->
+    <div id="listaBloques" class="bloques-grid"></div>
+
+    <!-- DETALLE -->
+    <div id="tablaDetalle" class="mt-4"></div>
+
+<div id="descargas" style="margin-top: 12px; display:none;">
+    <button class="btn-buscar" id="btnPDF"><i class="fas fa-file-pdf"></i> Descargar PDF</button>
+    <button class="btn-buscar" id="btnExcel"><i class="fas fa-file-excel"></i> Descargar Excel</button>
+</div>
+
+</div>
+
+<style>
+    .titulo-reporte {
+        font-size: 22px;
+        margin-bottom: 18px;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .filtros-reporte {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        align-items: flex-end;
+        background: #fafafa;
+        padding: 12px 15px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        margin-bottom: 22px;
+    }
+
+    .filtros-reporte .campo label {
+        font-size: 14px;
+        font-weight: 600;
+        color: #444;
+        display: block;
+        margin-bottom: 4px;
+    }
+
+    .filtros-reporte input,
+    .filtros-reporte select {
+        padding: 6px 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        width: 100%;
+    }
+
+    .btn-buscar {
+        background: #444;
+        color: white;
+        padding: 8px 14px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-buscar:hover {
+        background: #222;
+    }
+
+    .bloques-grid {
+        display: grid;
+        gap: 16px;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        margin-top: 15px;
+    }
+
+    .bloques-grid .card {
+        background: linear-gradient(135deg, #f0f4ff, #d9e4ff);
+        border: 1px solid #c0c8d6;
+        border-radius: 10px;
+        padding: 14px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .bloques-grid .card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    }
+
+    .bloques-grid .fecha-bloque {
+        font-size: 14px;
+        color: #333;
+        margin-bottom: 8px;
+    }
+
+    .bloques-grid .btn-outline-primary {
+        font-size: 12px;
+        padding: 6px 10px;
+        align-self: flex-start;
+    }
+
+    .tabla-admin {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 12px;
+    }
+
+    .tabla-admin th,
+    .tabla-admin td {
+        padding: 8px;
+        border: 1px solid #ddd;
+        text-align: center;
+    }
+
+    .tabla-admin th {
+        background: #f0f0f0;
+    }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        cargarProductosAuditoria();
+        activarEventosAuditoria();
+    });
+
+
+    fetch("/admin/api/auditoria/producto/lista")
+        .then(r => r.json())
+        .then(lista => {
+            const select = document.getElementById("idProducto");
+            lista.forEach(p => {
+                select.innerHTML += `<option value="${p.idProducto}">${p.nombre}</option>`;
+            });
+        });
+
+
+    function activarEventosAuditoria() {
+        const tipoSelect = document.getElementById("tipo");
+        const fechaCampos = document.querySelectorAll(".campo-fecha");
+
+        tipoSelect.addEventListener("change", e => {
+            const mostrar = e.target.value === "rango";
+            fechaCampos.forEach(c => c.style.display = mostrar ? "block" : "none");
+        });
+    }
+
+    function formatearFecha(fechaStr) {
+        if (!fechaStr) return "-";
+        const fecha = new Date(fechaStr);
+        return fecha.toLocaleDateString('es-PE', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+    }
+
+    function generarBloques() {
+        const idProducto = document.getElementById("idProducto").value;
+        const tipo = document.getElementById("tipo").value;
+
+        if (!idProducto) {
+            alert("Debe seleccionar un producto.");
+            return;
+        }
+
+        let url = `/admin/api/auditoria/producto/bloques?idProducto=${idProducto}&tipo=${tipo}`;
+
+        if (tipo === "rango") {
+            const inicio = document.getElementById("fechaInicio").value;
+            const fin = document.getElementById("fechaFin").value;
+
+            if (!inicio || !fin) {
+                alert("Debe seleccionar ambas fechas para rango.");
+                return;
+            }
+            url += `&inicio=${inicio}&fin=${fin}`;
+        }
+
+        fetch(url)
+            .then(r => r.json())
+            .then(bloques => {
+                const cont = document.getElementById("listaBloques");
+                cont.innerHTML = "";
+
+                if (!bloques || bloques.length === 0) {
+                    cont.innerHTML = `<p class="text-muted">No hay bloques disponibles.</p>`;
+                    return;
+                }
+
+                bloques.forEach(b => {
+                    const fechaInicio = formatearFecha(b.inicio);
+                    const fechaFin = formatearFecha(b.fin);
+
+                    cont.innerHTML += `
+                    <div class="card">
+                        <div class="fecha-bloque">
+                            <strong>${b.titulo ?? `${fechaInicio} → ${fechaFin}`}</strong>
+                        </div>
+                        <button class="btn btn-sm btn-outline-primary"
+                            onclick="verDetalle(${idProducto}, '${b.inicio}', '${b.fin}')">
+                            Ver detalle
+                        </button>
+                    </div>`;
+                });
+            })
+            .catch(err => console.error("Error generando bloques:", err));
+    }
+
+function verDetalle(idProducto, inicio, fin) {
+    const selectProducto = document.getElementById("idProducto");
+    const nombreProducto = selectProducto.options[selectProducto.selectedIndex].text;
+    const fechaExport = new Date().toLocaleString();
+    const tipo = document.getElementById("tipo").value;
+
+    fetch(`/admin/api/auditoria/producto/detalle?idProducto=${idProducto}&inicio=${inicio}&fin=${fin}`)
+        .then(r => r.json())
+        .then(filas => {
+            const tabla = document.getElementById("tablaDetalle");
+            if (!filas || filas.length === 0) {
+                tabla.innerHTML = "<p class='text-muted'>No hay registros en este bloque.</p>";
+                document.getElementById("descargas").style.display = "none";
+                return;
+            }
+
+            let bloqueTexto = "";
+            if (tipo === "semana") bloqueTexto = `${formatearFecha(inicio)} → ${formatearFecha(fin)}`;
+            else if (tipo === "mes") bloqueTexto = `${inicio.substring(0,7)}`; // AAAA-MM
+            else if (tipo === "anio") bloqueTexto = inicio.substring(0,4);
+            else bloqueTexto = `${formatearFecha(inicio)} → ${formatearFecha(fin)}`;
+
+            let html = `
+                <h5>Detalle del bloque</h5>
+                <p><strong>Producto:</strong> ${nombreProducto}</p>
+                <p><strong>Bloque:</strong> ${bloqueTexto}</p>
+                <p><strong>Fecha de exportación:</strong> ${fechaExport}</p>
+                <table class="tabla-admin">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Cantidad</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${filas.map(f => `
+                            <tr>
+                                <td>${formatearFecha(f.fecha)}</td>
+                                <td>${f.cantidad ?? f.Cantidad ?? "-"}</td>
+                                <td>${f.subtotal ?? f.Subtotal ?? "-"}</td>
+                            </tr>`).join("")}
+                    </tbody>
+                </table>`;
+            tabla.innerHTML = html;
+
+            // Guardar info en dataset para exportaciones
+            tabla.dataset.producto = nombreProducto;
+            tabla.dataset.bloque = bloqueTexto;
+            tabla.dataset.fechaExport = fechaExport;
+
+            document.getElementById("descargas").style.display = "block";
+        })
+        .catch(err => console.error("Error cargando detalle:", err));
+}
+
+
+
+
+</script>
+
+<!-- jsPDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<!-- SheetJS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<script>
+// Exportar Excel
+document.getElementById("btnExcel").addEventListener("click", () => {
+    const tabla = document.querySelector(".tabla-admin");
+    if (!tabla) { alert("No hay datos para exportar"); return; }
+
+    const wb = XLSX.utils.book_new();
+
+    // Extraer datos del contenedor
+    const contenedor = document.getElementById("tablaDetalle");
+    const producto = contenedor.dataset.producto || "-";
+    const bloque = contenedor.dataset.bloque || "-";
+    const fechaExport = contenedor.dataset.fechaExport || "-";
+
+    // Crear hoja manualmente para incluir Producto, Bloque y Fecha de exportación
+    const hojaDatos = [];
+    hojaDatos.push([`Reporte de Auditoría por Producto`]);
+    hojaDatos.push([`Producto: ${producto}`]);
+    hojaDatos.push([`Bloque: ${bloque}`]);
+    hojaDatos.push([`Fecha de exportación: ${fechaExport}`]);
+    hojaDatos.push([]); // fila vacía
+
+    // Agregar encabezados de tabla
+    const headers = Array.from(tabla.querySelectorAll("thead th")).map(th => th.innerText);
+    hojaDatos.push(headers);
+
+    // Agregar filas
+    const dataRows = Array.from(tabla.querySelectorAll("tbody tr")).map(tr =>
+        Array.from(tr.querySelectorAll("td")).map(td => td.innerText)
+    );
+    hojaDatos.push(...dataRows);
+
+    const ws = XLSX.utils.aoa_to_sheet(hojaDatos);
+    XLSX.utils.book_append_sheet(wb, ws, "Auditoria");
+    XLSX.writeFile(wb, `auditoria_${producto.replace(/\s/g,"_")}.xlsx`);
+});
+
+// Exportar PDF
+document.getElementById("btnPDF").addEventListener("click", () => {
+    const tabla = document.querySelector(".tabla-admin");
+    if (!tabla) { alert("No hay datos para exportar"); return; }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    // Extraer datos del contenedor
+    const contenedor = document.getElementById("tablaDetalle");
+    const producto = contenedor.dataset.producto || "-";
+    const bloque = contenedor.dataset.bloque || "-";
+    const fechaExport = contenedor.dataset.fechaExport || "-";
+
+    // Títulos y metadatos
+    doc.setFontSize(12);
+    doc.text(`Reporte de Auditoría por Producto`, 14, 15);
+    doc.text(`Producto: ${producto}`, 14, 22);
+    doc.text(`Bloque: ${bloque}`, 14, 29);
+    doc.text(`Fecha de exportación: ${fechaExport}`, 14, 36);
+
+    // Extraer datos de la tabla
+    const headers = Array.from(tabla.querySelectorAll("thead th")).map(th => th.innerText);
+    const data = Array.from(tabla.querySelectorAll("tbody tr")).map(tr =>
+        Array.from(tr.querySelectorAll("td")).map(td => td.innerText)
+    );
+
+    doc.autoTable({
+        startY: 42,
+        head: [headers],
+        body: data,
+    });
+
+    doc.save(`auditoria_${producto.replace(/\s/g,"_")}.pdf`);
+});
+
+</script>

@@ -1,0 +1,245 @@
+<div class="admin_report_ventas">
+
+    <h3 class="titulo-reporte">
+        <i class="fas fa-chart-line"></i> Reporte de Ventas
+    </h3>
+
+    <!-- FILTROS -->
+    <div class="filtros-reporte">
+        <div class="campo">
+            <label>Inicio:</label>
+            <input type="date" id="inicio">
+        </div>
+
+        <div class="campo">
+            <label>Fin:</label>
+            <input type="date" id="fin">
+        </div>
+
+        <div class="campo">
+            <label>Ver por:</label>
+            <select id="atributo">
+                <option value="producto">Producto</option>
+                <option value="categoria">Categoría</option>
+            </select>
+        </div>
+
+        <button class="btn-buscar" onclick="cargarVentas()">
+            <i class="fas fa-search"></i> Buscar
+        </button>
+    </div>
+
+    <!-- BOTONES DE EXPORTACIÓN -->
+    <div class="export-buttons">
+        <button class="btn-export excel" onclick="exportarExcel()">
+            <i class="fas fa-file-excel"></i> Excel
+        </button>
+
+        <button class="btn-export pdf" onclick="exportarPDF()">
+            <i class="fas fa-file-pdf"></i> PDF
+        </button>
+    </div>
+
+    <!-- TABLA DINÁMICA -->
+    <div id="contenedorTablaVentas" class="contenedor-tabla"></div>
+
+</div>
+
+<style>
+    /* TÍTULO */
+    .titulo-reporte {
+        font-size: 22px;
+        margin-bottom: 18px;
+        font-weight: 600;
+        color: #333;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* CONTENEDOR DE FILTROS */
+    .filtros-reporte {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+        background: #fafafa;
+        padding: 12px 15px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        margin-bottom: 20px;
+    }
+
+    .filtros-reporte .campo label {
+        font-size: 14px;
+        font-weight: 600;
+        color: #444;
+    }
+
+    .filtros-reporte input,
+    .filtros-reporte select {
+        padding: 6px 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    /* BOTÓN BUSCAR */
+    .btn-buscar {
+        padding: 8px 14px;
+        background: #444;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .btn-buscar:hover {
+        background: #000;
+    }
+
+    /* BOTONES EXPORTACIÓN */
+    .export-buttons {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+    .btn-export {
+        padding: 7px 14px;
+        border: 1px solid #ccc;
+        background: #f4f4f4;
+        cursor: pointer;
+        border-radius: 5px;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .btn-export:hover {
+        background: #e9e9e9;
+    }
+
+    .btn-export.excel i {
+        color: #2d6a3f;
+    }
+
+    .btn-export.pdf i {
+        color: #b41f1f;
+    }
+
+    /* TABLA */
+    .tabla-admin {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+    }
+
+    .tabla-admin thead {
+        background: #f1f1f1;
+    }
+
+    .tabla-admin th,
+    .tabla-admin td {
+        border: 1px solid #ddd;
+        padding: 10px;
+    }
+
+    .tabla-admin th {
+        font-weight: 600;
+        color: #333;
+        text-align: left;
+    }
+
+    .tabla-admin tr:hover {
+        background: #f7f7f7;
+    }
+
+    .contenedor-tabla {
+        margin-top: 10px;
+    }
+</style>
+
+<script>
+    function cargarVentas() {
+
+        const inicio = document.getElementById("inicio").value;
+        const fin = document.getElementById("fin").value;
+        const atributo = document.getElementById("atributo").value;
+
+        if (!inicio || !fin) {
+            document.getElementById("contenedorTablaVentas").innerHTML =
+                "<p style='color:red;'>Seleccione fecha inicio y fin.</p>";
+            return;
+        }
+
+        fetch(`/admin/api/reporte/ventas?inicio=${inicio}&fin=${fin}&atributo=${atributo}`)
+            .then(res => res.json())
+            .then(data => renderizarTablaVentas(data, atributo))
+            .catch(err => {
+                document.getElementById("contenedorTablaVentas").innerHTML =
+                    "<p style='color:red;'>Error cargando información.</p>";
+            });
+    }
+
+    function renderizarTablaVentas(lista, atributo) {
+
+        if (lista.length === 0) {
+            document.getElementById("contenedorTablaVentas").innerHTML =
+                "<p>No hay resultados para ese rango de fechas.</p>";
+            return;
+        }
+
+        let html = `
+        <table class="tabla-admin">
+            <thead>
+                <tr>
+                    <th>${atributo === "producto" ? "Producto" : "Categoría"}</th>
+                    <th>Categoría</th>
+                    <th>Cantidad Vendida</th>
+                    <th>Ingreso Total (S/.)</th>
+                    <th>IGV (S/.)</th>
+                    <th>Ingreso Neto (S/.)</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+        lista.forEach(r => {
+            html += `
+            <tr>
+                <td>${r.etiqueta}</td>
+                <td>${r.categoria || ""}</td>
+                <td>${r.cantidadVendida}</td>
+                <td>S/. ${Number(r.ingresoTotal).toFixed(2)}</td>
+                <td>S/. ${Number(r.igv).toFixed(2)}</td>
+                <td>S/. ${Number(r.ingresoNeto).toFixed(2)}</td>
+            </tr>
+        `;
+        });
+
+        html += `
+            </tbody>
+        </table>
+    `;
+
+        document.getElementById("contenedorTablaVentas").innerHTML = html;
+    }
+
+    /* EXPORTAR EXCEL */
+    function exportarExcel() {
+        const inicio = document.getElementById("inicio").value;
+        const fin = document.getElementById("fin").value;
+        const atributo = document.getElementById("atributo").value;
+
+        window.location.href = `/admin/api/reporte/ventas/excel?inicio=${inicio}&fin=${fin}&atributo=${atributo}`;
+    }
+
+    /* EXPORTAR PDF */
+    function exportarPDF() {
+        const inicio = document.getElementById("inicio").value;
+        const fin = document.getElementById("fin").value;
+        const atributo = document.getElementById("atributo").value;
+
+        window.location.href = `/admin/api/reporte/ventas/pdf?inicio=${inicio}&fin=${fin}&atributo=${atributo}`;
+    }
+</script>

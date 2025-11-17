@@ -1,0 +1,241 @@
+<div class="admin_report_producto">
+
+    <h3 class="titulo-reporte"><i class="fas fa-box"></i> Reporte Específico por Producto</h3>
+
+    <!-- FILTROS -->
+    <div class="filtros-reporte">
+        <div class="campo">
+            <label>Producto:</label>
+            <select id="idProducto"></select>
+        </div>
+
+        <div class="campo">
+            <label>Mes y Año:</label>
+            <input type="month" id="mesProducto">
+        </div>
+
+        <button class="btn-buscar" onclick="cargarReporteProducto()"><i class="fas fa-search"></i> Buscar</button>
+    </div>
+
+    <!-- TÍTULO DE TABLA -->
+    <h4 id="tituloTabla" style="margin-bottom:10px;"></h4>
+
+    <!-- TABLA -->
+    <div id="tablaProducto" class="tabla-container"></div>
+
+    <!-- GRÁFICOS -->
+    <div id="graficoPrecio" style="width: 100%; height: 350px; margin-top: 20px;"></div>
+    <div id="graficoStock" style="width: 100%; height: 350px; margin-top: 20px;"></div>
+
+</div>
+
+<!-- ECharts -->
+<script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const hoy = new Date();
+    document.getElementById("mesProducto").value = hoy.toISOString().slice(0,7);
+    cargarProductos();
+});
+
+// -----------------------------------------------------
+// CARGAR PRODUCTOS
+// -----------------------------------------------------
+    fetch("/admin/api/productos")
+        .then(r => r.json())
+        .then(lista => {
+            const select = document.getElementById("idProducto");
+            lista.forEach(p => {
+                select.innerHTML += `<option value="${p.idProdHistoria}">${p.nombre}</option>`;
+            });
+        })
+        .catch(err => console.error("Error cargando productos:", err));
+// -----------------------------------------------------
+// CARGAR REPORTE
+// -----------------------------------------------------
+function cargarReporteProducto() {
+    const selectProducto = document.getElementById("idProducto");
+    const idProdHistoria = selectProducto.value;
+    const productoNombre = selectProducto.options[selectProducto.selectedIndex].text;
+    const mes = document.getElementById("mesProducto").value;
+
+    if (!idProdHistoria || !mes) {
+        document.getElementById("tablaProducto").innerHTML = "<p style='color:red;'>Seleccione producto y mes.</p>";
+        return;
+    }
+
+    const [anio, mesNum] = mes.split("-");
+    const url = `/admin/api/reporte/producto?idProdHistoria=${idProdHistoria}&anio=${anio}&mes=${mesNum}`;
+
+    fetch(url)
+        .then(r => r.json())
+        .then(data => {
+            const { precios, cantidades, ventas } = data;
+
+            if ((!precios || precios.length === 0) && (!cantidades || cantidades.length === 0)) {
+                document.getElementById("tablaProducto").innerHTML = "<p>No hay datos para este período.</p>";
+                return;
+            }
+
+            // Crear un mapa por fecha
+            const mapa = {};
+            precios.forEach(p => { mapa[p.fecha] = mapa[p.fecha] || {}; mapa[p.fecha].precio = p.precio; });
+            cantidades.forEach(c => { mapa[c.fecha] = mapa[c.fecha] || {}; mapa[c.fecha].stock = c.cantidad; });
+            ventas.forEach(v => { mapa[v.fecha] = mapa[v.fecha] || {}; mapa[v.fecha].cantidad = v.cantidad; mapa[v.fecha].total = v.total; });
+
+            // Convertir el mapa a lista ordenada por fecha
+            const listaFinal = Object.keys(mapa).sort().map(fecha => ({ fecha, ...mapa[fecha] }));
+
+            // Actualizar título de la tabla
+            const mesNombre = new Date(anio, mesNum - 1).toLocaleString('es-PE', { month: 'long' });
+            document.getElementById("tituloTabla").textContent = `Reporte del producto "${productoNombre}" / Mes: ${mesNombre} ${anio}`;
+
+            renderTabla(listaFinal);
+            renderGraficos(listaFinal);
+        })
+        .catch(err => console.error("Error al cargar reporte:", err));
+}
+
+// -----------------------------------------------------
+// FORMATEAR FECHA PARA USUARIO
+// -----------------------------------------------------
+function formatearFecha(fechaStr) {
+    const fecha = new Date(fechaStr);
+    return fecha.toLocaleDateString('es-PE', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+// -----------------------------------------------------
+// RENDERIZAR TABLA
+// -----------------------------------------------------
+function renderTabla(lista) {
+    let html = `<div style="overflow-x:auto;"><table class="tabla-admin">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Precio (S/.)</th>
+                            <th>Stock</th>
+                            <th>Cantidad Vendida</th>
+                            <th>Total (S/.)</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+
+    lista.forEach(v => {
+        const precio = v.precio ?? 0;
+        const stock = v.stock ?? 0;
+        const cantidad = v.cantidad ?? 0;
+        const total = v.total ?? 0;
+
+        html += `<tr>
+                    <td>${formatearFecha(v.fecha)}</td>
+                    <td>${precio.toFixed(2)}</td>
+                    <td>${stock}</td>
+                    <td>${cantidad}</td>
+                    <td>${total.toFixed(2)}</td>
+                 </tr>`;
+    });
+
+    html += `</tbody></table></div>`;
+    document.getElementById("tablaProducto").innerHTML = html;
+}
+
+// -----------------------------------------------------
+// RENDERIZAR GRÁFICOS ECHARTS
+// -----------------------------------------------------
+function renderGraficos(lista) {
+    const fechas = lista.map(v => formatearFecha(v.fecha));
+    const precios = lista.map(v => v.precio ?? 0);
+    const stocks = lista.map(v => v.stock ?? 0);
+
+    // Grafico Precio
+    const chartPrecio = echarts.init(document.getElementById('graficoPrecio'));
+    chartPrecio.setOption({
+        title: { text: 'Evolución del Precio por Día' },
+        tooltip: { trigger: 'axis' },
+        xAxis: { type: 'category', data: fechas },
+        yAxis: { type: 'value', name: 'S/.' },
+        series: [{ name: 'Precio', type: 'line', data: precios, color: '#5470C6' }]
+    });
+
+    // Grafico Stock
+    const chartStock = echarts.init(document.getElementById('graficoStock'));
+    chartStock.setOption({
+        title: { text: 'Evolución del Stock por Día' },
+        tooltip: { trigger: 'axis' },
+        xAxis: { type: 'category', data: fechas },
+        yAxis: { type: 'value', name: 'Cantidad' },
+        series: [{ name: 'Stock', type: 'line', data: stocks, color: '#91CC75' }]
+    });
+}
+</script>
+
+<style>
+.admin_report_producto {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.titulo-reporte {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 18px;
+}
+
+.filtros-reporte {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    background: #fafafa;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    margin-bottom: 22px;
+    flex-wrap: wrap;
+}
+
+.filtros-reporte .campo {
+    display: flex;
+    flex-direction: column;
+}
+
+.filtros-reporte .campo label {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.filtros-reporte input,
+.filtros-reporte select {
+    padding: 6px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.btn-buscar {
+    padding: 8px 14px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    background: #444;
+    color: #fff;
+}
+
+.tabla-container {
+    overflow-x: auto;
+}
+
+.tabla-admin {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.tabla-admin th,
+.tabla-admin td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+</style>

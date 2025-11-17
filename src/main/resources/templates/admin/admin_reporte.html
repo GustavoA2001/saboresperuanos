@@ -18,15 +18,8 @@
         }
 
         @keyframes aparecer {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* ======== GRID ======== */
@@ -44,7 +37,7 @@
             padding: 45px 20px;
             text-align: center;
             cursor: pointer;
-            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.12);
             transition: all 0.3s ease;
             font-size: 19px;
             font-weight: 600;
@@ -53,15 +46,22 @@
 
         .report-btn:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
             background: rgba(255, 255, 255, 0.75);
+        }
+
+        .report-btn i {
+            display: block;
+            font-size: 38px;
+            margin-bottom: 12px;
+            color: #444;
         }
 
         /* ======== MODAL ======== */
         .modal-reporte-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0,0,0,0.6);
             display: none;
             justify-content: center;
             align-items: center;
@@ -78,19 +78,12 @@
             overflow-y: auto;
             position: relative;
             animation: modalShow 0.3s ease;
-            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.25);
         }
 
         @keyframes modalShow {
-            from {
-                opacity: 0;
-                transform: scale(0.92);
-            }
-
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
+            from { opacity: 0; transform: scale(0.92); }
+            to { opacity: 1; transform: scale(1); }
         }
 
         .modal-reporte-close {
@@ -121,33 +114,36 @@
     <div class="adm-main">
         <div class="report-container">
 
-            <h2 style="font-size:28px; font-weight:bold;">📊 Reportes del Sistema</h2>
+            <h2 style="font-size:28px; font-weight:bold;">
+                <i class="fas fa-chart-pie"></i> Reportes del Sistema
+            </h2>
             <p>Selecciona un tipo de reporte para visualizarlo.</p>
 
             <div class="report-grid">
 
                 <div class="report-btn" onclick="abrirReporte('general')">
-                    📝 Reporte General
+                    <i class="fas fa-file-alt"></i>
+                    Reporte General
                 </div>
 
                 <div class="report-btn" onclick="abrirReporte('ventas')">
-                    📈 Ventas por Producto / Categoría
+                    <i class="fas fa-chart-line"></i>
+                    Ventas por Producto / Categoría
                 </div>
 
                 <div class="report-btn" onclick="abrirReporte('avance')">
-                    📆 Avance Diario / Semanal / Mensual
+                    <i class="fas fa-calendar-alt"></i>
+                    Avance Diario / Semanal / Mensual
                 </div>
 
-                <div class="report-btn" onclick="abrirReporte('resumen')">
-                    📊 Resumen General
+                <div class="report-btn" onclick="abrirReporte('productos')">
+                    <i class="fas fa-search"></i>
+                    Reporte Específico por Producto
                 </div>
 
-                <div class="report-btn" onclick="abrirReporte('producto')">
-                    🔍 Reporte Específico por Producto
-                </div>
-
-                <div class="report-btn" onclick="abrirReporte('precios')">
-                    💰 Auditoría de Precios
+                <div class="report-btn" onclick="abrirReporte('auditoria_prod')">
+                    <i class="fas fa-tags"></i>
+                    Auditoría de Precios
                 </div>
 
             </div>
@@ -157,6 +153,7 @@
     <!-- MODAL -->
     <div id="modalReporte" class="modal-reporte-overlay">
         <div class="modal-reporte-content">
+
             <button class="modal-reporte-close" onclick="cerrarModalReporte()">
                 <i class="fas fa-times"></i>
             </button>
@@ -166,7 +163,6 @@
     </div>
 
     <script>
-
         function abrirReporte(tipo) {
             fetch(`/admin/reporte/${tipo}`)
                 .then(resp => resp.text())
@@ -175,31 +171,28 @@
                     const contenedor = document.getElementById("contenedorComponente");
                     contenedor.innerHTML = html;
 
-                    // Ejecutar scripts internos
+                    // Ejecutar scripts internos del componente cargado
                     const scripts = contenedor.querySelectorAll("script");
 
                     scripts.forEach(oldScript => {
                         const newScript = document.createElement("script");
                         if (oldScript.src) {
-                            newScript.src = oldScript.src;   // para scripts externos
+                            newScript.src = oldScript.src;
                         } else {
-                            newScript.textContent = oldScript.textContent; // scripts inline
+                            newScript.textContent = oldScript.textContent;
                         }
                         document.body.appendChild(newScript);
                     });
 
                     document.getElementById("modalReporte").style.display = "flex";
                 });
-
         }
 
         function cerrarModalReporte() {
             document.getElementById("modalReporte").style.display = "none";
             document.getElementById("contenedorComponente").innerHTML = "";
         }
-
     </script>
 
 </body>
-
 </html>
