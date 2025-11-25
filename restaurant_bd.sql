@@ -117,7 +117,9 @@ CREATE TABLE producto (
   PrecioUnitario DECIMAL(10,2) DEFAULT NULL,
   Cantidad INT(11) DEFAULT NULL,
   FechaProducto DATETIME DEFAULT NULL,
-  EnCarta TINYINT(1) DEFAULT 0
+  EnCarta TINYINT(1) DEFAULT 0,
+  Visible TINYINT(1) DEFAULT 0,
+  EstadoDia varchar(20)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE pedido (

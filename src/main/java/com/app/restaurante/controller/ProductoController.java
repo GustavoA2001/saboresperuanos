@@ -63,14 +63,14 @@ public class ProductoController {
         int totalProductos;
 
         if (query != null && !query.isEmpty()) {
-            totalProductos = productosDAO.countByBusquedaPorNombre(query);
-            productos = productosDAO.buscarProductosPorNombre(query, offset, pageSize);
+            totalProductos = productosDAO.countBusquedaDisponibles(query);
+            productos = productosDAO.buscarProductosPorNombreDisponibles(query, offset, pageSize);
         } else if (idCategoria != null) {
-            totalProductos = productosDAO.countByCategoria(idCategoria);
-            productos = productosDAO.obtenerPorCategoriaId(idCategoria, offset, pageSize);
+            totalProductos = productosDAO.countPorCategoriaDisponibles(idCategoria);
+            productos = productosDAO.obtenerPorCategoriaIdDisponibles(idCategoria, offset, pageSize);
         } else {
-            totalProductos = productosDAO.countAll();
-            productos = productosDAO.findAllProducts(offset, pageSize);
+            productos = productosDAO.findProductosDisponiblesHoy(offset, pageSize);
+            totalProductos = productosDAO.countProductosDisponiblesHoy();
         }
 
         model.addAttribute("productos", productos);
@@ -105,12 +105,17 @@ public class ProductoController {
      */
     @GetMapping("/detalle/{idProducto}")
     public String detalleProducto(@PathVariable int idProducto, Model model) {
+        System.out.println("Llegó petición para detalle del producto con ID: " + idProducto);
         Productos producto = productosDAO.obtenerPorId(idProducto);
+        if (producto == null) {
+            System.out.println("Producto con ID " + idProducto + " no encontrado.");
+        } else {
+            System.out.println(
+                    "Producto encontrado: " + producto.getNomProducto() + ", stock: " + producto.getCantidad());
+        }
         model.addAttribute("producto", producto);
         return "detalle_productos"; // busca templates/detalle_producto.html
     }
-
-
 
     /**
      * Metodo que maneja la solicitud POST para registrar un nuevo producto

@@ -84,29 +84,12 @@
             transform: scale(1.05);
         }
 
-        .foto_uno {
-            grid-area: foto_uno;
-        }
-        .foto_uno img {
-            width: 410px;
-            height: 410px;
-        }
-
-        .foto_dos {
-            grid-area: foto_dos;
-        }
-
-        .foto_tres {
-            grid-area: foto_tres;
-        }
-
-        .foto_cuatro {
-            grid-area: foto_cuatro;
-        }
-
-        .foto_cinco {
-            grid-area: foto_cinco;
-        }
+        .foto_uno { grid-area: foto_uno; }
+        .foto_uno img { width: 410px; height: 410px; }
+        .foto_dos { grid-area: foto_dos; }
+        .foto_tres { grid-area: foto_tres; }
+        .foto_cuatro { grid-area: foto_cuatro; }
+        .foto_cinco { grid-area: foto_cinco; }
 
         /* === BLOQUE DERECHO: INFORMACIÓN === */
         .detalle-info {
@@ -128,7 +111,14 @@
             font-size: 1rem;
             line-height: 1.7;
             color: #555;
-            margin-bottom: 25px;
+            margin-bottom: 15px;
+        }
+
+        .detalle-categoria,
+        .detalle-stock {
+            font-size: 0.95rem;
+            color: #666;
+            margin-bottom: 15px;
         }
 
         .detalle-precio {
@@ -192,34 +182,15 @@
             box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
         }
 
-        .detalle-acciones a {
-            background-color: #6c757d;
-        }
-
-        .detalle-acciones a:hover {
-            background-color: #5a6268;
-        }
-
-        .detalle-acciones button:hover {
-            background-color: #c72f3c;
-            transform: translateY(-2px);
-        }
+        .detalle-acciones a { background-color: #6c757d; }
+        .detalle-acciones a:hover { background-color: #5a6268; }
+        .detalle-acciones button:hover { background-color: #c72f3c; transform: translateY(-2px); }
 
         /* === RESPONSIVE === */
         @media (max-width: 950px) {
-            .detalle-container {
-                flex-direction: column;
-            }
-
-            .detalle-imagen,
-            .detalle-info {
-                flex: 1 1 100%;
-                padding: 30px;
-            }
-
-            main {
-                margin-top: 80px;
-            }
+            .detalle-container { flex-direction: column; }
+            .detalle-imagen, .detalle-info { flex: 1 1 100%; padding: 30px; }
+            main { margin-top: 80px; }
         }
 
         @media (max-width: 850px) {
@@ -236,17 +207,9 @@
         }
 
         @media (max-width: 500px) {
-            .detalle-info h1 {
-                font-size: 1.8rem;
-            }
-
-            .detalle-precio {
-                font-size: 1.6rem;
-            }
-
-            .detalle-acciones {
-                flex-direction: column;
-            }
+            .detalle-info h1 { font-size: 1.8rem; }
+            .detalle-precio { font-size: 1.6rem; }
+            .detalle-acciones { flex-direction: column; }
         }
     </style>
 </head>
@@ -260,24 +223,19 @@
             <div class="detalle-imagen">
                 <div class="grid-container">
                     <div class="foto_uno">
-                        <img th:src="@{/upload/productos/{filename}(filename=${producto.fotoProducto})}"
-                            alt="Imagen del producto">
+                        <img th:src="@{/upload/productos/{filename}(filename=${producto.fotoProducto})}" alt="Imagen del producto">
                     </div>
                     <div class="foto_dos">
-                        <img th:src="@{/upload/productos/{filename}(filename=${producto.fotoProducto})}"
-                            alt="Imagen del producto">
+                        <img th:src="@{/upload/productos/{filename}(filename=${producto.fotoProducto})}" alt="Imagen del producto">
                     </div>
                     <div class="foto_tres">
-                        <img th:src="@{/upload/productos/{filename}(filename=${producto.fotoProducto})}"
-                            alt="Imagen del producto">
+                        <img th:src="@{/upload/productos/{filename}(filename=${producto.fotoProducto})}" alt="Imagen del producto">
                     </div>
                     <div class="foto_cuatro">
-                        <img th:src="@{/upload/productos/{filename}(filename=${producto.fotoProducto})}"
-                            alt="Imagen del producto">
+                        <img th:src="@{/upload/productos/{filename}(filename=${producto.fotoProducto})}" alt="Imagen del producto">
                     </div>
                     <div class="foto_cinco">
-                        <img th:src="@{/upload/productos/{filename}(filename=${producto.fotoProducto})}"
-                            alt="Imagen del producto">
+                        <img th:src="@{/upload/productos/{filename}(filename=${producto.fotoProducto})}" alt="Imagen del producto">
                     </div>
                 </div>
             </div>
@@ -291,6 +249,8 @@
 
                     <h1 th:text="${producto.nomProducto}">Nombre del producto</h1>
                     <p class="detalle-descripcion" th:text="${producto.descripcion}">Descripción del producto...</p>
+                    <p class="detalle-categoria" th:text="'Categoría: ' + ${producto.nomCategoria}">Categoría</p>
+                    <p class="detalle-stock" th:text="'Stock disponible: ' + ${producto.stock}">Stock disponible</p>
                     <p class="detalle-precio" th:text="'S/ ' + ${producto.precioUnitario}">S/ 0.00</p>
 
                     <div class="cantidad-container">
@@ -311,7 +271,7 @@
         </div>
     </main>
 
-    <script>
+    <script th:inline="javascript">
         document.addEventListener('DOMContentLoaded', function () {
             const btnDecrementar = document.getElementById('btn-decrementar');
             const btnIncrementar = document.getElementById('btn-incrementar');
@@ -320,6 +280,7 @@
             const btnComprar = document.getElementById('btn-comprar');
 
             let cantidad = 1;
+            const stockMax = /*[[${producto.stock}]]*/ 0;
 
             btnDecrementar.addEventListener('click', () => {
                 if (cantidad > 1) {
@@ -330,9 +291,13 @@
             });
 
             btnIncrementar.addEventListener('click', () => {
-                cantidad++;
-                cantidadSpan.textContent = cantidad;
-                cantidadInput.value = cantidad;
+                if (cantidad < stockMax) {
+                    cantidad++;
+                    cantidadSpan.textContent = cantidad;
+                    cantidadInput.value = cantidad;
+                } else {
+                    alert('No se puede agregar más, stock disponible: ' + stockMax);
+                }
             });
 
             btnComprar.addEventListener('click', () => {
@@ -341,5 +306,4 @@
         });
     </script>
 </body>
-
 </html>

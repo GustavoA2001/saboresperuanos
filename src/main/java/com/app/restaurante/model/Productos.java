@@ -11,7 +11,8 @@ public class Productos {
     private String FotoProducto;
 
     private Long idCategoria;
-
+    private String nomCategoria;
+    private int stock;
 
     // Constructor vacío
     public Productos() {
@@ -64,6 +65,9 @@ public class Productos {
     public Long getIdCategoria() {        return idCategoria;    }
     public void setIdCategoria(Long idCategoria) {        this.idCategoria = idCategoria;    }
 
-    
+    public String getNomCategoria() { return nomCategoria; }
+    public void setNomCategoria(String nomCategoria) { this.nomCategoria = nomCategoria; }
 
+    public int getStock() { return stock; }
+public void setStock(int stock) { this.stock = stock; }
 }

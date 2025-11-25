@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -228,7 +229,7 @@ public class ProductosDAO {
                         p.Cantidad,
                         p.FechaProducto,
                         f.FotoPrincipal AS FotoProducto,
-                        p.IDCategoria
+                        h.IDCategoria
                     FROM producto p
                     LEFT JOIN productohistoria h ON p.IDProducto = h.IDProducto
                     LEFT JOIN fotoproducto f ON p.IDProducto = f.IDProducto
@@ -249,7 +250,7 @@ public class ProductosDAO {
                         p.Cantidad,
                         p.FechaProducto,
                         f.FotoPrincipal AS FotoProducto,
-                        p.IDCategoria
+                        h.IDCategoria
                     FROM producto p
                     LEFT JOIN productohistoria h ON p.IDProducto = h.IDProducto
                     LEFT JOIN fotoproducto f ON p.IDProducto = f.IDProducto
@@ -301,146 +302,395 @@ public class ProductosDAO {
         return jdbcTemplate.query(sql, new Object[] { idCategoria }, getRowMapper());
     }
 
+    public List<Productos> obtenerPorCategoriaIdDisponibles(Long categoriaId, int offset, int limit) {
+        String sql = """
+                    SELECT
+                        p.IDProducto AS idProducto,
+                        ph.NomProducto AS nomProducto,
+                        ph.Descripcion AS descripcion,
+                        p.PrecioUnitario AS precioUnitario,
+                        (p.Cantidad - IFNULL(SUM(CASE WHEN pe.EstadoPedido='Pagado' THEN c.Cantidad ELSE 0 END), 0)) AS cantidad,
+                        fp.FotoPrincipal AS fotoProducto,
+                        ph.IDCategoria AS idCategoria,
+                        p.FechaProducto AS FechaProducto
+                    FROM producto p
+                    INNER JOIN productohistoria ph ON p.IDProdHistoria = ph.IDProdHistoria
+                    LEFT JOIN fotoproducto fp ON ph.IDProdHistoria = fp.IDProdHistoria
+                    LEFT JOIN carrito c ON c.IDProducto = p.IDProducto
+                    LEFT JOIN pedido pe ON c.IDPedido = pe.IDPedido
+                    WHERE p.EnCarta = 1
+                      AND p.Visible = 1
+                      AND DATE(p.FechaProducto) = CURDATE()
+                      AND p.EstadoDia = 'disponible'
+                      AND ph.IDCategoria = ?   -- <-- CORREGIDO
+                    GROUP BY p.IDProducto
+                    HAVING cantidad > 0
+                    LIMIT ? OFFSET ?;
+                """;
+        return jdbcTemplate.query(sql, new Object[] { categoriaId, limit, offset }, getRowMapper());
+    }
+
+    public List<Productos> buscarProductosPorNombreDisponibles(String nombre, int offset, int limit) {
+        String sql = """
+                    SELECT
+                        p.IDProducto AS idProducto,
+                        ph.NomProducto AS nomProducto,
+                        ph.Descripcion AS descripcion,
+                        p.PrecioUnitario AS precioUnitario,
+                        (p.Cantidad - IFNULL(SUM(CASE WHEN pe.EstadoPedido='Pagado' THEN c.Cantidad ELSE 0 END), 0)) AS cantidad,
+                        fp.FotoPrincipal AS fotoProducto,
+                        ph.IDCategoria AS idCategoria,
+                        p.FechaProducto AS FechaProducto
+                    FROM producto p
+                    INNER JOIN productohistoria ph ON p.IDProdHistoria = ph.IDProdHistoria
+                    LEFT JOIN fotoproducto fp ON ph.IDProdHistoria = fp.IDProdHistoria
+                    LEFT JOIN carrito c ON c.IDProducto = p.IDProducto
+                    LEFT JOIN pedido pe ON c.IDPedido = pe.IDPedido
+                    WHERE p.EnCarta = 1
+                      AND p.Visible = 1
+                      AND DATE(p.FechaProducto) = CURDATE()
+                      AND p.EstadoDia = 'disponible'
+                      AND ph.NomProducto LIKE ?  -- <-- ESTÁ BIEN
+                    GROUP BY p.IDProducto
+                    HAVING cantidad > 0
+                    LIMIT ? OFFSET ?;
+                """;
+        String param = "%" + nombre + "%";
+        return jdbcTemplate.query(sql, new Object[] { param, limit, offset }, getRowMapper());
+    }
+
+    public int countPorCategoriaDisponibles(Long categoriaId) {
+        String sql = """
+                    SELECT COUNT(*) FROM (
+                        SELECT p.IDProducto,
+                               (p.Cantidad - IFNULL(SUM(CASE WHEN pe.EstadoPedido='Pagado' THEN c.Cantidad ELSE 0 END), 0)) AS cantidad
+                        FROM producto p
+                        INNER JOIN productohistoria ph ON p.IDProdHistoria = ph.IDProdHistoria
+                        LEFT JOIN carrito c ON c.IDProducto = p.IDProducto
+                        LEFT JOIN pedido pe ON c.IDPedido = pe.IDPedido
+                        WHERE p.EnCarta = 1
+                          AND p.Visible = 1
+                          AND DATE(p.FechaProducto) = CURDATE()
+                          AND p.EstadoDia = 'disponible'
+                          AND ph.IDCategoria = ?
+                        GROUP BY p.IDProducto
+                        HAVING cantidad > 0
+                    ) AS sub;
+                """;
+
+        return jdbcTemplate.queryForObject(sql, new Object[] { categoriaId }, Integer.class);
+    }
+
+    public int countBusquedaDisponibles(String nombre) {
+        String sql = """
+                    SELECT COUNT(*) FROM (
+                        SELECT p.IDProducto,
+                               (p.Cantidad - IFNULL(SUM(CASE WHEN pe.EstadoPedido='Pagado' THEN c.Cantidad ELSE 0 END), 0)) AS cantidad
+                        FROM producto p
+                        INNER JOIN productohistoria ph ON p.IDProdHistoria = ph.IDProdHistoria
+                        LEFT JOIN carrito c ON c.IDProducto = p.IDProducto
+                        LEFT JOIN pedido pe ON c.IDPedido = pe.IDPedido
+                        WHERE p.EnCarta = 1
+                          AND p.Visible = 1
+                          AND DATE(p.FechaProducto) = CURDATE()
+                          AND p.EstadoDia = 'disponible'
+                          AND ph.NomProducto LIKE ?
+                        GROUP BY p.IDProducto
+                        HAVING cantidad > 0
+                    ) AS sub;
+                """;
+        String param = "%" + nombre + "%";
+        return jdbcTemplate.queryForObject(sql, new Object[] { param }, Integer.class);
+    }
+
     public Productos obtenerPorId(int idProducto) {
         String sql = """
                     SELECT
                         p.IDProducto AS idProducto,
-                        COALESCE(h.NomProducto, '') AS nomProducto,
-                        COALESCE(h.Descripcion, '') AS descripcion,
+                        COALESCE(ph.NomProducto, '') AS nomProducto,
+                        COALESCE(ph.Descripcion, '') AS descripcion,
                         p.PrecioUnitario AS precioUnitario,
-                        p.Cantidad AS cantidad,
-                        p.FechaProducto AS fechaProducto,
-                        f.FotoPrincipal AS fotoProducto
+                        p.Cantidad AS cantidadInicial,
+                        IFNULL(SUM(c.Cantidad), 0) AS vendidos,
+                        (p.Cantidad - IFNULL(SUM(CASE WHEN pe.EstadoPedido='Pagado' THEN c.Cantidad ELSE 0 END), 0)) AS stock,
+                        p.Visible AS visible,
+                        p.EnCarta AS enCarta,
+                        p.EstadoDia AS estadoDia,
+                        f.FotoPrincipal AS fotoProducto,
+                        cat.NomCategoria AS nomCategoria
                     FROM producto p
-                    LEFT JOIN productohistoria h ON p.IDProdHistoria = h.IDProdHistoria
-                    LEFT JOIN fotoproducto f ON h.IDProdHistoria = f.IDProdHistoria
+                    INNER JOIN productohistoria ph ON ph.IDProdHistoria = p.IDProdHistoria
+                    LEFT JOIN fotoproducto f ON f.IDProdHistoria = ph.IDProdHistoria
+                    LEFT JOIN categoriaproducto cat ON cat.IDCategoria = ph.IDCategoria
+                    LEFT JOIN carrito c ON c.IDProducto = p.IDProducto
+                    LEFT JOIN pedido pe ON c.IDPedido = pe.IDPedido
+
                     WHERE p.IDProducto = ?
+                    GROUP BY
+                        p.IDProducto,
+                        ph.NomProducto,
+                        ph.Descripcion,
+                        p.PrecioUnitario,
+                        p.Cantidad,
+                        p.Visible,
+                        p.EnCarta,
+                        p.EstadoDia,
+                        f.FotoPrincipal,
+                        cat.NomCategoria
                 """;
-        return jdbcTemplate.queryForObject(sql, new BeanPropertyRowMapper<>(Productos.class), idProducto);
+
+        System.out.println("Ejecutando SQL para obtener producto por ID: " + idProducto);
+
+        try {
+            Productos producto = jdbcTemplate.queryForObject(sql, new BeanPropertyRowMapper<>(Productos.class),
+                    idProducto);
+            System.out.println("Producto recuperado desde DB: " + producto.getNomProducto() + ", stock calculado: "
+                    + producto.getCantidad());
+            return producto;
+        } catch (Exception e) {
+            System.out.println("Error al obtener producto: " + e.getMessage());
+            return null;
+        }
     }
 
-    // Productos de la carta
-    public List<Map<String, Object>> obtenerProductosDiaAnterior() {
+    @SuppressWarnings("deprecation")
+    public List<Productos> findProductosDisponiblesHoy(int offset, int limit) {
         String sql = """
                 SELECT
                     p.IDProducto AS idProducto,
-                    h.NomProducto AS nomProducto,
+                    ph.NomProducto AS nomProducto,
+                    ph.Descripcion AS descripcion,
                     p.PrecioUnitario AS precioUnitario,
-                    p.Cantidad AS cantidadInicial,
-                    COALESCE((
-                        SELECT SUM(c.Cantidad)
-                        FROM carrito c
-                        JOIN pedido pe ON c.IDPedido = pe.IDPedido
-                        LEFT JOIN pago pa ON pe.IDPedido = pa.IDPedido
-                        WHERE c.IDProducto = p.IDProducto
-                          AND DATE(pe.FechaPedido) = CURDATE() - INTERVAL 1 DAY
-                          AND pe.EstadoPedido = 'Pagado'
-                          AND pa.IDPago IS NOT NULL   -- solo pedidos con pago registrado
-                    ), 0) AS vendidos,
-                    (p.Cantidad - COALESCE((
-                        SELECT SUM(c.Cantidad)
-                        FROM carrito c
-                        JOIN pedido pe ON c.IDPedido = pe.IDPedido
-                        LEFT JOIN pago pa ON pe.IDPedido = pa.IDPedido
-                        WHERE c.IDProducto = p.IDProducto
-                          AND DATE(pe.FechaPedido) = CURDATE() - INTERVAL 1 DAY
-                          AND pe.EstadoPedido = 'Pagado'
-                          AND pa.IDPago IS NOT NULL
-                    ), 0)) AS stock,
-                    p.FechaProducto AS fechaProducto
+                    (p.Cantidad - IFNULL(SUM(CASE WHEN pe.EstadoPedido='Pagado' THEN c.Cantidad ELSE 0 END), 0)) AS cantidad,
+                    fp.FotoPrincipal AS fotoProducto,
+                    ph.IDCategoria AS idCategoria,
+                    p.FechaProducto AS FechaProducto
                 FROM producto p
-                JOIN productohistoria h ON p.IDProdHistoria = h.IDProdHistoria
-                WHERE DATE(p.FechaProducto) = CURDATE() - INTERVAL 1 DAY
-                  AND h.EnCarta = 0
-                  AND h.EstadoProducto = 'Activo'
-                ORDER BY p.FechaProducto DESC;
+                INNER JOIN productohistoria ph ON p.IDProdHistoria = ph.IDProdHistoria
+                LEFT JOIN fotoproducto fp ON ph.IDProdHistoria = fp.IDProdHistoria
+                LEFT JOIN carrito c ON c.IDProducto = p.IDProducto
+                LEFT JOIN pedido pe ON c.IDPedido = pe.IDPedido
+                WHERE p.EnCarta = 1
+                  AND p.Visible = 1
+                  AND DATE(p.FechaProducto) = CURDATE()
+                  AND p.EstadoDia = 'disponible'
+                GROUP BY p.IDProducto
+                HAVING cantidad > 0
+                LIMIT ? OFFSET ?;
 
-                """;
-
-        return jdbcTemplate.queryForList(sql);
+                    """;
+        return jdbcTemplate.query(sql, new Object[] { limit, offset }, getRowMapper());
     }
 
-    public List<Map<String, Object>> obtenerProductosRecientes() {
+    public int countProductosDisponiblesHoy() {
+        String sql = """
+                SELECT COUNT(*) FROM (
+                    SELECT p.IDProducto
+                    FROM producto p
+                    LEFT JOIN carrito c ON c.IDProducto = p.IDProducto
+                    LEFT JOIN pedido pe ON c.IDPedido = pe.IDPedido
+                    WHERE p.EnCarta = 1
+                      AND p.Visible = 1
+                      AND DATE(p.FechaProducto) = CURDATE()
+                      AND p.EstadoDia = 'disponible'
+                    GROUP BY p.IDProducto, p.Cantidad
+                    HAVING (MAX(p.Cantidad) - IFNULL(SUM(CASE WHEN pe.EstadoPedido='Pagado' THEN c.Cantidad ELSE 0 END), 0)) > 0
+                ) AS sub;
+                """;
+        return jdbcTemplate.queryForObject(sql, Integer.class);
+    }
+
+    // =============================================
+    // CARTA PARA ADMINA
+    // =============================================
+
+    // =============================================
+    // PRODUCTOS PARA LA CARTA (HOY)
+    // =============================================
+    public List<Map<String, Object>> obtenerProductosHoy() {
+        System.out.println("\n---- [DAO] obtenerProductosHoy() ----");
+
         String sql = """
                 SELECT
                     p.IDProducto AS idProducto,
-                    h.NomProducto AS nomProducto,
+                    ph.NomProducto AS nomProducto,
+                    ph.Descripcion AS descripcion,
                     p.PrecioUnitario AS precioUnitario,
                     p.Cantidad AS cantidadInicial,
-                    COALESCE((
-                        SELECT SUM(c.Cantidad)
-                        FROM carrito c
-                        JOIN pedido pe ON c.IDPedido = pe.IDPedido
-                        LEFT JOIN pago pa ON pe.IDPedido = pa.IDPedido
-                        WHERE c.IDProducto = p.IDProducto
-                          AND DATE(pe.FechaPedido) = CURDATE()
-                          AND pe.EstadoPedido = 'Pagado'
-                          AND pa.IDPago IS NOT NULL
-                    ), 0) AS vendidos,
-                    (p.Cantidad - COALESCE((
-                        SELECT SUM(c.Cantidad)
-                        FROM carrito c
-                        JOIN pedido pe ON c.IDPedido = pe.IDPedido
-                        LEFT JOIN pago pa ON pe.IDPedido = pa.IDPedido
-                        WHERE c.IDProducto = p.IDProducto
-                          AND DATE(pe.FechaPedido) = CURDATE()
-                          AND pe.EstadoPedido = 'Pagado'
-                          AND pa.IDPago IS NOT NULL
-                    ), 0)) AS stock
+                    IFNULL(SUM(c.Cantidad), 0) AS vendidos,
+                    (p.Cantidad - IFNULL(SUM(c.Cantidad), 0)) AS stock,
+                    p.Visible AS visible,
+                    p.EnCarta AS enCarta,
+                    p.EstadoDia AS estadoDia,
+                    fp.FotoPrincipal AS fotoPrincipal,
+                    cat.NomCategoria AS nomCategoria
                 FROM producto p
-                JOIN productohistoria h ON p.IDProdHistoria = h.IDProdHistoria
+                INNER JOIN productohistoria ph ON ph.IDProdHistoria = p.IDProdHistoria
+                LEFT JOIN fotoproducto fp ON fp.IDProdHistoria = ph.IDProdHistoria
+                LEFT JOIN categoriaproducto cat ON cat.IDCategoria = ph.IDCategoria
+                LEFT JOIN carrito c ON c.IDProducto = p.IDProducto
                 WHERE DATE(p.FechaProducto) = CURDATE()
-                  AND h.EnCarta = 1
-                  AND h.EstadoProducto = 'Activo'
-                ORDER BY p.FechaProducto DESC;
-                """;
+                  AND p.EnCarta = 1
+                GROUP BY
+                    p.IDProducto,
+                    ph.NomProducto,
+                    ph.Descripcion,
+                    p.PrecioUnitario,
+                    p.Cantidad,
+                    p.Visible,
+                    p.EnCarta,
+                    p.EstadoDia,
+                    fp.FotoPrincipal,
+                    cat.NomCategoria;
+                    """;
 
-        return jdbcTemplate.queryForList(sql);
+        List<Map<String, Object>> lista = jdbcTemplate.queryForList(sql);
+
+        System.out.println("Resultado HOY (rows): " + lista.size());
+
+        int index = 1;
+        for (Map<String, Object> row : lista) {
+            System.out.println("\n---- Fila #" + index + " ----");
+            row.forEach((k, v) -> {
+                System.out.println(" " + k + " → " + v + " (tipo: " +
+                        (v != null ? v.getClass().getSimpleName() : "NULL") + ")");
+            });
+            index++;
+        }
+
+        System.out.println("----------------------------------------\n");
+
+        return lista;
     }
 
-    public List<Map<String, Object>> obtenerProductosPasados() {
+    // =============================================
+    // HISTÓRICOS → Productos de días anteriores
+    // Solo 1 por producto (último de cada día anterior)
+    // Incluye vendidos reales del día (solo pedidos pagados)
+    // =============================================
+    public List<Map<String, Object>> obtenerProductosHistoricos() {
+
+        System.out.println("---- [DAO] obtenerProductosHistoricos() (MODAL) ----");
+
         String sql = """
                 SELECT
                     p.IDProducto AS idProducto,
-                    h.NomProducto AS nomProducto,
+                    ph.IDProdHistoria AS idProdHistoria,
+                    ph.NomProducto AS nomProducto,
                     p.PrecioUnitario AS precioUnitario,
                     p.Cantidad AS cantidadInicial,
-                    COALESCE((
-                        SELECT SUM(c.Cantidad)
-                        FROM carrito c
-                        JOIN pedido pe ON c.IDPedido = pe.IDPedido
-                        LEFT JOIN pago pa ON pe.IDPedido = pa.IDPedido
-                        WHERE c.IDProducto = p.IDProducto
-                          AND DATE(pe.FechaPedido) = DATE(p.FechaProducto)
-                          AND pe.EstadoPedido = 'Pagado'
-                          AND pa.IDPago IS NOT NULL
-                    ), 0) AS vendidos,
-                    (p.Cantidad - COALESCE((
-                        SELECT SUM(c.Cantidad)
-                        FROM carrito c
-                        JOIN pedido pe ON c.IDPedido = pe.IDPedido
-                        LEFT JOIN pago pa ON pe.IDPedido = pa.IDPedido
-                        WHERE c.IDProducto = p.IDProducto
-                          AND DATE(pe.FechaPedido) = DATE(p.FechaProducto)
-                          AND pe.EstadoPedido = 'Pagado'
-                          AND pa.IDPago IS NOT NULL
-                    ), 0)) AS stock,
-                    p.FechaProducto AS fechaProducto
-                FROM producto p
-                JOIN productohistoria h ON p.IDProdHistoria = h.IDProdHistoria
-                JOIN (
-                    -- Subquery: obtener la fecha más reciente de cada producto
-                    SELECT IDProdHistoria, MAX(FechaProducto) AS maxFecha
-                    FROM producto
-                    WHERE FechaProducto < CURDATE() - INTERVAL 1 DAY
-                    GROUP BY IDProdHistoria
-                ) ultimos ON p.IDProdHistoria = ultimos.IDProdHistoria AND p.FechaProducto = ultimos.maxFecha
-                WHERE h.EstadoProducto = 'Activo'
-                ORDER BY p.FechaProducto DESC;
 
+                    -- VENDIDOS reales del día
+                    IFNULL((
+                        SELECT SUM(c2.Cantidad)
+                        FROM carrito c2
+                        INNER JOIN pedido ped ON ped.IDPedido = c2.IDPedido
+                        WHERE c2.IDProducto = p.IDProducto
+                          AND ped.EstadoPedido = 'Pagado'
+                          AND DATE(p.FechaProducto) = DATE(ped.FechaPedido)
+                    ), 0) AS vendidos,
+
+                    DATE(p.FechaProducto) AS fechaProducto
+
+                FROM producto p
+                INNER JOIN productohistoria ph ON ph.IDProdHistoria = p.IDProdHistoria
+
+                -- Último registro histórico por producto
+                INNER JOIN (
+                    SELECT
+                        IDProdHistoria,
+                        MAX(FechaProducto) AS maxFecha
+                    FROM producto
+                    WHERE DATE(FechaProducto) < CURDATE()
+                    GROUP BY IDProdHistoria
+                ) ult ON p.IDProdHistoria = ult.IDProdHistoria
+                   AND p.FechaProducto = ult.maxFecha
+
+                --EXCLUIR PRODUCTOS QUE YA ESTÁN EN CARTA HOY
+                WHERE NOT EXISTS (
+                    SELECT 1
+                    FROM producto p2
+                    WHERE p2.IDProdHistoria = p.IDProdHistoria
+                      AND DATE(p2.FechaProducto) = CURDATE()
+                      AND p2.EnCarta = 1
+                )
+
+                ORDER BY p.FechaProducto DESC;
                                 """;
 
-        return jdbcTemplate.queryForList(sql);
+        List<Map<String, Object>> lista = jdbcTemplate.queryForList(sql);
+
+        System.out.println("Resultado para MODAL (históricos): " + lista.size());
+        lista.forEach(row -> System.out.println("Fila: " + row));
+
+        return lista;
+    }
+
+    public Map<String, Object> validarProductoActivo(Integer idProdHistoria) {
+
+        System.out.println("DAO >> validarProductoActivo(" + idProdHistoria + ")");
+
+        String sql = """
+                    SELECT *
+                    FROM productohistoria
+                    WHERE IDProdHistoria = ?
+                      AND EstadoProducto = 'Activo'
+                """;
+
+        List<Map<String, Object>> lista = jdbcTemplate.queryForList(sql, idProdHistoria);
+
+        System.out.println("DAO >> Resultado validarProductoActivo: " + lista);
+
+        return lista.isEmpty() ? null : lista.get(0);
+    }
+
+    public boolean existeProductoHoy(Integer idProdHistoria) {
+
+        System.out.println("DAO >> existeProductoHoy(" + idProdHistoria + ")");
+
+        String sql = """
+                    SELECT COUNT(*)
+                    FROM producto
+                    WHERE IDProdHistoria = ?
+                      AND DATE(FechaProducto) = CURDATE()
+                """;
+
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, idProdHistoria);
+
+        System.out.println("DAO >> count = " + count);
+
+        return count != null && count > 0;
+    }
+
+    public void insertarProductoHoy(Integer idProdHistoria, BigDecimal precio, Integer cantidad) {
+
+        System.out.println("DAO >> insertarProductoHoy(id=" + idProdHistoria +
+                ", precio=" + precio + ", cantidad=" + cantidad + ")");
+
+        String sql = """
+                    INSERT INTO producto (IDProdHistoria, PrecioUnitario, Cantidad, FechaProducto, EnCarta, Visible, EstadoDia)
+                    VALUES (?, ?, ?, NOW(), 1, 0, 'disponible')
+                """;
+
+        jdbcTemplate.update(sql, idProdHistoria, precio, cantidad);
+
+        System.out.println("DAO >> INSERT OK");
+    }
+
+    // Cambiar visibilidad
+    public void actualizarVisible(int idProducto, int estado) {
+        jdbcTemplate.update("UPDATE producto SET Visible = ? WHERE IDProducto = ?", estado, idProducto);
+    }
+
+    // Eliminar instancia
+    public void eliminarProducto(int idProducto) {
+        jdbcTemplate.update("DELETE FROM producto WHERE IDProducto = ?", idProducto);
+    }
+
+    // Cerrar carta del día
+    public void cerrarCartaHoy() {
+        jdbcTemplate
+                .update("UPDATE producto SET Visible = 0, EstadoDia = 'cerrado' WHERE DATE(FechaProducto) = CURDATE()");
     }
 
 }

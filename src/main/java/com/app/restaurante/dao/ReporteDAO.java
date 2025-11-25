@@ -17,9 +17,11 @@ public class ReporteDAO {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    // ==========================================================
-    // 1. REPORTE: VENTAS TOTALES
-    // ==========================================================
+    // =========================================================================
+    // MÓDULO 1 — REPORTE GENERAL DEL SISTEMA
+    // =========================================================================
+
+    // 1. Ventas Totales
     public Double obtenerVentasTotales(Date inicio, Date fin) {
         String sql = """
                     SELECT IFNULL(SUM(p.MontoFinal), 0)
@@ -27,13 +29,10 @@ public class ReporteDAO {
                     WHERE p.FechaPedido BETWEEN ? AND ?
                       AND p.EstadoPedido = 'Pagado'
                 """;
-
         return jdbcTemplate.queryForObject(sql, Double.class, inicio, fin);
     }
 
-    // ==========================================================
-    // 2. REPORTE: TOTAL DE PRODUCTOS VENDIDOS
-    // ==========================================================
+    // 2. Total de productos vendidos
     public Integer obtenerCantidadProductosVendidos(Date inicio, Date fin) {
         String sql = """
                     SELECT IFNULL(SUM(c.Cantidad), 0)
@@ -42,13 +41,10 @@ public class ReporteDAO {
                     WHERE p.FechaPedido BETWEEN ? AND ?
                       AND p.EstadoPedido = 'Pagado'
                 """;
-
         return jdbcTemplate.queryForObject(sql, Integer.class, inicio, fin);
     }
 
-    // ==========================================================
-    // 3. REPORTE: CATEGORÍAS MÁS VENDIDAS
-    // ==========================================================
+    // 3. Categorías más vendidas
     public List<Map<String, Object>> obtenerCategoriasMasVendidas(Date inicio, Date fin) {
         String sql = """
                     SELECT cat.NomCategoria,
@@ -63,13 +59,10 @@ public class ReporteDAO {
                     GROUP BY cat.NomCategoria
                     ORDER BY totalVendidos DESC
                 """;
-
         return jdbcTemplate.queryForList(sql, inicio, fin);
     }
 
-    // ==========================================================
-    // 4. REPORTE: CLIENTES FRECUENTES
-    // ==========================================================
+    // 4. Clientes más frecuentes
     public List<Map<String, Object>> obtenerClientesFrecuentes(Date inicio, Date fin) {
         String sql = """
                     SELECT cl.Nombre, cl.Apellido,
@@ -82,13 +75,10 @@ public class ReporteDAO {
                     ORDER BY pedidosRealizados DESC
                     LIMIT 10
                 """;
-
         return jdbcTemplate.queryForList(sql, inicio, fin);
     }
 
-    // ==========================================================
-    // 5. REPORTE: INGRESO TOTAL POR DÍA
-    // ==========================================================
+    // 5. Ingreso total por día
     public Double obtenerIngresosPorDia(Date fecha) {
         String sql = """
                     SELECT IFNULL(SUM(p.MontoFinal), 0)
@@ -96,15 +86,11 @@ public class ReporteDAO {
                     WHERE DATE(p.FechaPedido) = DATE(?)
                       AND p.EstadoPedido = 'Pagado'
                 """;
-
         return jdbcTemplate.queryForObject(sql, Double.class, fecha);
     }
 
-    // ==========================================================
-    // 6. REPORTE: EVOLUCIÓN TEMPORAL
-    // ==========================================================
+    // 6. Evolución temporal global
     public List<Map<String, Object>> obtenerEvolucion(Date inicio, Date fin) {
-
         String sql = """
                     SELECT
                         DATE(p.FechaPedido) AS fecha,
@@ -115,13 +101,10 @@ public class ReporteDAO {
                     GROUP BY DATE(p.FechaPedido)
                     ORDER BY fecha ASC
                 """;
-
         return jdbcTemplate.queryForList(sql, inicio, fin);
     }
 
-    // ==========================================================
-    // 7. REPORTE DETALLADO
-    // ==========================================================
+    // 7. Reporte detallado del sistema
     public List<Map<String, Object>> obtenerDetalleReporte(Date inicio, Date fin) {
         String sql = """
                     SELECT p.FechaPedido,
@@ -137,13 +120,10 @@ public class ReporteDAO {
                       AND p.EstadoPedido = 'Pagado'
                     ORDER BY p.FechaPedido DESC
                 """;
-
         return jdbcTemplate.queryForList(sql, inicio, fin);
     }
 
-    // ==========================================================
-    // 8. REPORTE: VENTAS POR PRODUCTO
-    // ==========================================================
+    // 8. Reporte ventas por categoría o producto
     public List<Map<String, Object>> reporteVentas(Date inicio, Date fin, String atributo) {
 
         String sql;
@@ -191,20 +171,11 @@ public class ReporteDAO {
         return jdbcTemplate.queryForList(sql, inicio, fin);
     }
 
-    // ---------------------------------------------------------
-    // EVOLUCIÓN DE PRECIOS
-    // ---------------------------------------------------------
-    public List<Map<String, Object>> evolucionPreciosProducto(int idProdHistoria, LocalDate inicio, LocalDate fin) {
-        String sql = "SELECT DATE(FechaProducto) AS fecha, PrecioUnitario AS precio FROM producto WHERE IDProdHistoria = ? AND DATE(FechaProducto) BETWEEN ? AND ? ORDER BY FechaProducto ASC";
-        List<Map<String, Object>> lista = jdbcTemplate.queryForList(sql, idProdHistoria, inicio.toString(), fin.toString());
-        System.out.println("→ [DAO] Precios producto " + idProdHistoria + ": " + lista.size());
-        lista.forEach(p -> System.out.println("  " + p));
-        return lista;
-    }
+    // =========================================================================
+    // MÓDULO 2 — REPORTE POR PRODUCTO
+    // =========================================================================
 
-    // ---------------------------------------------------------
-    // LISTA DE PRODUCTOS
-    // ---------------------------------------------------------
+    // Listar productos
     public List<Map<String, Object>> listarProductos() {
         String sql = """
                     SELECT
@@ -216,20 +187,31 @@ public class ReporteDAO {
         return jdbcTemplate.queryForList(sql);
     }
 
-    // ---------------------------------------------------------
-    // EVOLUCIÓN DE CANTIDADES
-    // ---------------------------------------------------------
-    public List<Map<String, Object>> evolucionCantidadProducto(int idProdHistoria, LocalDate inicio, LocalDate fin) {
-        String sql = "SELECT DATE(FechaProducto) AS fecha, Cantidad AS cantidad FROM producto WHERE IDProdHistoria = ? AND DATE(FechaProducto) BETWEEN ? AND ? ORDER BY FechaProducto ASC";
-        List<Map<String, Object>> lista = jdbcTemplate.queryForList(sql, idProdHistoria, inicio.toString(), fin.toString());
-        System.out.println("→ [DAO] Cantidades producto " + idProdHistoria + ": " + lista.size());
-        lista.forEach(c -> System.out.println("  " + c));
-        return lista;
+    // Evolución de precios
+    public List<Map<String, Object>> evolucionPreciosProducto(int idProdHistoria, LocalDate inicio, LocalDate fin) {
+        String sql = """
+                SELECT DATE(FechaProducto) AS fecha, PrecioUnitario AS precio
+                FROM producto
+                WHERE IDProdHistoria = ?
+                  AND DATE(FechaProducto) BETWEEN ? AND ?
+                ORDER BY FechaProducto ASC
+                """;
+        return jdbcTemplate.queryForList(sql, idProdHistoria, inicio.toString(), fin.toString());
     }
 
-    // ---------------------------------------------------------
-    // VENTAS POR PRODUCTO
-    // ---------------------------------------------------------
+    // Evolución de cantidades
+    public List<Map<String, Object>> evolucionCantidadProducto(int idProdHistoria, LocalDate inicio, LocalDate fin) {
+        String sql = """
+                SELECT DATE(FechaProducto) AS fecha, Cantidad AS cantidad
+                FROM producto
+                WHERE IDProdHistoria = ?
+                  AND DATE(FechaProducto) BETWEEN ? AND ?
+                ORDER BY FechaProducto ASC
+                """;
+        return jdbcTemplate.queryForList(sql, idProdHistoria, inicio.toString(), fin.toString());
+    }
+
+    // Ventas por producto
     public List<Map<String, Object>> ventasProducto(int idProdHistoria, LocalDate inicio, LocalDate fin) {
         String sql = """
                 SELECT DATE(p.FechaPedido) AS fecha,
@@ -244,124 +226,14 @@ public class ReporteDAO {
                 GROUP BY DATE(p.FechaPedido)
                 ORDER BY fecha ASC
                 """;
-        List<Map<String, Object>> lista = jdbcTemplate.queryForList(sql, idProdHistoria, inicio.toString(), fin.toString());
-        System.out.println("→ [DAO] Ventas producto " + idProdHistoria + ": " + lista.size());
-        lista.forEach(v -> System.out.println("  " + v));
-        return lista;
+        return jdbcTemplate.queryForList(sql, idProdHistoria, inicio.toString(), fin.toString());
     }
 
-    public List<Map<String, Object>> obtenerBloquesAuditoria(int idProducto, String tipo) {
+    // =========================================================================
+    // MÓDULO 3 — AUDITORÍA DE PRODUCTOS
+    // =========================================================================
 
-        String sql = "";
-
-        switch (tipo) {
-            case "semana":
-                sql = """
-                            SELECT
-                                DATE(fecha) AS inicio,
-                                DATE(fecha + INTERVAL 6 DAY) AS fin
-                            FROM auditoria_producto
-                            WHERE idProducto = ?
-                            GROUP BY YEARWEEK(fecha)
-                            ORDER BY fecha DESC
-                        """;
-                break;
-
-            case "mes":
-                sql = """
-                            SELECT
-                                DATE(DATE_FORMAT(fecha,'%Y-%m-01')) AS inicio,
-                                LAST_DAY(fecha) AS fin
-                            FROM auditoria_producto
-                            WHERE idProducto = ?
-                            GROUP BY YEAR(fecha), MONTH(fecha)
-                            ORDER BY fecha DESC
-                        """;
-                break;
-
-            case "anio":
-                sql = """
-                            SELECT
-                                DATE(CONCAT(YEAR(fecha),'-01-01')) AS inicio,
-                                DATE(CONCAT(YEAR(fecha),'-12-31')) AS fin
-                            FROM auditoria_producto
-                            WHERE idProducto = ?
-                            GROUP BY YEAR(fecha)
-                            ORDER BY fecha DESC
-                        """;
-                break;
-        }
-
-        return jdbcTemplate.queryForList(sql, idProducto);
-    }
-
-    public List<Map<String, Object>> generarBloques(int idProducto, String tipo, Date inicio, Date fin) {
-
-        String sql = "";
-
-        switch (tipo.toLowerCase()) {
-
-            case "semana":
-                sql = """
-                            SELECT
-                                DATE(fecha) AS inicio,
-                                DATE(fecha) AS fin
-                            FROM productoauditoria
-                            WHERE IDProducto = ?
-                            GROUP BY YEAR(fecha), WEEK(fecha)
-                            ORDER BY fecha DESC
-                            LIMIT 6
-                        """;
-                break;
-
-            case "mes":
-                sql = """
-                            SELECT
-                                DATE_FORMAT(fecha, '%Y-%m-01') AS inicio,
-                                LAST_DAY(fecha) AS fin
-                            FROM productoauditoria
-                            WHERE IDProducto = ?
-                            GROUP BY YEAR(fecha), MONTH(fecha)
-                            ORDER BY fecha DESC
-                            LIMIT 6
-                        """;
-                break;
-
-            case "anio":
-                sql = """
-                            SELECT
-                                DATE_FORMAT(fecha, '%Y-01-01') AS inicio,
-                                DATE_FORMAT(fecha, '%Y-12-31') AS fin
-                            FROM productoauditoria
-                            WHERE IDProducto = ?
-                            GROUP BY YEAR(fecha)
-                            ORDER BY fecha DESC
-                            LIMIT 5
-                        """;
-                break;
-
-            case "rango":
-                sql = """
-                            SELECT
-                                ? AS inicio,
-                                ? AS fin
-                            FROM DUAL
-                        """;
-                return jdbcTemplate.queryForList(sql, inicio, fin);
-        }
-        List<Map<String, Object>> bloques = jdbcTemplate.queryForList(sql, idProducto);
-
-        System.out.println(
-                "[DAO] Bloques generados para producto " + idProducto + " tipo " + tipo + ": " + bloques.size());
-        bloques.forEach(b -> System.out.println("  " + b));
-
-        return jdbcTemplate.queryForList(sql, idProducto);
-    }
-
-    // ==========================================================
-    // 2. PRIMER Y ÚLTIMO MOVIMIENTO DEL PRODUCTO
-    // Sirve para generar el rango automático (semana, mes, año)
-    // ==========================================================
+    // Primer y último movimiento
     public Map<String, Object> obtenerPrimerUltimoMovimiento(int idProducto) {
         String sql = """
                     SELECT
@@ -371,63 +243,149 @@ public class ReporteDAO {
                     INNER JOIN pedido p ON p.IDPedido = c.IDPedido
                     WHERE c.IDProducto = ?
                 """;
-
-        Map<String, Object> resultado = jdbcTemplate.queryForMap(sql, idProducto);
-        System.out.println("[DAO] Primer y último movimiento para producto " + idProducto + ": " + resultado);
-        return resultado;
+        return jdbcTemplate.queryForMap(sql, idProducto);
     }
 
-    // ==========================================================
-    // 3. DATOS DIARIOS DE AUDITORÍA PARA UN BLOQUE
-    // (Para cada semana, mes o año)
-    // ==========================================================
-    public List<Map<String, Object>> obtenerDatosDiariosAuditoria(
-            int idProducto,
-            LocalDate inicio,
-            LocalDate fin) {
+    // Bloques generados desde auditoría BD (semana, mes, año)
+    public List<Map<String, Object>> obtenerBloquesAuditoria(int idProducto, String tipo) {
 
-        String sql = """
-                    SELECT
-                        p.FechaPedido AS fecha,
-                        SUM(c.Cantidad) AS cantidad,
-                        SUM(c.Cantidad * c.PrecioProducto) AS total
-                    FROM carrito c
-                    INNER JOIN pedido p ON p.IDPedido = c.IDPedido
-                    WHERE c.IDProducto = ?
-                      AND DATE(p.FechaPedido) BETWEEN ? AND ?
-                    GROUP BY DATE(p.FechaPedido)
-                    ORDER BY DATE(p.FechaPedido)
-                """;
+        String sql = "";
 
-        List<Map<String, Object>> datos = jdbcTemplate.queryForList(
-                sql, idProducto, inicio.toString(), fin.toString());
+        switch (tipo) {
+            case "semana":
+                sql = """
+                          SELECT DATE(fecha) AS inicio,
+                                 DATE(fecha + INTERVAL 6 DAY) AS fin
+                          FROM auditoria_producto
+                          WHERE idProducto = ?
+                          GROUP BY YEARWEEK(fecha)
+                          ORDER BY fecha DESC
+                        """;
+                break;
 
-        System.out.println("[DAO] Datos diarios para producto " + idProducto + " (" + inicio + " → " + fin + "): "
-                + datos.size() + " registros");
-        if (!datos.isEmpty()) {
-            datos.forEach(d -> System.out.println("  " + d));
+            case "mes":
+                sql = """
+                          SELECT DATE(DATE_FORMAT(fecha,'%Y-%m-01')) AS inicio,
+                                 LAST_DAY(fecha) AS fin
+                          FROM auditoria_producto
+                          WHERE idProducto = ?
+                          GROUP BY YEAR(fecha), MONTH(fecha)
+                          ORDER BY fecha DESC
+                        """;
+                break;
+
+            case "anio":
+                sql = """
+                          SELECT DATE(CONCAT(YEAR(fecha),'-01-01')) AS inicio,
+                                 DATE(CONCAT(YEAR(fecha),'-12-31')) AS fin
+                          FROM auditoria_producto
+                          WHERE idProducto = ?
+                          GROUP BY YEAR(fecha)
+                          ORDER BY fecha DESC
+                        """;
+                break;
         }
 
-        return datos;
+        return jdbcTemplate.queryForList(sql, idProducto);
     }
 
-    // ==========================================================
-    // 4. DETALLE DIARIO → para ver lo que compone un bloque
-    // ==========================================================
+    // Bloques generados manualmente (semana, mes, año, rango)
+    public List<Map<String, Object>> generarBloques(int idProducto, String tipo, Date inicio, Date fin) {
+
+        String sql = "";
+
+        switch (tipo.toLowerCase()) {
+
+            case "semana":
+                sql = """
+                          SELECT DATE(fecha) AS inicio,
+                                 DATE(fecha) AS fin
+                          FROM productoauditoria
+                          WHERE IDProducto = ?
+                          GROUP BY YEAR(fecha), WEEK(fecha)
+                          ORDER BY fecha DESC
+                          LIMIT 6
+                        """;
+                break;
+
+            case "mes":
+                sql = """
+                          SELECT DATE_FORMAT(fecha, '%Y-%m-01') AS inicio,
+                                 LAST_DAY(fecha) AS fin
+                          FROM productoauditoria
+                          WHERE IDProducto = ?
+                          GROUP BY YEAR(fecha), MONTH(fecha)
+                          ORDER BY fecha DESC
+                          LIMIT 6
+                        """;
+                break;
+
+            case "anio":
+                sql = """
+                          SELECT DATE_FORMAT(fecha, '%Y-01-01') AS inicio,
+                                 DATE_FORMAT(fecha, '%Y-12-31') AS fin
+                          FROM productoauditoria
+                          WHERE IDProducto = ?
+                          GROUP BY YEAR(fecha)
+                          ORDER BY fecha DESC
+                          LIMIT 5
+                        """;
+                break;
+
+            case "rango":
+                sql = """
+                          SELECT ? AS inicio,
+                                 ? AS fin
+                          FROM DUAL
+                        """;
+                return jdbcTemplate.queryForList(sql, inicio, fin);
+        }
+
+        return jdbcTemplate.queryForList(sql, idProducto);
+    }
+
+    // Datos diarios para cada bloque
+    public List<Map<String, Object>> obtenerDatosDiariosAuditoria(int idProducto, LocalDate inicio, LocalDate fin) {
+
+        System.out.println("[DAO] Consultando datos diarios...");
+        System.out.println("   Producto: " + idProducto);
+        System.out.println("   Inicio  : " + inicio);
+        System.out.println("   Fin     : " + fin);
+
+        String sql = """
+                SELECT p.FechaPedido AS fecha,
+                       SUM(c.Cantidad) AS cantidad,
+                       SUM(c.Cantidad * c.PrecioProducto) AS total
+                FROM carrito c
+                INNER JOIN pedido p ON p.IDPedido = c.IDPedido
+                WHERE c.IDProducto = ?
+                  AND DATE(p.FechaPedido) BETWEEN ? AND ?
+                GROUP BY DATE(p.FechaPedido)
+                ORDER BY DATE(p.FechaPedido)
+                """;
+
+        List<Map<String, Object>> result = jdbcTemplate.queryForList(sql, idProducto, inicio.toString(),
+                fin.toString());
+
+        System.out.println("   -> Registros encontrados: " + result.size());
+
+        return result;
+    }
+
+    // Detalle completo de auditoría (por día)
     public List<Map<String, Object>> obtenerDetalleAuditoria(int idProducto, Date inicio, Date fin) {
 
         String sql = """
-                    SELECT
-                        p.FechaPedido AS fecha,
-                        c.Cantidad,
-                        c.PrecioProducto,
-                        (c.Cantidad * c.PrecioProducto) AS subtotal,
-                        p.IDPedido
-                    FROM carrito c
-                    INNER JOIN pedido p ON p.IDPedido = c.IDPedido
-                    WHERE c.IDProducto = ?
-                      AND DATE(p.FechaPedido) BETWEEN ? AND ?
-                    ORDER BY p.FechaPedido, p.IDPedido
+                SELECT p.FechaPedido AS fecha,
+                       c.Cantidad,
+                       c.PrecioProducto,
+                       (c.Cantidad * c.PrecioProducto) AS subtotal,
+                       p.IDPedido
+                FROM carrito c
+                INNER JOIN pedido p ON p.IDPedido = c.IDPedido
+                WHERE c.IDProducto = ?
+                  AND DATE(p.FechaPedido) BETWEEN ? AND ?
+                ORDER BY p.FechaPedido, p.IDPedido
                 """;
 
         return jdbcTemplate.queryForList(sql,
@@ -436,19 +394,19 @@ public class ReporteDAO {
                 new java.sql.Date(fin.getTime()));
     }
 
+    // Detalle diario resumido
     public List<Map<String, Object>> obtenerDetalleAuditoria(int idProducto, LocalDate inicio, LocalDate fin) {
         String sql = """
-                    SELECT
-                        DATE(p.FechaPedido) AS fecha,
-                        SUM(c.Cantidad) AS cantidad,
-                        AVG(c.PrecioProducto) AS precio,
-                        SUM(c.Cantidad * c.PrecioProducto) AS subtotal
-                    FROM carrito c
-                    INNER JOIN pedido p ON p.IDPedido = c.IDPedido
-                    WHERE c.IDProducto = ?
-                      AND DATE(p.FechaPedido) BETWEEN ? AND ?
-                    GROUP BY DATE(p.FechaPedido)
-                    ORDER BY DATE(p.FechaPedido)
+                SELECT DATE(p.FechaPedido) AS fecha,
+                       SUM(c.Cantidad) AS cantidad,
+                       AVG(c.PrecioProducto) AS precio,
+                       SUM(c.Cantidad * c.PrecioProducto) AS subtotal
+                FROM carrito c
+                INNER JOIN pedido p ON p.IDPedido = c.IDPedido
+                WHERE c.IDProducto = ?
+                  AND DATE(p.FechaPedido) BETWEEN ? AND ?
+                GROUP BY DATE(p.FechaPedido)
+                ORDER BY DATE(p.FechaPedido)
                 """;
         return jdbcTemplate.queryForList(sql, idProducto, inicio.toString(), fin.toString());
     }

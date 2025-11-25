@@ -17,6 +17,12 @@
         <button class="btn-buscar" onclick="cargarReporteProducto()"><i class="fas fa-search"></i> Buscar</button>
     </div>
 
+    <!-- BOTONES EXPORTACIÓN -->
+    <div style="margin-top: 12px; display:flex; gap:10px;" id="descargasProducto" hidden>
+        <button class="btn-buscar" id="btnExcelProducto"><i class="fas fa-file-excel"></i> Exportar Excel</button>
+        <button class="btn-buscar" id="btnPDFProducto"><i class="fas fa-file-pdf"></i> Exportar PDF</button>
+    </div>
+
     <!-- TÍTULO DE TABLA -->
     <h4 id="tituloTabla" style="margin-bottom:10px;"></h4>
 
@@ -29,31 +35,28 @@
 
 </div>
 
-<!-- ECharts -->
+<!-- Librerías -->
 <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-    const hoy = new Date();
-    document.getElementById("mesProducto").value = hoy.toISOString().slice(0,7);
+    document.getElementById("mesProducto").value = new Date().toISOString().slice(0,7);
     cargarProductos();
 });
 
-// -----------------------------------------------------
-// CARGAR PRODUCTOS
-// -----------------------------------------------------
+// Cargar productos
     fetch("/admin/api/productos")
         .then(r => r.json())
         .then(lista => {
             const select = document.getElementById("idProducto");
-            lista.forEach(p => {
-                select.innerHTML += `<option value="${p.idProdHistoria}">${p.nombre}</option>`;
-            });
+            lista.forEach(p => select.innerHTML += `<option value="${p.idProdHistoria}">${p.nombre}</option>`);
         })
         .catch(err => console.error("Error cargando productos:", err));
-// -----------------------------------------------------
-// CARGAR REPORTE
-// -----------------------------------------------------
+
+// Cargar reporte
 function cargarReporteProducto() {
     const selectProducto = document.getElementById("idProducto");
     const idProdHistoria = selectProducto.value;
@@ -66,49 +69,39 @@ function cargarReporteProducto() {
     }
 
     const [anio, mesNum] = mes.split("-");
-    const url = `/admin/api/reporte/producto?idProdHistoria=${idProdHistoria}&anio=${anio}&mes=${mesNum}`;
-
-    fetch(url)
+    fetch(`/admin/api/reporte/producto?idProdHistoria=${idProdHistoria}&anio=${anio}&mes=${mesNum}`)
         .then(r => r.json())
         .then(data => {
             const { precios, cantidades, ventas } = data;
-
-            if ((!precios || precios.length === 0) && (!cantidades || cantidades.length === 0)) {
+            if ((!precios || !precios.length) && (!cantidades || !cantidades.length)) {
                 document.getElementById("tablaProducto").innerHTML = "<p>No hay datos para este período.</p>";
+                document.getElementById("descargasProducto").hidden = true;
                 return;
             }
 
-            // Crear un mapa por fecha
             const mapa = {};
             precios.forEach(p => { mapa[p.fecha] = mapa[p.fecha] || {}; mapa[p.fecha].precio = p.precio; });
             cantidades.forEach(c => { mapa[c.fecha] = mapa[c.fecha] || {}; mapa[c.fecha].stock = c.cantidad; });
             ventas.forEach(v => { mapa[v.fecha] = mapa[v.fecha] || {}; mapa[v.fecha].cantidad = v.cantidad; mapa[v.fecha].total = v.total; });
 
-            // Convertir el mapa a lista ordenada por fecha
             const listaFinal = Object.keys(mapa).sort().map(fecha => ({ fecha, ...mapa[fecha] }));
-
-            // Actualizar título de la tabla
             const mesNombre = new Date(anio, mesNum - 1).toLocaleString('es-PE', { month: 'long' });
             document.getElementById("tituloTabla").textContent = `Reporte del producto "${productoNombre}" / Mes: ${mesNombre} ${anio}`;
 
-            renderTabla(listaFinal);
+            renderTabla(listaFinal, productoNombre, mes);
             renderGraficos(listaFinal);
         })
         .catch(err => console.error("Error al cargar reporte:", err));
 }
 
-// -----------------------------------------------------
-// FORMATEAR FECHA PARA USUARIO
-// -----------------------------------------------------
+// Formatear fecha
 function formatearFecha(fechaStr) {
     const fecha = new Date(fechaStr);
-    return fecha.toLocaleDateString('es-PE', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    return fecha.toLocaleDateString('es-PE', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
 }
 
-// -----------------------------------------------------
-// RENDERIZAR TABLA
-// -----------------------------------------------------
-function renderTabla(lista) {
+// Renderizar tabla
+function renderTabla(lista, productoNombre, mes) {
     let html = `<div style="overflow-x:auto;"><table class="tabla-admin">
                     <thead>
                         <tr>
@@ -120,37 +113,35 @@ function renderTabla(lista) {
                         </tr>
                     </thead>
                     <tbody>`;
-
     lista.forEach(v => {
-        const precio = v.precio ?? 0;
-        const stock = v.stock ?? 0;
-        const cantidad = v.cantidad ?? 0;
-        const total = v.total ?? 0;
-
         html += `<tr>
                     <td>${formatearFecha(v.fecha)}</td>
-                    <td>${precio.toFixed(2)}</td>
-                    <td>${stock}</td>
-                    <td>${cantidad}</td>
-                    <td>${total.toFixed(2)}</td>
+                    <td>${(v.precio ?? 0).toFixed(2)}</td>
+                    <td>${v.stock ?? 0}</td>
+                    <td>${v.cantidad ?? 0}</td>
+                    <td>${(v.total ?? 0).toFixed(2)}</td>
                  </tr>`;
     });
-
     html += `</tbody></table></div>`;
-    document.getElementById("tablaProducto").innerHTML = html;
+
+    const contenedor = document.getElementById("tablaProducto");
+    contenedor.innerHTML = html;
+
+    // Guardar metadata para exportación
+    contenedor.dataset.producto = productoNombre;
+    contenedor.dataset.mes = mes;
+    contenedor.dataset.fechaExport = new Date().toLocaleString('es-PE');
+
+    document.getElementById("descargasProducto").hidden = false;
 }
 
-// -----------------------------------------------------
-// RENDERIZAR GRÁFICOS ECHARTS
-// -----------------------------------------------------
+// Renderizar gráficos
 function renderGraficos(lista) {
     const fechas = lista.map(v => formatearFecha(v.fecha));
     const precios = lista.map(v => v.precio ?? 0);
     const stocks = lista.map(v => v.stock ?? 0);
 
-    // Grafico Precio
-    const chartPrecio = echarts.init(document.getElementById('graficoPrecio'));
-    chartPrecio.setOption({
+    echarts.init(document.getElementById('graficoPrecio')).setOption({
         title: { text: 'Evolución del Precio por Día' },
         tooltip: { trigger: 'axis' },
         xAxis: { type: 'category', data: fechas },
@@ -158,9 +149,7 @@ function renderGraficos(lista) {
         series: [{ name: 'Precio', type: 'line', data: precios, color: '#5470C6' }]
     });
 
-    // Grafico Stock
-    const chartStock = echarts.init(document.getElementById('graficoStock'));
-    chartStock.setOption({
+    echarts.init(document.getElementById('graficoStock')).setOption({
         title: { text: 'Evolución del Stock por Día' },
         tooltip: { trigger: 'axis' },
         xAxis: { type: 'category', data: fechas },
@@ -168,74 +157,80 @@ function renderGraficos(lista) {
         series: [{ name: 'Stock', type: 'line', data: stocks, color: '#91CC75' }]
     });
 }
+
+// -----------------------------------------------------
+// Exportar Excel
+// -----------------------------------------------------
+document.getElementById("btnExcelProducto").addEventListener("click", () => {
+    const tabla = document.querySelector("#tablaProducto .tabla-admin");
+    if (!tabla) return alert("No hay datos para exportar");
+
+    const contenedor = document.getElementById("tablaProducto");
+    const producto = contenedor.dataset.producto || "-";
+    const mes = contenedor.dataset.mes || "-";
+    const fechaExport = contenedor.dataset.fechaExport || "-";
+
+    const wb = XLSX.utils.book_new();
+    const hojaDatos = [
+        [`Reporte Específico por Producto`],
+        [`Producto: ${producto}`],
+        [`Mes: ${mes}`],
+        [`Fecha de exportación: ${fechaExport}`],
+        []
+    ];
+
+    const headers = Array.from(tabla.querySelectorAll("thead th")).map(th => th.innerText);
+    hojaDatos.push(headers);
+
+    const dataRows = Array.from(tabla.querySelectorAll("tbody tr")).map(tr =>
+        Array.from(tr.querySelectorAll("td")).map(td => td.innerText)
+    );
+    hojaDatos.push(...dataRows);
+
+    const ws = XLSX.utils.aoa_to_sheet(hojaDatos);
+    XLSX.utils.book_append_sheet(wb, ws, "Reporte");
+    XLSX.writeFile(wb, `reporte_producto_${producto.replace(/\s/g,"_")}.xlsx`);
+});
+
+// -----------------------------------------------------
+// Exportar PDF
+// -----------------------------------------------------
+document.getElementById("btnPDFProducto").addEventListener("click", () => {
+    const tabla = document.querySelector("#tablaProducto .tabla-admin");
+    if (!tabla) return alert("No hay datos para exportar");
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    const contenedor = document.getElementById("tablaProducto");
+    const producto = contenedor.dataset.producto || "-";
+    const mes = contenedor.dataset.mes || "-";
+    const fechaExport = contenedor.dataset.fechaExport || "-";
+
+    doc.setFontSize(12);
+    doc.text(`Reporte Específico por Producto`, 14, 15);
+    doc.text(`Producto: ${producto}`, 14, 22);
+    doc.text(`Mes: ${mes}`, 14, 29);
+    doc.text(`Fecha de exportación: ${fechaExport}`, 14, 36);
+
+    const headers = Array.from(tabla.querySelectorAll("thead th")).map(th => th.innerText);
+    const data = Array.from(tabla.querySelectorAll("tbody tr")).map(tr =>
+        Array.from(tr.querySelectorAll("td")).map(td => td.innerText)
+    );
+
+    doc.autoTable({ startY: 42, head: [headers], body: data });
+    doc.save(`reporte_producto_${producto.replace(/\s/g,"_")}.pdf`);
+});
 </script>
 
 <style>
-.admin_report_producto {
-    padding: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.titulo-reporte {
-    font-size: 22px;
-    font-weight: 600;
-    margin-bottom: 18px;
-}
-
-.filtros-reporte {
-    display: flex;
-    gap: 16px;
-    align-items: center;
-    background: #fafafa;
-    padding: 12px 15px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    margin-bottom: 22px;
-    flex-wrap: wrap;
-}
-
-.filtros-reporte .campo {
-    display: flex;
-    flex-direction: column;
-}
-
-.filtros-reporte .campo label {
-    font-size: 14px;
-    font-weight: 600;
-    margin-bottom: 4px;
-}
-
-.filtros-reporte input,
-.filtros-reporte select {
-    padding: 6px 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-.btn-buscar {
-    padding: 8px 14px;
-    border-radius: 5px;
-    border: none;
-    cursor: pointer;
-    background: #444;
-    color: #fff;
-}
-
-.tabla-container {
-    overflow-x: auto;
-}
-
-.tabla-admin {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-}
-
-.tabla-admin th,
-.tabla-admin td {
-    padding: 10px;
-    border: 1px solid #ddd;
-    text-align: center;
-}
+.admin_report_producto { padding: 20px; max-width: 1200px; margin: 0 auto; }
+.titulo-reporte { font-size: 22px; font-weight: 600; margin-bottom: 18px; }
+.filtros-reporte { display: flex; gap: 16px; align-items: center; background: #fafafa; padding: 12px 15px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 22px; flex-wrap: wrap; }
+.filtros-reporte .campo { display: flex; flex-direction: column; }
+.filtros-reporte .campo label { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+.filtros-reporte input, .filtros-reporte select { padding: 6px 8px; border: 1px solid #ccc; border-radius: 4px; }
+.btn-buscar { padding: 8px 14px; border-radius: 5px; border: none; cursor: pointer; background: #444; color: #fff; }
+.tabla-container { overflow-x: auto; }
+.tabla-admin { width: 100%; border-collapse: collapse; margin-top: 10px; }
+.tabla-admin th, .tabla-admin td { padding: 10px; border: 1px solid #ddd; text-align: center; }
 </style>

@@ -21,8 +21,6 @@ import org.springframework.ui.Model;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -53,28 +51,20 @@ public class ReportesController {
     public String cargarComponente(@PathVariable String tipo) {
 
         switch (tipo) {
-
             case "general":
                 return "admin/components/admin_report_general";
-
             case "ventas":
                 return "admin/components/admin_report_ventas";
-
             case "productos":
                 return "admin/components/admin_report_productos";
-
             case "clientes":
                 return "admin/components/admin_report_clientes";
-
             case "auditoria_prod":
-                return "admin/components/admin_report_auditoria_prod"; // nombre del fragmento
-
+                return "admin/components/admin_report_auditoria_prod";
             case "ingresos":
                 return "admin/components/admin_report_ingresos";
-
             case "movimientos":
                 return "admin/components/admin_report_movimientos";
-
             default:
                 return "admin/components/admin_report_notfound";
         }
@@ -90,7 +80,6 @@ public class ReportesController {
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date fin) {
 
         Map<String, Object> data = new HashMap<>();
-
         data.put("ventasTotales", reporteDAO.obtenerVentasTotales(inicio, fin));
         data.put("productosVendidos", reporteDAO.obtenerCantidadProductosVendidos(inicio, fin));
         data.put("categorias", reporteDAO.obtenerCategoriasMasVendidas(inicio, fin));
@@ -102,7 +91,7 @@ public class ReportesController {
     }
 
     // ==========================================================
-    // 3. EXPORTAR → PDF
+    // 4. EXPORTAR → PDF REPORTE GENERAL
     // ==========================================================
     @GetMapping("/admin/reporte/general/pdf")
     public void exportarPDF(
@@ -122,20 +111,15 @@ public class ReportesController {
             doc.open();
 
             Font tituloFont = new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD);
-
             Paragraph titulo = new Paragraph("Reporte General del Sistema\n\n", tituloFont);
             titulo.setAlignment(Element.ALIGN_CENTER);
             doc.add(titulo);
 
-            doc.add(new Paragraph("Fechas: " + inicio + "  →  " + fin));
-            doc.add(new Paragraph("\n"));
-            doc.add(new Paragraph("Evolución de ventas"));
-            doc.add(new Paragraph("\n"));
+            doc.add(new Paragraph("Fechas: " + inicio + " → " + fin));
+            doc.add(new Paragraph("\nEvolución de ventas\n"));
 
-            // TABLA EVOLUCIÓN
             PdfPTable tablaEvo = new PdfPTable(2);
             tablaEvo.setWidthPercentage(100);
-
             tablaEvo.addCell("Fecha");
             tablaEvo.addCell("Total");
 
@@ -145,13 +129,10 @@ public class ReportesController {
             }
 
             doc.add(tablaEvo);
-            doc.add(new Paragraph("\n\nDetalle de pedidos:"));
-            doc.add(new Paragraph("\n"));
+            doc.add(new Paragraph("\n\nDetalle de pedidos:\n"));
 
-            // TABLA DETALLE
             PdfPTable tabla = new PdfPTable(4);
             tabla.setWidthPercentage(100);
-
             tabla.addCell("Fecha");
             tabla.addCell("Detalle");
             tabla.addCell("Movimientos");
@@ -173,7 +154,7 @@ public class ReportesController {
     }
 
     // ==========================================================
-    // 4. API → REPORTE DE VENTAS POR PRODUCTO / CATEGORÍA
+    // 5. API → REPORTE VENTAS POR PRODUCTO / CATEGORÍA
     // ==========================================================
     @GetMapping("/admin/api/reporte/ventas")
     @ResponseBody
@@ -186,7 +167,7 @@ public class ReportesController {
     }
 
     // ==========================================================
-    // 5. API → REPORTE ESPECÍFICO POR PRODUCTO
+    // 6. API → LISTA DE PRODUCTOS
     // ==========================================================
     @GetMapping("/admin/api/productos")
     @ResponseBody
@@ -194,12 +175,11 @@ public class ReportesController {
         System.out.println("→ [CONTROLADOR] Solicitando lista de productos...");
         List<Map<String, Object>> lista = reporteService.listarProductos();
         System.out.println("→ [CONTROLADOR] Productos obtenidos: " + lista.size());
-        lista.forEach(p -> System.out.println("  " + p));
         return lista;
     }
 
     // ==========================================================
-    // 5. API → REPORTE ESPECÍFICO POR PRODUCTO (MES)
+    // 7. API → REPORTE ESPECÍFICO POR PRODUCTO (MES)
     // ==========================================================
     @GetMapping("/admin/api/reporte/producto")
     @ResponseBody
@@ -208,34 +188,19 @@ public class ReportesController {
             @RequestParam int anio,
             @RequestParam int mes) {
 
-        System.out.println("→ [CONTROLADOR] Recibido idProdHistoria=" + idProdHistoria + ", año=" + anio + ", mes=" + mes);
-
         LocalDate inicioLD = LocalDate.of(anio, mes, 1);
         LocalDate finLD = inicioLD.withDayOfMonth(inicioLD.lengthOfMonth());
 
         Map<String, Object> data = new HashMap<>();
-
-        List<Map<String, Object>> precios = reporteService.evolucionPrecios(idProdHistoria, inicioLD, finLD);
-        List<Map<String, Object>> cantidades = reporteService.evolucionCantidades(idProdHistoria, inicioLD, finLD);
-        List<Map<String, Object>> ventas = reporteService.ventasProducto(idProdHistoria, inicioLD, finLD);
-
-        System.out.println("→ [CONTROLADOR] Precios obtenidos: " + precios.size());
-        System.out.println("→ [CONTROLADOR] Cantidades obtenidas: " + cantidades.size());
-        System.out.println("→ [CONTROLADOR] Ventas obtenidas: " + ventas.size());
-
-        precios.forEach(p -> System.out.println("  Precio: " + p));
-        cantidades.forEach(c -> System.out.println("  Cantidad: " + c));
-        ventas.forEach(v -> System.out.println("  Venta: " + v));
-
-        data.put("precios", precios);
-        data.put("cantidades", cantidades);
-        data.put("ventas", ventas);
+        data.put("precios", reporteService.evolucionPrecios(idProdHistoria, inicioLD, finLD));
+        data.put("cantidades", reporteService.evolucionCantidades(idProdHistoria, inicioLD, finLD));
+        data.put("ventas", reporteService.ventasProducto(idProdHistoria, inicioLD, finLD));
 
         return data;
     }
 
     // ==========================================================
-    // 6. API → Auditoría de Productos (LISTA)
+    // 8. API → Auditoría de Productos (LISTA)
     // ==========================================================
     @GetMapping("/admin/api/auditoria/producto/lista")
     @ResponseBody
@@ -244,7 +209,7 @@ public class ReportesController {
     }
 
     // ==========================================================
-    // 7. API → Auditoría de Productos (BLOQUES)
+    // 9. API → Auditoría de Productos (BLOQUES)
     // ==========================================================
     @GetMapping("/admin/api/auditoria/producto/bloques")
     @ResponseBody
@@ -254,46 +219,67 @@ public class ReportesController {
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date inicio,
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date fin) {
 
+        System.out.println("\n================= [AUDITORIA BLOQUES] =================");
+        System.out.println("ID Producto: " + idProducto);
+        System.out.println("Tipo solicitado: " + tipo);
+
         LocalDate ini;
         LocalDate fn;
 
+        // Si NO es rango, usamos el primer y último movimiento real
         if (!tipo.equalsIgnoreCase("rango")) {
-            // Obtenemos el primer y último movimiento directamente como LocalDateTime
+
             Map<String, Object> rango = reporteDAO.obtenerPrimerUltimoMovimiento(idProducto);
+            System.out.println("Rango obtenido desde la BD: " + rango);
 
             if (rango.get("inicio") == null || rango.get("fin") == null) {
-                return List.of(); // no hay movimientos
+                System.out.println("⚠ Producto no tiene movimientos.");
+                return List.of();
             }
 
-            // Convertimos LocalDateTime -> LocalDate
             ini = ((LocalDateTime) rango.get("inicio")).toLocalDate();
             fn = ((LocalDateTime) rango.get("fin")).toLocalDate();
 
         } else {
-            // Rango personalizado desde frontend
-            if (inicio == null || fin == null) {
-                throw new RuntimeException("Debe enviar fechas para un rango personalizado");
-            }
             ini = new java.sql.Date(inicio.getTime()).toLocalDate();
             fn = new java.sql.Date(fin.getTime()).toLocalDate();
         }
 
-        // Generamos bloques según tipo
+        System.out.println("➡ Rango final usado para generar bloques:");
+        System.out.println("  INICIO: " + ini);
+        System.out.println("  FIN   : " + fn);
+
+        // GENERAR BLOQUES
         List<Map<String, Object>> bloques = reporteService.generarBloquesAuditoria(ini, fn, tipo);
 
-        // Para cada bloque, obtenemos los datos diarios
+        System.out.println("Cantidad de bloques generados: " + bloques.size());
         for (Map<String, Object> b : bloques) {
+            System.out.println(" - BLOQUE: " + b);
+        }
+
+        // Obtener datos por cada bloque
+        for (Map<String, Object> b : bloques) {
+
             LocalDate i = LocalDate.parse(b.get("inicio").toString());
             LocalDate f = LocalDate.parse(b.get("fin").toString());
+
+            System.out.println("⬇ Consultando datos diarios del bloque");
+            System.out.println("   Inicio: " + i);
+            System.out.println("   Fin   : " + f);
+
             List<Map<String, Object>> datos = reporteDAO.obtenerDatosDiariosAuditoria(idProducto, i, f);
+            System.out.println("   Movimientos encontrados: " + datos.size());
+
             b.put("datos", datos);
         }
+
+        System.out.println("=============== [FIN AUDITORIA BLOQUES] ===============\n");
 
         return bloques;
     }
 
     // ==========================================================
-    // 8. API → Auditoría de Productos (DETALLE BLOQUE)
+    // 10. API → Auditoría de Productos (DETALLE BLOQUE)
     // ==========================================================
     @GetMapping("/admin/api/auditoria/producto/detalle")
     @ResponseBody
@@ -304,4 +290,5 @@ public class ReportesController {
 
         return reporteDAO.obtenerDetalleAuditoria(idProducto, inicio, fin);
     }
+
 }

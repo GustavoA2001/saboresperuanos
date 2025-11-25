@@ -197,9 +197,6 @@
                         <col style="width: 5%;"> <!-- ID -->
                         <col style="width: 15%;"> <!-- Nombre -->
                         <col style="width: 30%;"> <!-- Descripción -->
-                        <col style="width: 10%;"> <!-- Precio -->
-                        <col style="width: 10%;"> <!-- Cantidad -->
-                        <col style="width: 15%;"> <!-- Fecha -->
                         <col style="width: 15%;"> <!-- Acciones -->
                     </colgroup>
 
@@ -208,9 +205,7 @@
                             <th>ID</th>
                             <th>Nombre</th>
                             <th>Descripción</th>
-                            <th>Precio</th>
-                            <th>Cantidad</th>
-                            <th>Fecha</th>
+
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -219,9 +214,6 @@
                             <td th:text="${producto.idProducto}"></td>
                             <td th:text="${producto.nomProducto}"></td>
                             <td th:text="${producto.descripcion}"></td>
-                            <td th:text="'S/. ' + ${producto.precioUnitario}"></td>
-                            <td th:text="${producto.cantidad}"></td>
-                            <td th:text="${producto.fechaProducto}"></td>
                             <td>
                                 <div class="adm-actions-btns">
                                     <a th:href="@{/admin/productos/{id}(id=${producto.idProducto})}"
