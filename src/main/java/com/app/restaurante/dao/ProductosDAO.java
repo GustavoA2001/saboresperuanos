@@ -606,7 +606,7 @@ public class ProductosDAO {
                 ) ult ON p.IDProdHistoria = ult.IDProdHistoria
                    AND p.FechaProducto = ult.maxFecha
 
-                --EXCLUIR PRODUCTOS QUE YA ESTÁN EN CARTA HOY
+                -- EXCLUIR PRODUCTOS QUE YA ESTÁN EN CARTA HOY
                 WHERE NOT EXISTS (
                     SELECT 1
                     FROM producto p2
@@ -677,14 +677,56 @@ public class ProductosDAO {
         System.out.println("DAO >> INSERT OK");
     }
 
-    // Cambiar visibilidad
-    public void actualizarVisible(int idProducto, int estado) {
-        jdbcTemplate.update("UPDATE producto SET Visible = ? WHERE IDProducto = ?", estado, idProducto);
+    public Map<String, Object> obtenerProducto(Integer idProducto) {
+
+        System.out.println("---- [DAO] obtenerProducto(" + idProducto + ") ----");
+
+        String sql = """
+                SELECT
+                    IDProducto AS idProducto,
+                    PrecioUnitario AS precioUnitario,
+                    Cantidad AS cantidad,
+                    Visible AS visible,
+                    EstadoDia AS estadoDia
+                FROM producto
+                WHERE IDProducto = ?
+                LIMIT 1
+                """;
+
+        List<Map<String, Object>> lista = jdbcTemplate.queryForList(sql, idProducto);
+
+        if (lista.isEmpty()) {
+            System.out.println("No existe el producto.");
+            return null;
+        }
+
+        System.out.println("Producto encontrado: " + lista.get(0));
+        return lista.get(0);
     }
 
-    // Eliminar instancia
-    public void eliminarProducto(int idProducto) {
-        jdbcTemplate.update("DELETE FROM producto WHERE IDProducto = ?", idProducto);
+    public int actualizarProducto(int id, BigDecimal precio, int cantidad) {
+        String sql = """
+                    UPDATE producto
+                    SET PrecioUnitario = ?, Cantidad = ?
+                    WHERE IDProducto = ?
+                """;
+
+        return jdbcTemplate.update(sql, precio, cantidad, id);
+    }
+
+    public int actualizarVisible(int id, boolean visible) {
+        String sql = "UPDATE producto SET Visible=? WHERE IDProducto=?";
+        return jdbcTemplate.update(sql, visible, id);
+    }
+
+    public int actualizarEstadoDia(int id, String estado) {
+        String sql = "UPDATE producto SET EstadoDia=? WHERE IDProducto=?";
+        return jdbcTemplate.update(sql, estado, id);
+    }
+
+    public int eliminarProducto(int id) {
+        String sql = "DELETE FROM producto WHERE IDProducto=?";
+        return jdbcTemplate.update(sql, id);
     }
 
     // Cerrar carta del día

@@ -221,18 +221,153 @@ public class AdminController {
         return respuesta;
     }
 
-    // Cambiar visibilidad
-    @PostMapping("/admin/carta/visible/{idProducto}/{estado}")
+    @PostMapping("/admin/carta/guardar")
     @ResponseBody
-    public void cambiarVisible(@PathVariable int idProducto, @PathVariable int estado) {
-        productosDAO.actualizarVisible(idProducto, estado);
+    public Map<String, Object> guardarCambios(@RequestBody Map<String, Object> data) {
+
+        System.out.println("=== [INICIO] Guardar cambios de producto ===");
+
+        // -----------------------------
+        // 1. RECIBIR DATOS DEL FRONTEND
+        // -----------------------------
+        Integer idProducto = (Integer) data.get("idProducto");
+        BigDecimal precio = new BigDecimal(data.get("precio").toString());
+        Integer cantidad = (Integer) data.get("cantidad");
+
+        System.out.println("[1] Datos recibidos del frontend:");
+        System.out.println("    - idProducto: " + idProducto);
+        System.out.println("    - precio: " + precio);
+        System.out.println("    - cantidad: " + cantidad);
+
+        try {
+
+            // -----------------------------
+            // 2. VALIDAR PRODUCTO EXISTENTE
+            // -----------------------------
+            System.out.println("[2] Validando existencia del producto...");
+            Map<String, Object> prod = productosDAO.obtenerProducto(idProducto);
+
+            if (prod == null) {
+                System.out.println("[ERROR] Producto no encontrado en la BD.");
+                return Map.of("ok", false, "mensaje", "El producto no existe.");
+            }
+
+            System.out.println("[2.1] Producto encontrado: " + prod);
+
+            // ---------------------------------------
+            // 3. VALIDAR QUE ESTÉ ACTIVO (disponible)
+            // ---------------------------------------
+            String estado = (String) prod.get("estadoDia");
+            System.out.println("[3] Estado actual del producto: " + estado);
+
+            if (!"disponible".equalsIgnoreCase(estado)) {
+                System.out.println("[ERROR] Producto no está activo/disponible.");
+                return Map.of("ok", false, "mensaje", "El producto no está disponible para modificar.");
+            }
+
+            // -----------------------------
+            // 4. ACTUALIZAR PRODUCTO
+            // -----------------------------
+            System.out.println("[4] Actualizando producto...");
+            System.out.println("    > Ejecutando update en DAO...");
+
+            int r = productosDAO.actualizarProducto(idProducto, precio, cantidad);
+
+            System.out.println("[4.1] Resultado del UPDATE: filas afectadas = " + r);
+
+            if (r > 0) {
+                System.out.println("[SUCCESS] Producto actualizado correctamente.");
+                System.out.println("=== [FIN] Guardar cambios de producto ===");
+                return Map.of("ok", true);
+            } else {
+                System.out.println("[ERROR] El UPDATE no afectó filas.");
+                return Map.of("ok", false, "mensaje", "No se pudo actualizar el producto.");
+            }
+
+        } catch (Exception ex) {
+            // -----------------------------
+            // 5. CATCH DE ERRORES
+            // -----------------------------
+            System.out.println("[EXCEPCIÓN] Error inesperado:");
+            ex.printStackTrace();
+            return Map.of("ok", false, "mensaje", "Ocurrió un error en el servidor.");
+        }
     }
 
-    // Eliminar instancia diaria
-    @PostMapping("/admin/carta/eliminar/{idProducto}")
+    @PostMapping("/admin/carta/visible")
     @ResponseBody
-    public void eliminarProducto(@PathVariable int idProducto) {
-        productosDAO.eliminarProducto(idProducto);
+    public Map<String, Object> cambiarVisible(@RequestBody Map<String, Object> data) {
+
+        Integer idProducto = (Integer) data.get("idProducto");
+        Boolean visible = (Boolean) data.get("visible");
+
+        System.out.println("====== CAMBIAR VISIBLE ======");
+        System.out.println("ID recibido: " + idProducto);
+        System.out.println("Nuevo valor visible: " + visible);
+
+        Map<String, Object> producto = productosDAO.obtenerProducto(idProducto);
+        System.out.println("Producto BD -> " + producto);
+
+        if (producto == null) {
+            return Map.of("ok", false, "mensaje", "Producto no encontrado.");
+        }
+
+        int r = productosDAO.actualizarVisible(idProducto, visible);
+        System.out.println("Resultado UPDATE: " + r);
+
+        return (r > 0)
+                ? Map.of("ok", true)
+                : Map.of("ok", false, "mensaje", "Error al cambiar visibilidad.");
+    }
+
+    @PostMapping("/admin/carta/estado")
+    @ResponseBody
+    public Map<String, Object> cambiarEstadoDia(@RequestBody Map<String, Object> data) {
+
+        Integer idProducto = (Integer) data.get("idProducto");
+        String estado = (String) data.get("estado");
+
+        System.out.println("====== CAMBIAR ESTADO DIA ======");
+        System.out.println("ID recibido: " + idProducto);
+        System.out.println("Nuevo estado: " + estado);
+
+        Map<String, Object> producto = productosDAO.obtenerProducto(idProducto);
+        System.out.println("Producto BD -> " + producto);
+
+        if (producto == null) {
+            return Map.of("ok", false, "mensaje", "Producto no encontrado.");
+        }
+
+        int r = productosDAO.actualizarEstadoDia(idProducto, estado);
+        System.out.println("Resultado UPDATE: " + r);
+
+        return (r > 0)
+                ? Map.of("ok", true)
+                : Map.of("ok", false, "mensaje", "Error al actualizar estado.");
+    }
+
+    @PostMapping("/admin/carta/eliminar")
+    @ResponseBody
+    public Map<String, Object> eliminar(@RequestBody Map<String, Object> data) {
+
+        Integer idProducto = (Integer) data.get("idProducto");
+
+        System.out.println("====== ELIMINAR PRODUCTO ======");
+        System.out.println("ID recibido: " + idProducto);
+
+        Map<String, Object> producto = productosDAO.obtenerProducto(idProducto);
+        System.out.println("Producto BD -> " + producto);
+
+        if (producto == null) {
+            return Map.of("ok", false, "mensaje", "Producto no encontrado.");
+        }
+
+        int r = productosDAO.eliminarProducto(idProducto);
+        System.out.println("Resultado DELETE: " + r);
+
+        return (r > 0)
+                ? Map.of("ok", true)
+                : Map.of("ok", false, "mensaje", "No se pudo eliminar.");
     }
 
     // Cerrar carta del día

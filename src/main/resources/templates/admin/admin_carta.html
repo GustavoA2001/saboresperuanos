@@ -306,6 +306,15 @@
             transition: 0.2s;
         }
 
+        .input-tabla {
+            width: 80px;
+            padding: 6px 4px 3px;
+            border: 1px solid #aaa;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 20px;
+        }
+
         .btn-agregar-final:hover {
             background: var(--color-fourth);
         }
@@ -371,8 +380,18 @@
                                 <tr th:each="prod : ${productosRecientes}">
                                     <td th:text="${prod['idProducto']}"></td>
                                     <td th:text="${prod['nomProducto']}"></td>
-                                    <td th:text="'S/. ' + ${prod['precioUnitario']}"></td>
-                                    <td th:text="${prod['cantidadInicial']}"></td>
+                                    <td>
+                                        <input type="number" step="0.10" min="0" th:value="${prod['precioUnitario']}"
+                                            class="input-tabla league-spartan"
+                                            th:id="'precio_' + ${prod['idProducto']}">
+                                    </td>
+
+                                    <td>
+                                        <input type="number" min="0" th:value="${prod['cantidadInicial']}"
+                                            class="input-tabla league-spartan"
+                                            th:id="'cantidad_' + ${prod['idProducto']}">
+                                    </td>
+
                                     <td th:text="${prod['vendidos']}"></td>
                                     <td th:text="${prod['stock']}"></td>
                                     <td th:text="${prod['visible'] ? 'Sí' : 'No'}"></td>
@@ -380,10 +399,11 @@
 
                                     <td class="adm-actions">
 
-                                        <a th:href="@{'/admin/carta/guardar/' + ${prod['idProducto']}}"
-                                            class="adm-btn-text league-spartan">
+                                        <button class="adm-btn-text league-spartan"
+                                            th:onclick="guardarProducto([[${prod['idProducto']}]]);">
                                             Guardar
-                                        </a>
+                                        </button>
+
 
                                         <button th:if="${prod['visible']}"
                                             th:onclick="'cambiarVisible(' + ${prod['idProducto']} + ', false)'"
@@ -514,76 +534,207 @@
     </div>
 
     <script>
-    let datosSeleccionados = null;
+        let datosSeleccionados = null;
 
-    /* ============================
-        ABRIR Y CERRAR MODAL
-    =============================== */
-    function abrirModalAddProducto() {
-        document.getElementById("modalAgregarProducto").classList.add("active");
-    }
-
-    function cerrarModalAddProducto() {
-        document.getElementById("modalAgregarProducto").classList.remove("active");
-        datosSeleccionados = null;
-    }
-
-    /* ============================
-        SELECCIONAR ITEM DEL MODAL
-    =============================== */
-    function seleccionarProducto(item) {
-
-        // Quitar selección previa
-        document.querySelectorAll(".item-modal").forEach(x => x.classList.remove("selected"));
-
-        // Marcar elemento
-        item.classList.add("selected");
-
-        // Guardar datos
-        datosSeleccionados = {
-            idProdHistoria: item.dataset.id,
-            precio: item.dataset.precio,
-            cantidad: item.dataset.cantidad
-        };
-
-        console.log("SELECCIONADO:", datosSeleccionados);
-    }
-
-    /* ============================
-        ENVIAR AL BACKEND
-    =============================== */
-    function agregarSeleccionado() {
-
-        if (!datosSeleccionados) {
-            alert("Selecciona un producto antes de continuar.");
-            return;
+        /* ============================
+            ABRIR Y CERRAR MODAL
+        =============================== */
+        function abrirModalAddProducto() {
+            document.getElementById("modalAgregarProducto").classList.add("active");
         }
 
-        console.log("ENVIANDO AL BACKEND:", datosSeleccionados);
+        function cerrarModalAddProducto() {
+            document.getElementById("modalAgregarProducto").classList.remove("active");
+            datosSeleccionados = null;
+        }
 
-        fetch('/admin/carta/agregar', {
-            method: 'POST',
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(datosSeleccionados)
-        })
-        .then(async r => {
-            console.log("Respuesta HTTP:", r.status);
+        /* ============================
+            SELECCIONAR ITEM DEL MODAL
+        =============================== */
+        function seleccionarProducto(item) {
 
-            const data = await r.json().catch(() => null);
-            console.log("Body respuesta:", data);
+            // Quitar selección previa
+            document.querySelectorAll(".item-modal").forEach(x => x.classList.remove("selected"));
 
-            if (r.ok && data && data.ok) {
-                location.reload();
-            } else {
-                alert(data?.mensaje || "Error al agregar el producto.");
+            // Marcar elemento
+            item.classList.add("selected");
+
+            // Guardar datos
+            datosSeleccionados = {
+                idProdHistoria: item.dataset.id,
+                precio: item.dataset.precio,
+                cantidad: item.dataset.cantidad
+            };
+
+            console.log("SELECCIONADO:", datosSeleccionados);
+        }
+
+        /* ============================
+            ENVIAR AL BACKEND
+        =============================== */
+        function agregarSeleccionado() {
+
+            if (!datosSeleccionados) {
+                alert("Selecciona un producto antes de continuar.");
+                return;
             }
-        })
-        .catch(err => {
-            console.error("ERROR FATAL EN FETCH:", err);
-            alert("No se pudo conectar con el servidor.");
-        });
-    }
-</script>
+
+            console.log("ENVIANDO AL BACKEND:", datosSeleccionados);
+
+            fetch('/admin/carta/agregar', {
+                method: 'POST',
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(datosSeleccionados)
+            })
+                .then(async r => {
+                    console.log("Respuesta HTTP:", r.status);
+
+                    const data = await r.json().catch(() => null);
+                    console.log("Body respuesta:", data);
+
+                    if (r.ok && data && data.ok) {
+                        location.reload();
+                    } else {
+                        alert(data?.mensaje || "Error al agregar el producto.");
+                    }
+                })
+                .catch(err => {
+                    console.error("ERROR FATAL EN FETCH:", err);
+                    alert("No se pudo conectar con el servidor.");
+                });
+        }
+
+        function guardarProducto(idProducto) {
+
+            const precio = document.getElementById("precio_" + idProducto).value;
+            const cantidad = document.getElementById("cantidad_" + idProducto).value;
+
+            const datos = {
+                idProducto: idProducto,
+                precio: parseFloat(precio),
+                cantidad: parseInt(cantidad)
+            };
+
+            console.log("Enviando datos para guardar:", datos);
+
+            fetch('/admin/carta/guardar', {
+                method: 'POST',
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(datos)
+            })
+                .then(r => r.json())
+                .then(data => {
+                    console.log("RESPUESTA BACK:", data);
+
+                    if (data.ok) {
+
+                        // ================
+                        // 🔄 ACTUALIZAR TABLA
+                        // ================
+                        actualizarFilaProducto(idProducto, precio, cantidad);
+
+                    } else {
+                        console.warn("Error:", data.mensaje);
+                    }
+                })
+                .catch(err => {
+                    console.error("ERROR en fetch:", err);
+                });
+        }
+
+        function actualizarFilaProducto(idProducto, nuevoPrecio, nuevaCantidad) {
+
+            // Actualizar inputs directamente
+            document.getElementById("precio_" + idProducto).value = nuevoPrecio;
+            document.getElementById("cantidad_" + idProducto).value = nuevaCantidad;
+
+            // Toma el tr (fila)
+            const fila = document.querySelector(`button[onclick="guardarProducto(${idProducto})"]`)
+                .closest("tr");
+
+            // Recalcular stock (si lo usas)
+            const vendidos = parseInt(fila.children[4].innerText);
+            const stock = nuevaCantidad - vendidos;
+
+            fila.children[5].innerText = stock;
+
+            // Animación visual para indicar guardado
+            fila.style.backgroundColor = "#d2f8d2"; // verde suave
+
+            setTimeout(() => {
+                fila.style.transition = "background-color 1s";
+                fila.style.backgroundColor = "";
+            }, 150);
+
+            console.log("Fila actualizada visualmente.");
+        }
+
+        function cambiarVisible(idProducto, visible) {
+
+            const datos = { idProducto, visible };
+
+            console.log("CAMBIAR VISIBLE ENVIADO:", datos);
+
+            fetch('/admin/carta/visible', {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(datos)
+            })
+                .then(r => r.json())
+                .then(data => {
+                    console.log("RESPUESTA CAMBIAR VISIBLE:", data);
+
+                    if (data.ok) location.reload();
+                    else alert(data.mensaje);
+                })
+                .catch(err => console.error("ERROR cambiarVisible:", err));
+        }
+
+        function cambiarEstadoDia(idProducto, nuevoEstado) {
+
+            const datos = { idProducto, estado: nuevoEstado };
+
+            console.log("CAMBIAR ESTADO ENVIADO:", datos);
+
+            fetch('/admin/carta/estado', {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(datos)
+            })
+                .then(r => r.json())
+                .then(data => {
+                    console.log("RESPUESTA CAMBIAR ESTADO:", data);
+
+                    if (data.ok) location.reload();
+                    else alert(data.mensaje);
+                })
+                .catch(err => console.error("ERROR cambiarEstado:", err));
+        }
+
+        function eliminarProducto(idProducto) {
+
+            if (!confirm("¿Seguro que deseas eliminar este producto de la carta?")) return;
+
+            const datos = { idProducto };
+
+            console.log("ELIMINAR ENVIADO:", datos);
+
+            fetch('/admin/carta/eliminar', {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(datos)
+            })
+                .then(r => r.json())
+                .then(data => {
+                    console.log("RESPUESTA ELIMINAR:", data);
+
+                    if (data.ok) location.reload();
+                    else alert(data.mensaje);
+                })
+                .catch(err => console.error("ERROR eliminarProducto:", err));
+        }
+
+    </script>
 
 </body>
 
