@@ -370,11 +370,64 @@ public class AdminController {
                 : Map.of("ok", false, "mensaje", "No se pudo eliminar.");
     }
 
-    // Cerrar carta del día
+    // Cerrar carta
     @PostMapping("/admin/carta/cerrar")
     @ResponseBody
-    public void cerrarCarta() {
-        productosDAO.cerrarCartaHoy();
+    public Map<String, Object> cerrarCarta() {
+
+        System.out.println("===== INICIANDO CIERRE DE CARTA =====");
+
+        try {
+
+            System.out.println("[1] Clonando productos para mañana...");
+            int clonados = productosDAO.clonarProductosParaManana();
+            System.out.println(" -> Productos clonados: " + clonados);
+
+            System.out.println("[2] Cambiando estadoDia de DISPONIBLE -> CERRADO (solo hoy)...");
+            int cerrados = productosDAO.cerrarProductosDeHoy();
+            System.out.println(" -> Productos cambiados a 'cerrado': " + cerrados);
+
+            System.out.println("[3] Cambiando EnCarta = 0 para los productos de HOY...");
+            int encarta0 = productosDAO.desactivarCartaHoy();
+            System.out.println(" -> Productos con EnCarta=0: " + encarta0);
+
+            System.out.println("===== CARTA CERRADA CORRECTAMENTE =====");
+
+            return Map.of("ok", true, "mensaje", "Carta cerrada correctamente.");
+
+        } catch (Exception e) {
+            System.out.println("[ERROR] Al cerrar carta:");
+            e.printStackTrace();
+            return Map.of("ok", false, "mensaje", "Error al cerrar carta.");
+        }
+    }
+
+    // Abrir carta
+    @PostMapping("/admin/carta/abrir")
+    @ResponseBody
+    public Map<String, Object> abrirCarta() {
+
+        System.out.println("===== INICIANDO APERTURA DE CARTA =====");
+
+        try {
+
+            System.out.println("[1] Eliminando productos clonados (mañana)...");
+            int eliminados = productosDAO.eliminarProductosDeManana();
+            System.out.println(" -> Productos eliminados: " + eliminados);
+
+            System.out.println("[2] Restaurando productos del día de HOY...");
+            int restaurados = productosDAO.restaurarProductosDeHoy();
+            System.out.println(" -> Productos restaurados: " + restaurados);
+
+            System.out.println("===== CARTA ABIERTA CORRECTAMENTE =====");
+
+            return Map.of("ok", true, "mensaje", "Carta abierta correctamente.");
+
+        } catch (Exception e) {
+            System.out.println("[ERROR] Al abrir carta:");
+            e.printStackTrace();
+            return Map.of("ok", false, "mensaje", "Error al abrir carta.");
+        }
     }
 
     // =========================================

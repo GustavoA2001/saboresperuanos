@@ -730,9 +730,89 @@ public class ProductosDAO {
     }
 
     // Cerrar carta del día
-    public void cerrarCartaHoy() {
-        jdbcTemplate
-                .update("UPDATE producto SET Visible = 0, EstadoDia = 'cerrado' WHERE DATE(FechaProducto) = CURDATE()");
+    // ==============================
+    // 1. CLONAR PRODUCTOS (MAÑANA)
+    // ==============================
+    public int clonarProductosParaManana() {
+        String sql = """
+                    INSERT INTO producto (
+                        IDProdHistoria,
+                        PrecioUnitario,
+                        Cantidad,
+                        FechaProducto,
+                        EstadoDia,
+                        EnCarta,
+                        Visible
+                    )
+                    SELECT
+                        IDProdHistoria,
+                        PrecioUnitario,
+                        Cantidad,
+                        DATE_ADD(DATE(FechaProducto), INTERVAL 1 DAY),
+                        'disponible',
+                        1,
+                        Visible
+                    FROM producto
+                    WHERE DATE(FechaProducto) = CURDATE();
+                """;
+
+        System.out.println("[SQL ejecutar] " + sql);
+
+        return jdbcTemplate.update(sql);
+    }
+
+    // =====================================
+    // 2. CERRAR PRODUCTOS DISPONIBLES HOY
+    // =====================================
+    public int cerrarProductosDeHoy() {
+        String sql = """
+                    UPDATE producto
+                    SET estadoDia = 'cerrado'
+                    WHERE DATE(FechaProducto) = CURDATE()
+                      AND estadoDia = 'disponible';
+                """;
+
+        return jdbcTemplate.update(sql);
+    }
+
+    // ==============================
+    // 3. ENCARTA = 0 PARA HOY
+    // ==============================
+    public int desactivarCartaHoy() {
+        String sql = """
+                    UPDATE producto
+                    SET enCarta = 0
+                    WHERE DATE(FechaProducto) = CURDATE();
+                """;
+
+        return jdbcTemplate.update(sql);
+    }
+
+    // ==============================
+    // 4. ELIMINAR PRODUCTOS MAÑANA
+    // ==============================
+    public int eliminarProductosDeManana() {
+        String sql = """
+                    DELETE FROM producto
+                    WHERE DATE(FechaProducto) = DATE_ADD(CURDATE(), INTERVAL 1 DAY);
+                """;
+
+        return jdbcTemplate.update(sql);
+    }
+
+    // ===================================
+    // 5. RESTAURAR PRODUCTOS DEL DÍA HOY
+    // ===================================
+    public int restaurarProductosDeHoy() {
+        String sql = """
+                    UPDATE producto
+                    SET enCarta = 1,
+                        estadoDia = 'disponible'
+                    WHERE DATE(FechaProducto) = CURDATE()
+                      AND estadoDia = 'cerrado';
+                """;
+
+        return jdbcTemplate.update(sql);
     }
 
 }

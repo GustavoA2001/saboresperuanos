@@ -536,9 +536,6 @@
     <script>
         let datosSeleccionados = null;
 
-        /* ============================
-            ABRIR Y CERRAR MODAL
-        =============================== */
         function abrirModalAddProducto() {
             document.getElementById("modalAgregarProducto").classList.add("active");
         }
@@ -548,18 +545,10 @@
             datosSeleccionados = null;
         }
 
-        /* ============================
-            SELECCIONAR ITEM DEL MODAL
-        =============================== */
         function seleccionarProducto(item) {
-
-            // Quitar selección previa
             document.querySelectorAll(".item-modal").forEach(x => x.classList.remove("selected"));
-
-            // Marcar elemento
             item.classList.add("selected");
 
-            // Guardar datos
             datosSeleccionados = {
                 idProdHistoria: item.dataset.id,
                 precio: item.dataset.precio,
@@ -569,13 +558,9 @@
             console.log("SELECCIONADO:", datosSeleccionados);
         }
 
-        /* ============================
-            ENVIAR AL BACKEND
-        =============================== */
         function agregarSeleccionado() {
-
             if (!datosSeleccionados) {
-                alert("Selecciona un producto antes de continuar.");
+                console.warn("No seleccionaste un producto antes de agregar.");
                 return;
             }
 
@@ -595,12 +580,11 @@
                     if (r.ok && data && data.ok) {
                         location.reload();
                     } else {
-                        alert(data?.mensaje || "Error al agregar el producto.");
+                        console.warn("Error al agregar producto:", data?.mensaje);
                     }
                 })
                 .catch(err => {
                     console.error("ERROR FATAL EN FETCH:", err);
-                    alert("No se pudo conectar con el servidor.");
                 });
         }
 
@@ -627,12 +611,7 @@
                     console.log("RESPUESTA BACK:", data);
 
                     if (data.ok) {
-
-                        // ================
-                        // 🔄 ACTUALIZAR TABLA
-                        // ================
                         actualizarFilaProducto(idProducto, precio, cantidad);
-
                     } else {
                         console.warn("Error:", data.mensaje);
                     }
@@ -643,23 +622,18 @@
         }
 
         function actualizarFilaProducto(idProducto, nuevoPrecio, nuevaCantidad) {
-
-            // Actualizar inputs directamente
             document.getElementById("precio_" + idProducto).value = nuevoPrecio;
             document.getElementById("cantidad_" + idProducto).value = nuevaCantidad;
 
-            // Toma el tr (fila)
             const fila = document.querySelector(`button[onclick="guardarProducto(${idProducto})"]`)
                 .closest("tr");
 
-            // Recalcular stock (si lo usas)
             const vendidos = parseInt(fila.children[4].innerText);
             const stock = nuevaCantidad - vendidos;
 
             fila.children[5].innerText = stock;
 
-            // Animación visual para indicar guardado
-            fila.style.backgroundColor = "#d2f8d2"; // verde suave
+            fila.style.backgroundColor = "#d2f8d2";
 
             setTimeout(() => {
                 fila.style.transition = "background-color 1s";
@@ -670,7 +644,6 @@
         }
 
         function cambiarVisible(idProducto, visible) {
-
             const datos = { idProducto, visible };
 
             console.log("CAMBIAR VISIBLE ENVIADO:", datos);
@@ -685,13 +658,11 @@
                     console.log("RESPUESTA CAMBIAR VISIBLE:", data);
 
                     if (data.ok) location.reload();
-                    else alert(data.mensaje);
                 })
                 .catch(err => console.error("ERROR cambiarVisible:", err));
         }
 
         function cambiarEstadoDia(idProducto, nuevoEstado) {
-
             const datos = { idProducto, estado: nuevoEstado };
 
             console.log("CAMBIAR ESTADO ENVIADO:", datos);
@@ -706,15 +677,11 @@
                     console.log("RESPUESTA CAMBIAR ESTADO:", data);
 
                     if (data.ok) location.reload();
-                    else alert(data.mensaje);
                 })
                 .catch(err => console.error("ERROR cambiarEstado:", err));
         }
 
         function eliminarProducto(idProducto) {
-
-            if (!confirm("¿Seguro que deseas eliminar este producto de la carta?")) return;
-
             const datos = { idProducto };
 
             console.log("ELIMINAR ENVIADO:", datos);
@@ -729,11 +696,47 @@
                     console.log("RESPUESTA ELIMINAR:", data);
 
                     if (data.ok) location.reload();
-                    else alert(data.mensaje);
                 })
                 .catch(err => console.error("ERROR eliminarProducto:", err));
         }
 
+        function cerrarCarta() {
+            console.log("Enviando solicitud para CERRAR la carta...");
+
+            fetch('/admin/carta/cerrar', {
+                method: "POST"
+            })
+                .then(r => r.json())
+                .then(data => {
+                    console.log("Respuesta cerrarCarta:", data);
+
+                    if (data.ok) {
+                        location.reload();
+                    }
+                })
+                .catch(err => {
+                    console.error("ERROR cerrarCarta:", err);
+                });
+        }
+
+        function abrirCarta() {
+            console.log("Enviando solicitud para ABRIR la carta...");
+
+            fetch('/admin/carta/abrir', {
+                method: "POST"
+            })
+                .then(r => r.json())
+                .then(data => {
+                    console.log("Respuesta abrirCarta:", data);
+
+                    if (data.ok) {
+                        location.reload();
+                    }
+                })
+                .catch(err => {
+                    console.error("ERROR abrirCarta:", err);
+                });
+        }
     </script>
 
 </body>
